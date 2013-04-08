@@ -14,6 +14,7 @@
 	<modules>
 		<module>mediamanager-core</module>
 		<module>mediamanager-daemon</module>
+		<module>plugins</module>
 	</modules>
 
 	<properties>
