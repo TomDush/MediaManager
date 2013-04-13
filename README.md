@@ -1,40 +1,62 @@
-**********************************************************
-** Media Manager					**
-**********************************************************
+# Media Manager
 
-I - Object
-----------------------------------------------------------
+Have you ever wondered what recently acquired movies watching? Or what's the next unseen episode of TV shows you're watching? Have you ever wanted to stop music when you quit home? And replay when you came back ?
 
-MediaManager's objectives are provide interfaces (web, android, ...) to
-control other media player.
+MediaManager is plugin-architectured. Basically, it help you to manage your mediatech, with meta-data on each film, series, ... Modules are plugged to core to provide controls on  your system :
 
-It facilitaties watching TV Series or Manga (remember last episode seen of
-each series), switching between music and video, ...
+* get more meta-data on yours medias
+* play media with your favorite player and control it
+* automate recurrent actions like stop playing music before see film, start playing when coming back home, ...
+
+MediaManager is __not__ a media center. Its objectives is to be integrated in system context, not to provide alternative to players.
+
+------------------------------------------
+
+# Development and Architecture
+
+## Roadmap
+
+Indicative development roadmap is :
+
+1. __version 0.1__ : application core. 
+	- Scan film and series and persist its to mediatech.
+	- use module to find out media's meta-data
+
+	This version will have embedded modules :
+	
+	- to get meta-data
+	- UI module to provide web interface
+
+1. __version 0.2__ : connection to players
+	- manage TV show and mangas : restart on next unseen episode
+	- control _MPlayer_ to play films  and series
+	- control _Amarok_ (music player)
+
+1. __version ?__ : 
+	- provide mobile application for android
+	- TO-WATCH list : films/shows to watch on theaters, or buy on DVD.
+
+1. ... This is not the end !
+
+## Plugins
+
+I call it _plugins_, but there are _modules_ : we can't hot load one, and classpath have to change.
+
+## How To ...
+
+* __Contribute__	
+	Don't hesitate to contact me ;) Push requests are welcome.
+
+* __Build Media Manager__	
+	Core project and plug-ins are using _Maven_. To compil project :
+  
+	> mvn clean install
+
+* __Configure Media Manager__	
+	TODO
+
+* __Launch Media Manager__	
+	TODO
 
 
-II - Architecture
-----------------------------------------------------------
-Media Manager intended to be easily extending by plug-in.
 
-It use CDI (Java EE - JSR 299) to manage plug-in and dispatch events. Only
-principal fonctionnalities are hard coded in core.
-
-
-III - How To ...
-----------------------------------------------------------
-
-	a) Build Media Manager
-Core project and plug-ins are using Maven. To compil project :
-$ mvn clean install
-
-	b) Configure Media Manager
-TODO
-
-	c) Launch Media Manager
-TODO
-
-
----------------------------------
-
-Je ne me souviens jamais du numéro de l'épisode de chaque série que je regarde, ou des derniers films acquis que je n'ai pas encore vu. (ni même des albums fraichements téléchargés à écouter / playlistes préparées)
-Le MediaManager se veut être un média-center, sans les players embarqués. Il aide à organiser les différentes bibliothèques (musiques, films, séries, mangas annimés, ...), et utilise les players préférés (via des plugins) pour les lire.
