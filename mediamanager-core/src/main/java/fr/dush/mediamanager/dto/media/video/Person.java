@@ -3,6 +3,7 @@ package fr.dush.mediamanager.dto.media.video;
 import java.io.Serializable;
 
 import lombok.Data;
+import fr.dush.mediamanager.dto.media.Sources;
 
 /**
  * Person which can be actor, producer, ...
@@ -13,8 +14,10 @@ import lombok.Data;
 @Data
 public class Person implements Serializable {
 
-	private String firstname;
+	private Sources sourceIds = new Sources();
 
-	private String lastname;
+	private String name;
+
+	private String picture;
 
 }
