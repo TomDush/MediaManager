@@ -1,0 +1,72 @@
+package fr.dush.mediamanager.business.mediatech;
+
+import static org.fest.assertions.api.Assertions.*;
+
+import java.io.File;
+import java.net.URL;
+
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.dush.mediamanager.business.configuration.IConfigurationManager;
+
+@RunWith(BlockJUnit4ClassRunner.class)
+public class ArtDownloaderImplTest {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImplTest.class);
+
+	@InjectMocks
+	private ArtDownloaderImpl artDownloader;
+
+	@Spy
+	private IConfigurationManager configurationManager = new IConfigurationManager() {
+
+		@Override
+		public String getValue(String key, String defaultValue) {
+			return "target";
+		}
+	};
+
+	@Before
+	public void initMockito() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	public void testDownloadFile() throws Exception {
+		final String image = artDownloader.storeImage(new URL(
+				"http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/bgSHbGEA1OM6qDs3Qba4VlSZsNG.jpg"), null);
+
+		final File file = artDownloader.getImagePath(image).toFile();
+		LOGGER.info("Image {} downloaded into : {} ", image, file.getAbsoluteFile());
+
+		assertThat(image).isNotNull();
+		assertThat(file).exists();
+	}
+
+	@Test
+	@Ignore("Long test")
+	public void testTrailer() throws Exception {
+		// http://vimeo.com/27911262
+		final String trailer = artDownloader.storeTrailer(new URL("http://www.youtube.com/watch?v=aHjpOzsQ9YI"), null);
+
+		final File file = artDownloader.getTrailerPath(trailer).toFile();
+		LOGGER.info("Trailer {} downloaded into : {} ", trailer, file.getAbsoluteFile());
+
+		assertThat(trailer).isNotNull();
+		assertThat(file).exists();
+	}
+
+	@Test
+	public void testGetSimpleName() throws Exception {
+		assertThat(ArtDownloaderImpl.getSimpleFileName("Crystallize - Lindsey Stirling (Dubstep Violin Original Song).webm")).isEqualTo("Crystallize_Lindsey_Stirling");
+	}
+}

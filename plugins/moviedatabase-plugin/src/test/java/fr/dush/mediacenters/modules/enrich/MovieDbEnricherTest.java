@@ -49,7 +49,7 @@ public class MovieDbEnricherTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		when(metaMediaManager.storeImage(any(URL.class))).thenAnswer(new Answer<String>() {
+		when(metaMediaManager.storeImage(any(URL.class), anyString())).thenAnswer(new Answer<String>() {
 
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {

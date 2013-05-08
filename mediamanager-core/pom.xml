@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                      
+
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>fr.dush</groupId>
 		<artifactId>mediamanager</artifactId>
@@ -14,4 +14,12 @@
 	<name>MediaManager - CORE</name>
 	<packaging>jar</packaging>
 
+	<dependencies>
+		<!-- Downloader Youtube and Vimeo -->
+		<dependency>
+			<groupId>com.github.axet</groupId>
+			<artifactId>vget</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+	</dependencies>
 </project>

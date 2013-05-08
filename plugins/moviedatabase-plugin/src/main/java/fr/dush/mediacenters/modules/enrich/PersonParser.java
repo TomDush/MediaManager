@@ -82,7 +82,7 @@ public class PersonParser {
 			if (isNotBlank(movieDb.getProfilePath())) {
 				try {
 					person.setPicture(parent.getMetaMediaManager().storeImage(
-							parent.getApi().createImageUrl(movieDb.getProfilePath(), "original")));
+							parent.getApi().createImageUrl(movieDb.getProfilePath(), "original"), movieDb.getName()));
 				} catch (MovieDbException e) {
 					LOGGER.warn("Couldn't find person picture from URL {}", movieDb.getProfilePath());
 				}

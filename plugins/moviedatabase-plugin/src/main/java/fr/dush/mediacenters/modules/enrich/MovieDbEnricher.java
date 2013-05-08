@@ -138,7 +138,7 @@ public class MovieDbEnricher implements IEnrichFilm {
 				}));
 			}
 			film.setOverview(movieDb.getOverview());
-			film.getBackdrops().add(metaMediaManager.storeImage(api.createImageUrl(movieDb.getBackdropPath(), "original")));
+			film.getBackdrops().add(metaMediaManager.storeImage(api.createImageUrl(movieDb.getBackdropPath(), "original"), movieDb.getTitle()));
 
 			// Find main actors...
 			PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
@@ -175,7 +175,11 @@ public class MovieDbEnricher implements IEnrichFilm {
 			}
 
 			// Posters, ....
-			film.setPoster(download(movieDb.getPosterPath()));
+			try {
+				film.setPoster( metaMediaManager.storeImage(api.createImageUrl(movieDb.getPosterPath(), "original"), movieDb.getTitle()));
+			} catch (MovieDbException e) {
+				LOGGER.warn("Can't download file {} : {}", movieDb.getPosterPath(), e.getMessage(), e);
+			}
 
 			return film;
 		}
@@ -203,15 +207,6 @@ public class MovieDbEnricher implements IEnrichFilm {
 			return link;
 		}
 	};
-
-	private String download(String posterPath) {
-		try {
-			return metaMediaManager.storeImage(api.createImageUrl(posterPath, "original"));
-		} catch (MovieDbException e) {
-			LOGGER.warn("Can't download file {} : {}", posterPath, e.getMessage(), e);
-			return null;
-		}
-	}
 
 	public TheMovieDbApi getApi() {
 		return api;
