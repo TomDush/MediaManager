@@ -1,0 +1,13 @@
+[ {
+  "key" : "host",
+  "value" : "localhost",
+  "name" : "Target host",
+  "description" : "Host on which is installed players.",
+  "defaultValue" : true
+}, {
+  "key" : "port",
+  "value" : "8080",
+  "name" : null,
+  "description" : null,
+  "defaultValue" : false
+} ]
