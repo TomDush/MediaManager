@@ -16,7 +16,8 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.business.configuration.IConfigurationManager;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.engine.mock.MockedConfiguration;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ArtDownloaderImplTest {
@@ -27,17 +28,13 @@ public class ArtDownloaderImplTest {
 	private ArtDownloaderImpl artDownloader;
 
 	@Spy
-	private IConfigurationManager configurationManager = new IConfigurationManager() {
-
-		@Override
-		public String getValue(String key, String defaultValue) {
-			return "target";
-		}
-	};
+	private ModuleConfiguration configuration = new MockedConfiguration("downloader.imagespath", "target/", "downloader.trailerpath",
+			"target/");
 
 	@Before
 	public void initMockito() {
 		MockitoAnnotations.initMocks(this);
+		artDownloader.readConfiguration();
 	}
 
 	@Test
@@ -53,7 +50,7 @@ public class ArtDownloaderImplTest {
 	}
 
 	@Test
-	@Ignore("Long test")
+	@Ignore("Long test (depends on connection ;)")
 	public void testTrailer() throws Exception {
 		// http://vimeo.com/27911262
 		final String trailer = artDownloader.storeTrailer(new URL("http://www.youtube.com/watch?v=aHjpOzsQ9YI"), null);
@@ -67,6 +64,7 @@ public class ArtDownloaderImplTest {
 
 	@Test
 	public void testGetSimpleName() throws Exception {
-		assertThat(ArtDownloaderImpl.getSimpleFileName("Crystallize - Lindsey Stirling (Dubstep Violin Original Song).webm")).isEqualTo("Crystallize_Lindsey_Stirling");
+		assertThat(ArtDownloaderImpl.getSimpleFileName("Crystallize - Lindsey Stirling (Dubstep Violin Original Song).webm")).isEqualTo(
+				"Crystallize_Lindsey_Stirling");
 	}
 }

@@ -40,7 +40,4 @@ public @interface Configuration {
 	/** URL to file containing meta information on each configuration parameter. This file must be in class path. */
 	String definition() default "";
 
-	/** DO NOT USE : defined null value for {@link #entryPoint()}. */
-	public static final Class<?> NULL_ENTRY_POINT = Configuration.class;
-
 }

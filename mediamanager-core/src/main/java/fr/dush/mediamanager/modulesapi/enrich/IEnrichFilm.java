@@ -13,12 +13,6 @@ import fr.dush.mediamanager.dto.media.video.Film;
  */
 public interface IEnrichFilm {
 
-	/** Module name */
-	String getName();
-
-	/** Module description */
-	String getDescription();
-
 	/**
 	 * Search film from parsed file name.
 	 *
@@ -40,7 +34,7 @@ public interface IEnrichFilm {
 	 * List available trailers for this film.
 	 *
 	 * @param media
-	 * @param lang TODO
+	 * @param lang Expected trailer language.
 	 * @return
 	 * @throws EnrichException
 	 */

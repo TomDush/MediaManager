@@ -23,6 +23,7 @@ import com.omertron.themoviedbapi.model.Genre;
 import com.omertron.themoviedbapi.model.MovieDb;
 import com.omertron.themoviedbapi.model.Trailer;
 
+import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.SourceId;
@@ -39,6 +40,7 @@ import fr.dush.mediamanager.modulesapi.enrich.TrailerLink;
  * @author Thomas Duchatelle
  *
  */
+@Module(name = "MoviesDB Plugin", description = "Find data on films and shows with http://www.themoviedb.org/")
 public class MovieDbEnricher implements IEnrichFilm {
 
 	public static final String MOVIEDB_ID_TYPE = "moviedb";
@@ -52,16 +54,6 @@ public class MovieDbEnricher implements IEnrichFilm {
 
 	@Inject
 	private IArtDownloader metaMediaManager;
-
-	@Override
-	public String getName() {
-		return "Movies Database Plugin";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Find data on films and shows with http://www.themoviedb.org/";
-	}
 
 	@Override
 	public List<Film> findMediaData(ParsedFileName filename) throws EnrichException {
@@ -138,12 +130,19 @@ public class MovieDbEnricher implements IEnrichFilm {
 				}));
 			}
 			film.setOverview(movieDb.getOverview());
-			film.getBackdrops().add(metaMediaManager.storeImage(api.createImageUrl(movieDb.getBackdropPath(), "original"), movieDb.getTitle()));
+			film.getBackdrops().add(
+					metaMediaManager.storeImage(api.createImageUrl(movieDb.getBackdropPath(), "original"), movieDb.getTitle()));
 
 			// Find main actors...
 			PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
 			film.setMainActors(parser.getCasting(5));
 			film.setDirectors(parser.getDirectors());
+
+			// TODO Treat film collections
+			final com.omertron.themoviedbapi.model.Collection collection = movieDb.getBelongsToCollection();
+			if (null != collection) {
+				film.setTitle(film.getTitle() + " (collection : " + collection.getTitle() + ")");
+			}
 
 		} catch (MovieDbException e) {
 			throw new EnrichException(String.format("Can't enrich %s film : %s", film.getTitle(), e.getMessage()));
@@ -174,9 +173,11 @@ public class MovieDbEnricher implements IEnrichFilm {
 				}
 			}
 
+			// TODO (gérer les collections)
+
 			// Posters, ....
 			try {
-				film.setPoster( metaMediaManager.storeImage(api.createImageUrl(movieDb.getPosterPath(), "original"), movieDb.getTitle()));
+				film.setPoster(metaMediaManager.storeImage(api.createImageUrl(movieDb.getPosterPath(), "original"), movieDb.getTitle()));
 			} catch (MovieDbException e) {
 				LOGGER.warn("Can't download file {} : {}", movieDb.getPosterPath(), e.getMessage(), e);
 			}

@@ -18,6 +18,9 @@ import fr.dush.mediamanager.exceptions.ConfigurationException;
 @Getter
 public class ConfigurationInjectionPoint implements IConfigurationArguments {
 
+	/** DO NOT USE : defined null value for {@link #entryPoint()}. */
+	public static final Class<?> NULL_ENTRY_POINT = Configuration.class;
+
 	/** Configuration injection point */
 	private InjectionPoint point;
 
@@ -41,7 +44,7 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		}
 
 		// Read module (if any)
-		if (Configuration.NULL_ENTRY_POINT.equals(configurationAnnotation.entryPoint())) {
+		if (NULL_ENTRY_POINT.equals(configurationAnnotation.entryPoint())) {
 			// No entry point is defined, class may be directly Module...
 			module = point.getBean().getBeanClass().getAnnotation(Module.class);
 			if (null != module) {
@@ -59,7 +62,8 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getPackage()
 	 */
 	@Override
@@ -82,7 +86,8 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		return point.getBean().getBeanClass().getPackage().getName();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getName()
 	 */
 	@Override
@@ -101,7 +106,8 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getDefinition()
 	 */
 	@Override

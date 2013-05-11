@@ -24,10 +24,11 @@ import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 
 import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.dto.media.video.Film;
 import fr.dush.mediamanager.modulesapi.enrich.ParsedFileName;
-
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class MovieDbEnricherTest {
@@ -45,7 +46,9 @@ public class MovieDbEnricherTest {
 
 	@Before
 	public void initTest() throws MovieDbException {
-		api = new TheMovieDBProvider().provideTheMovieDbApi();
+		final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
+		theMovieDBProvider.setConfiguration(new ModuleConfiguration(null, new FieldSet()));
+		api = theMovieDBProvider.provideTheMovieDbApi();
 
 		MockitoAnnotations.initMocks(this);
 
@@ -54,23 +57,23 @@ public class MovieDbEnricherTest {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				return invocation.getArguments()[0].toString();
-			}});
+			}
+		});
 	}
 
 	@Test
 	public void testFindFilmData() throws Exception {
-		final List<Film> list = enrichMedia.findMediaData(new ParsedFileName("Transformers", 0)); //2007
+		final List<Film> list = enrichMedia.findMediaData(new ParsedFileName("Transformers", 2007));
 		assertThat(list).isNotEmpty();
 
-		for(Film f : list) {
-//			LOGGER.info("{}", f);
+		for (Film f : list) {
+			// LOGGER.info("{}", f);
 			enrichMedia.enrichMedia(f);
 			LOGGER.info("\n{}", f.prettyPrint(null));
 			LOGGER.info("Trailers : {}", enrichMedia.getTrailers(f, "en"));
 		}
 
-
-//		fail("Not yet implemented.");
+		// fail("Not yet implemented.");
 	}
 
 }

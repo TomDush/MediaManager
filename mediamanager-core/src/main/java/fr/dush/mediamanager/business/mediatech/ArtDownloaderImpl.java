@@ -10,6 +10,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -18,11 +20,17 @@ import org.slf4j.LoggerFactory;
 import com.github.axet.vget.VGet;
 import com.google.common.hash.Hashing;
 
-import fr.dush.mediamanager.business.configuration.IConfigurationManager;
+import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 
+@ApplicationScoped
 public class ArtDownloaderImpl implements IArtDownloader {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
+
+	@Inject
+	@Configuration(name = "Mediatech", definition = "configuration/mediatech.json")
+	private ModuleConfiguration configuration;
 
 	private Path temp;
 
@@ -30,17 +38,20 @@ public class ArtDownloaderImpl implements IArtDownloader {
 
 	private Path trailersRootPath;
 
-	@Inject
-	public ArtDownloaderImpl(IConfigurationManager configurationManager) throws IOException {
-		imageRootPath = FileSystems.getDefault().getPath(
-				configurationManager.getValue("downloader.imagespath", "$HOME/.mediamanager/images"));
-		trailersRootPath = FileSystems.getDefault().getPath(
-				configurationManager.getValue("downloader.trailerpath", "$HOME/.mediamanager/trailers"));
-
+	public ArtDownloaderImpl() throws IOException {
 		temp = Files.createTempDirectory("MM_Downloader");
 
 		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath,
 				trailersRootPath, temp);
+	}
+
+	/**
+	 * Read the configuration once.
+	 */
+	@PostConstruct
+	public void readConfiguration() {
+		imageRootPath = FileSystems.getDefault().getPath(configuration.getValue("downloader.imagespath"));
+		trailersRootPath = FileSystems.getDefault().getPath(configuration.getValue("downloader.trailerpath"));
 	}
 
 	@Override

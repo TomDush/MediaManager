@@ -15,16 +15,16 @@ public interface IArtDownloader {
 	 * Store in local images (posters, ...) and return relative path which can be saved.
 	 *
 	 * @param file
-	 * @param basename TODO
+	 * @param basename Name of what it represent (film name, ...)
 	 * @return
 	 */
 	String storeImage(URL file, String basename);
 
 	/**
-	 * Download trailer from web site like youtube.
+	 * Download trailer from web site like youtube or vimeo.
 	 *
 	 * @param trailer
-	 * @param basename TODO
+	 * @param basename Name of what it represent (film name, ...)
 	 * @return Relative path
 	 */
 	String storeTrailer(URL trailer, String basename);
