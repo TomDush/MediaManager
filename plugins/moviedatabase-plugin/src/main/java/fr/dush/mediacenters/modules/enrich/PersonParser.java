@@ -73,18 +73,17 @@ public class PersonParser {
 	private Function<Person, fr.dush.mediamanager.dto.media.video.Person> personConverter = new Function<Person, fr.dush.mediamanager.dto.media.video.Person>() {
 
 		@Override
-		public fr.dush.mediamanager.dto.media.video.Person apply(Person movieDb) {
+		public fr.dush.mediamanager.dto.media.video.Person apply(Person info) {
 			fr.dush.mediamanager.dto.media.video.Person person = new fr.dush.mediamanager.dto.media.video.Person();
 
-			person.getSourceIds().addId(MovieDbEnricher.MOVIEDB_ID_TYPE, Integer.toString(movieDb.getId()));
-			person.setName(movieDb.getName());
+			person.getSourceIds().addId(MovieDbEnricher.MOVIEDB_ID_TYPE, Integer.toString(info.getId()));
+			person.setName(info.getName());
 
-			if (isNotBlank(movieDb.getProfilePath())) {
+			if (isNotBlank(info.getProfilePath())) {
 				try {
-					person.setPicture(parent.getMetaMediaManager().storeImage(
-							parent.getApi().createImageUrl(movieDb.getProfilePath(), "original"), movieDb.getName()));
+					person.setPicture(parent.downloadImage(info.getProfilePath(), info.getName()));
 				} catch (MovieDbException e) {
-					LOGGER.warn("Couldn't find person picture from URL {}", movieDb.getProfilePath());
+					LOGGER.warn("Couldn't find person picture from URL {}", info.getProfilePath());
 				}
 			}
 

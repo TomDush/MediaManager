@@ -28,6 +28,7 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.dto.media.video.Film;
+import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import fr.dush.mediamanager.modulesapi.enrich.ParsedFileName;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -67,13 +68,14 @@ public class MovieDbEnricherTest {
 		assertThat(list).isNotEmpty();
 
 		for (Film f : list) {
-			// LOGGER.info("{}", f);
 			enrichMedia.enrichMedia(f);
+			enrichMedia.completeTrailers(new FindTrailersEvent(this, f, "en"));
+
+
 			LOGGER.info("\n{}", f.prettyPrint(null));
-			LOGGER.info("Trailers : {}", enrichMedia.getTrailers(f, "en"));
+//			LOGGER.info("Trailers : {}", enrichMedia.findTrailers(f, "en"));
 		}
 
-		// fail("Not yet implemented.");
 	}
 
 }
