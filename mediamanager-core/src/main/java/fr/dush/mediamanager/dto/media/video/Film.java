@@ -37,6 +37,9 @@ public class Film extends Media {
 	/** Film overview */
 	private String overview;
 
+	/** If film belong to collection */
+	private BelongToCollection collection;
+
 	/** Screenshot or fan arts to display back to the presentation. */
 	private List<String> backdrops = newArrayList();
 
@@ -49,8 +52,8 @@ public class Film extends Media {
 	/** Film types : actions, comedy, ... */
 	private Set<String> genres = newHashSet();
 
-	/** Downloaded trailers */
-	private Set<VideoFile> trailers = newHashSet();
+	/** Trailers (downloaded, and not). Null if not initialized... */
+	private Trailers trailers = null;
 
 	@Override
 	public String toString() {
@@ -60,6 +63,8 @@ public class Film extends Media {
 	}
 
 	public StringBuffer prettyPrint(StringBuffer sb) {
+		final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+
 		if (null == sb) sb = new StringBuffer();
 
 		Function<Person, String> names = new Function<Person, String>() {
@@ -70,17 +75,39 @@ public class Film extends Media {
 		};
 
 		sb.append("\n\t** ").append(getTitle()).append(" **");
-		if(getRelease() != null) sb.append(" (").append(new SimpleDateFormat("yyyy-MM-dd").format(getRelease())).append(")");
+		if (getRelease() != null) sb.append(" (").append(formatter.format(getRelease())).append(")");
 		sb.append("\n");
+
+		if (null != collection) {
+			sb.append("Belong to collection : ").append(collection.getTitle()).append(", part ").append(collection.getPart())
+					.append(" of ").append(collection.getTotalPart()).append("\n");
+		}
 		sb.append("Genres : ").append(Joiner.on(", ").join(genres)).append("\n");
 		if (null != overview) sb.append("Overview : \n\t").append(overview).append("\n");
 		sb.append("Director(s) : ").append(Joiner.on(", ").join(Lists.transform(directors, names))).append("\n");
 		sb.append("Cast : ").append(Joiner.on(", ").join(Lists.transform(mainActors, names))).append("\n");
 		sb.append("Poster : ").append(getPoster()).append("\n");
 		if (!backdrops.isEmpty()) sb.append("Backdrops : ").append(Joiner.on("\n\t- ").join(backdrops)).append("\n");
-		if (!trailers.isEmpty()) sb.append("Donwloaded trailers : ").append(trailers).append("\n");
+		if (null != trailers) {
+			if (trailers.getTrailers().isEmpty()) {
+				sb.append("No trailers, refreshed on ").append(formatter.format(trailers.getRefreshed())).append(") : \n");
+
+			} else {
+				sb.append("Trailers (refreshed on ").append(trailers.getRefreshed()).append(") : \n");
+				for (Trailer t : trailers.getTrailers()) {
+					sb.append("\t- ").append(t.getTitle());
+					if (t.getPublishDate() != null) sb.append(" (").append(t.getPublishDate()).append(")");
+					sb.append(" : ");
+
+					if (t.getTrailer() != null) sb.append(t.getTrailer()).append(" (source = ").append(t.getUrl()).append(")");
+					else sb.append(t.getUrl());
+					sb.append("\n");
+				}
+			}
+		} else {
+			sb.append("Trailers not initilized...");
+		}
 
 		return sb;
 	}
-
 }

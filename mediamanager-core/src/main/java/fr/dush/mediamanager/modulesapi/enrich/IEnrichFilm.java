@@ -3,7 +3,10 @@ package fr.dush.mediamanager.modulesapi.enrich;
 import java.util.List;
 
 import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.dto.media.video.BelongToCollection;
 import fr.dush.mediamanager.dto.media.video.Film;
+import fr.dush.mediamanager.dto.media.video.FilmsCollection;
+import fr.dush.mediamanager.dto.media.video.Trailer;
 
 /**
  * Bean to enrich medias meta-data : find on web informations from file name.
@@ -31,6 +34,15 @@ public interface IEnrichFilm {
 	void enrichMedia(Media media) throws EnrichException;
 
 	/**
+	 * Find data on collection
+	 *
+	 * @param collection
+	 * @return
+	 * @throws EnrichException
+	 */
+	FilmsCollection findCollection(BelongToCollection collection) throws EnrichException;
+
+	/**
 	 * List available trailers for this film.
 	 *
 	 * @param media
@@ -38,5 +50,5 @@ public interface IEnrichFilm {
 	 * @return
 	 * @throws EnrichException
 	 */
-	List<TrailerLink> getTrailers(Media media, String lang) throws EnrichException;
+	List<Trailer> findTrailers(Media media, String lang) throws EnrichException;
 }

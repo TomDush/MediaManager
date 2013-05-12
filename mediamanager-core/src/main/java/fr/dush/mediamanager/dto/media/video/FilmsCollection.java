@@ -21,7 +21,7 @@ import fr.dush.mediamanager.dto.media.Media;
  * </p>
  *
  * <p>
- * But films are only saved once. {@link #films} is <b>lazy</b> attribute.
+ * But films are only saved once. {@link #availableFilms} is <b>lazy</b> attribute.
  * </p>
  *
  * @author Thomas Duchatelle
@@ -31,7 +31,16 @@ import fr.dush.mediamanager.dto.media.Media;
 @EqualsAndHashCode(callSuper = true, of = {})
 public class FilmsCollection extends Media {
 
+	/** Total part in this collection */
+	private int totalPart;
+
+	/** Backdrops image (if any) */
+	private String backdrop;
+
 	/** List of films in this collection. This list is LAZY and is not saved in database. */
+	private List<Film> availableFilms = newArrayList();
+
+	/** Full list of collection's film, only ID are saved. Only principal data are saved in this list. DO NOT USE TO LAUNCH MOVIES ! */
 	private List<Film> films = newArrayList();
 
 }

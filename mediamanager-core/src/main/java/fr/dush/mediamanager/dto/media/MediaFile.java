@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = { "hash", "file" })
 public class MediaFile implements Serializable {
 
-	/** File sha1 hash, used to identifie file and find duplicates */
+	/** File sha1 hash, used to identify file and find duplicates */
 	private String hash;
 
 	/** Full path file */
