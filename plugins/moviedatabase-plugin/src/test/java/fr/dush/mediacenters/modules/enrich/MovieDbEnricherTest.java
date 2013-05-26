@@ -26,10 +26,10 @@ import com.omertron.themoviedbapi.TheMovieDbApi;
 import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.dto.media.video.Film;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
-import fr.dush.mediamanager.modulesapi.enrich.ParsedFileName;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class MovieDbEnricherTest {
@@ -64,7 +64,7 @@ public class MovieDbEnricherTest {
 
 	@Test
 	public void testFindFilmData() throws Exception {
-		final List<Film> list = enrichMedia.findMediaData(new ParsedFileName("Transformers", 2007));
+		final List<Film> list = enrichMedia.findMediaData(new MoviesParsedName("Transformers", 2007));
 		assertThat(list).isNotEmpty();
 
 		for (Film f : list) {

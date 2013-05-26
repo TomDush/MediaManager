@@ -27,6 +27,7 @@ import com.omertron.themoviedbapi.model.Trailer;
 
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.SourceId;
 import fr.dush.mediamanager.dto.media.Sources;
@@ -37,7 +38,6 @@ import fr.dush.mediamanager.dto.media.video.Trailers;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import fr.dush.mediamanager.modulesapi.enrich.IEnrichFilm;
-import fr.dush.mediamanager.modulesapi.enrich.ParsedFileName;
 
 /**
  * Find meta-data on films and shows from <i>dbmovies</i>.
@@ -61,7 +61,7 @@ public class MovieDbEnricher implements IEnrichFilm {
 	private IArtDownloader downloader;
 
 	@Override
-	public List<Film> findMediaData(ParsedFileName filename) throws EnrichException {
+	public List<Film> findMediaData(MoviesParsedName filename) throws EnrichException {
 
 		try {
 			// Search in database

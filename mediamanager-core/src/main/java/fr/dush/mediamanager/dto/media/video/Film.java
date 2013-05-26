@@ -28,7 +28,7 @@ import fr.dush.mediamanager.dto.media.Media;
 @EqualsAndHashCode(callSuper = true, of = {})
 public class Film extends Media {
 
-	/** Video files : can have multiple quality, or version, or cds ... */
+	/** Video files : can have multiple quality, or version ... */
 	private Set<VideoFile> videoFiles = newHashSet();
 
 	/** Release date */

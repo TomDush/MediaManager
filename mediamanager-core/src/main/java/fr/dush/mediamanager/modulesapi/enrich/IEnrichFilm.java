@@ -2,6 +2,7 @@ package fr.dush.mediamanager.modulesapi.enrich;
 
 import java.util.List;
 
+import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.video.BelongToCollection;
 import fr.dush.mediamanager.dto.media.video.Film;
@@ -23,7 +24,7 @@ public interface IEnrichFilm {
 	 * @return
 	 * @throws EnrichException If an error occurred, this exception is thrown.
 	 */
-	List<Film> findMediaData(ParsedFileName filename) throws EnrichException;
+	List<Film> findMediaData(MoviesParsedName filename) throws EnrichException;
 
 	/**
 	 * Get completed information on media.
