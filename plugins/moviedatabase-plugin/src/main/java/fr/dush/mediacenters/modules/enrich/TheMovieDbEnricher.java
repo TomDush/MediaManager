@@ -37,7 +37,7 @@ import fr.dush.mediamanager.dto.media.video.FilmsCollection;
 import fr.dush.mediamanager.dto.media.video.Trailers;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
-import fr.dush.mediamanager.modulesapi.enrich.IEnrichFilm;
+import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 
 /**
  * Find meta-data on films and shows from <i>dbmovies</i>.
@@ -45,12 +45,12 @@ import fr.dush.mediamanager.modulesapi.enrich.IEnrichFilm;
  * @author Thomas Duchatelle
  *
  */
-@Module(name = "MoviesDB Plugin", description = "Find data on films and shows with http://www.themoviedb.org/")
-public class MovieDbEnricher implements IEnrichFilm {
+@Module(name = "MoviesDB Plugin", description = "Find data on films and shows with http://www.themoviedb.org/", id="enricher-themoviesdb")
+public class TheMovieDbEnricher implements IMoviesEnricher {
 
 	public static final String MOVIEDB_ID_TYPE = "moviedb";
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MovieDbEnricher.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricher.class);
 
 	private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 

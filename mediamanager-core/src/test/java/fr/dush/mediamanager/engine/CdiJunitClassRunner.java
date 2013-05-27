@@ -1,15 +1,18 @@
 package fr.dush.mediamanager.engine;
 
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
 import org.apache.webbeans.config.WebBeansContext;
 import org.apache.webbeans.spi.ContainerLifecycle;
-import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -34,17 +37,30 @@ public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 		super(klass);
 
 		lifecycle = WebBeansContext.currentInstance().getService(ContainerLifecycle.class);
+		lifecycle.startApplication(null);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		lifecycle.stopApplication(null);
+		super.finalize();
 	}
 
 	@Override
 	protected Object createTest() throws Exception {
 		final BeanManager beanManager = lifecycle.getBeanManager();
 
-		final Set<Bean<?>> beans = beanManager.getBeans(getTestClass().getJavaClass());
+		final Set<Bean<?>> beans = beanManager.getBeans(getTestClass().getJavaClass(), new Any() {
+
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return Any.class;
+			}
+		});
 
 		if (beans.isEmpty()) {
 			LOGGER.error("No CDI bean found for class {}.", getTestClass().getJavaClass());
-			throw new RuntimeException("No test method found for class " + getTestClass().getJavaClass());
+			throw new RuntimeException("No CDI bean found for class " + getTestClass().getJavaClass());
 		}
 
 		final Bean<?> bean = beans.iterator().next();
@@ -52,12 +68,26 @@ public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 	}
 
 	@Override
-	public void run(RunNotifier notifier) {
-		lifecycle.startApplication(null);
+	protected Statement methodInvoker(FrameworkMethod method, Object test) {
+		final Statement st = super.methodInvoker(method, test);
 
-		super.run(notifier);
+		// Recast InvocatonTargetException
+		return new Statement() {
 
-		lifecycle.stopApplication(null);
+			@Override
+			public void evaluate() throws Throwable {
+				try {
+					st.evaluate();
+				} catch (Exception e) {
+					if (e.getCause() instanceof Error) {
+						throw e.getCause();
+					}
+
+					throw e;
+				}
+
+			}
+		};
 	}
 
 }

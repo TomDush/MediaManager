@@ -6,7 +6,6 @@ import static org.fest.assertions.api.Assertions.*;
 
 import java.util.List;
 
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 
 import org.junit.Test;
@@ -21,8 +20,7 @@ import fr.dush.mediamanager.dto.configuration.Field;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.engine.CdiJunitTest;
 
-@Default
-@Module(name = "JUNIT Module", description = "Fake description")
+@Module(name = "JUNIT Module", description = "Fake description", id="junit-configurationmanager")
 public class ConfigurationManagerImplTest extends CdiJunitTest {
 
 	@Inject

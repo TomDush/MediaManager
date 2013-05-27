@@ -3,7 +3,6 @@ package fr.dush.mediamanager.business.mediatech.scanner;
 import static com.google.common.collect.Sets.*;
 
 import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class FileScanner {
 
 	private final static ScannerConfiguration SCANNER_CONFIGURATION = new ScannerConfiguration();
 
-	@Inject
+//	@Inject
 	private IRootDirectoryDAO rootDirectoryDAO;
 
 	static {

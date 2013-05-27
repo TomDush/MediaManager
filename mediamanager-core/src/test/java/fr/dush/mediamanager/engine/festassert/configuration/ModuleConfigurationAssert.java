@@ -93,7 +93,7 @@ public class ModuleConfigurationAssert extends AbstractAssert<ModuleConfiguratio
 		isNotNull();
 
 		// we overrides the default error message with a more explicit one
-		String errorMessage = format("Expected fields size to be <%d>, but was <%d>", expected, actual.getAllFields().size());
+		String errorMessage = format("Expected fields size to be <%d>, but was <%d> : %s", expected, actual.getAllFields().size(),actual.getAllFields());
 
 		// check
 		if (actual.getAllFields().size() != expected) throw new AssertionError(errorMessage);

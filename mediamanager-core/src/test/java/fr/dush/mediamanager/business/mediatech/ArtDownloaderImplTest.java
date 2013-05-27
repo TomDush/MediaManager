@@ -38,6 +38,7 @@ public class ArtDownloaderImplTest {
 	}
 
 	@Test
+	@Ignore("Long test (depends on connection ;)")
 	public void testDownloadFile() throws Exception {
 		final String image = artDownloader.storeImage(new URL(
 				"http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/bgSHbGEA1OM6qDs3Qba4VlSZsNG.jpg"), null);

@@ -80,7 +80,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 	 */
 	@Produces
 	public ModuleConfiguration findModuleConfiguration(InjectionPoint point) {
-		LOGGER.debug("Create/find ModuleConfiguration for {}", point);
+		LOGGER.debug("Create/find ModuleConfiguration for {}.{}", point.getBean().getBeanClass().getName(), point.getMember().getName());
 
 		final IConfigurationArguments wrapper = new ConfigurationInjectionPoint(point);
 

@@ -15,7 +15,7 @@ import fr.dush.mediamanager.dto.media.video.Trailer;
  * @author Thomas Duchatelle
  *
  */
-public interface IEnrichFilm {
+public interface IMoviesEnricher {
 
 	/**
 	 * Search film from parsed file name.

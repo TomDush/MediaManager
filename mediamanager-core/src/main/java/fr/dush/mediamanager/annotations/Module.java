@@ -7,6 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
 /**
@@ -31,12 +32,18 @@ import javax.inject.Qualifier;
 public @interface Module {
 
 	/** Module name (to be displayed) */
+	@Nonbinding
 	String name();
 
 	/** Module description (to be displayed, can be HTML) */
+	@Nonbinding
 	String description() default "";
 
 	/** Override package name, default class package. */
+	@Nonbinding
 	String packageName() default "";
+
+	/** Module ID used to find entry point */
+	String id();
 
 }

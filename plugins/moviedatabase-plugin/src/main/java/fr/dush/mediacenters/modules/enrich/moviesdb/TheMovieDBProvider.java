@@ -8,14 +8,14 @@ import lombok.Setter;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 
-import fr.dush.mediacenters.modules.enrich.MovieDbEnricher;
+import fr.dush.mediacenters.modules.enrich.TheMovieDbEnricher;
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 
 public class TheMovieDBProvider {
 
 	@Inject
-	@Configuration(entryPoint = MovieDbEnricher.class)
+	@Configuration(entryPoint = TheMovieDbEnricher.class)
 	@Setter
 	private ModuleConfiguration configuration;
 

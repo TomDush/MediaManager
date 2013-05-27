@@ -32,12 +32,12 @@ import fr.dush.mediamanager.dto.media.video.Film;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 
 @RunWith(BlockJUnit4ClassRunner.class)
-public class MovieDbEnricherTest {
+public class TheMovieDbEnricherTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MovieDbEnricherTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricherTest.class);
 
 	@InjectMocks
-	private MovieDbEnricher enrichMedia;
+	private TheMovieDbEnricher enrichMedia;
 
 	@Spy
 	private TheMovieDbApi api;

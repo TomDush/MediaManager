@@ -29,11 +29,11 @@ public class PersonParser {
 
 	private static final String DIRECTOR_JOB = "DIRECTOR";
 
-	private MovieDbEnricher parent;
+	private TheMovieDbEnricher parent;
 
 	private List<Person> persons;
 
-	public PersonParser(MovieDbEnricher parent, List<Person> persons) {
+	public PersonParser(TheMovieDbEnricher parent, List<Person> persons) {
 		this.parent = parent;
 		this.persons = persons;
 	}
@@ -76,7 +76,7 @@ public class PersonParser {
 		public fr.dush.mediamanager.dto.media.video.Person apply(Person info) {
 			fr.dush.mediamanager.dto.media.video.Person person = new fr.dush.mediamanager.dto.media.video.Person();
 
-			person.getSourceIds().addId(MovieDbEnricher.MOVIEDB_ID_TYPE, Integer.toString(info.getId()));
+			person.getSourceIds().addId(TheMovieDbEnricher.MOVIEDB_ID_TYPE, Integer.toString(info.getId()));
 			person.setName(info.getName());
 
 			if (isNotBlank(info.getProfilePath())) {
