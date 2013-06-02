@@ -1,18 +1,23 @@
 package fr.dush.mediamanager.business.mediatech.scanner;
 
+import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.enterprise.inject.Instance;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
+import fr.dush.mediamanager.engine.mock.EventMock;
+import fr.dush.mediamanager.events.scan.InprogressScanning;
 import fr.dush.mediamanager.events.scan.NewRootDirectoryEvent;
 
 public class FileScannerTest extends SimpleJunitTest {
@@ -21,33 +26,42 @@ public class FileScannerTest extends SimpleJunitTest {
 	private FileScanner scanner;
 
 	@Mock
-	private IRootDirectoryDAO rootDirectoryDAO;
+	private Instance<MoviesScanner> moviesScannerProvider;
+
+	@Mock
+	private MoviesScanner moviesScanner;
+
+	@Spy
+	private EventMock<InprogressScanning> bus = new EventMock<InprogressScanning>();
 
 	@Before
 	public void postConstruct() {
+		when(moviesScannerProvider.get()).thenReturn(moviesScanner);
 	}
 
 	@Test
 	public void testScanning() throws Exception {
 		final RootDirectory rootDirectory = new RootDirectory();
-		rootDirectory.setName("Movies Junit Database");
-		rootDirectory.getPaths().add(Paths.get("/mnt/data/Films/Films vf/"));
 
 		// Exec
 		scanner.scanNewDirectory(new NewRootDirectoryEvent(this, rootDirectory));
 
 		// Test
-		verify(rootDirectoryDAO).save(rootDirectory);
+		assertThat(bus.getEvents()).isNotEmpty().hasSize(1);
+		verify(moviesScannerProvider).get();
+		verify(moviesScanner).startScanning(rootDirectory);
+
+		verifyNoMoreInteractions(moviesScannerProvider, moviesScanner);
 	}
 
 	@Test
-	@Ignore
 	public void testDateParser() throws Exception {
 		String filmName = "Sherlock.Holmes.2009.CD1";
 
-//		final Matcher m = scanner.getDatePattern().matcher(filmName);
-//
-//		assertThat(m.matches()).isTrue();
-//		assertThat(m.group(2)).isEqualTo("2009");
+		final Pattern pattern = Pattern.compile(FileScanner.SCANNER_CONFIGURATION.getDateRegex());
+		final Matcher m = pattern.matcher(filmName);
+
+		assertThat(m.matches()).isTrue();
+		assertThat(m.group(2)).isEqualTo("2009");
 	}
 }

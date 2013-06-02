@@ -28,7 +28,7 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
-import fr.dush.mediamanager.dto.media.video.Film;
+import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -64,10 +64,10 @@ public class TheMovieDbEnricherTest {
 
 	@Test
 	public void testFindFilmData() throws Exception {
-		final List<Film> list = enrichMedia.findMediaData(new MoviesParsedName("Transformers", 2007));
+		final List<Movie> list = enrichMedia.findMediaData(new MoviesParsedName(null, "Transformers", 2007));
 		assertThat(list).isNotEmpty();
 
-		for (Film f : list) {
+		for (Movie f : list) {
 			enrichMedia.enrichMedia(f);
 			enrichMedia.completeTrailers(new FindTrailersEvent(this, f, "en"));
 

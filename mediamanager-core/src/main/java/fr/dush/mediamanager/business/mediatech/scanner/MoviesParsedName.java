@@ -1,5 +1,7 @@
 package fr.dush.mediamanager.business.mediatech.scanner;
 
+import java.nio.file.Path;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,7 +19,7 @@ import fr.dush.mediamanager.dto.media.video.VideoFile;
 public class MoviesParsedName {
 
 	/** Original file name */
-	private String originalName;
+	private Path file;
 
 	/** Movie name (after useless data removed from filename) */
 	private String movieName;
@@ -33,20 +35,20 @@ public class MoviesParsedName {
 	/**
 	 * Initialize with original name
 	 *
-	 * @param originalName
+	 * @param file Concerned file
 	 */
-	public MoviesParsedName(String originalName) {
-		this.originalName = originalName;
+	public MoviesParsedName(Path file) {
+		this.file = file;
 	}
 
 	/**
 	 * Initialize with final name and date.
-	 *
+	 * @param file Concerned file
 	 * @param movieName Final movies name, with space as word separator.
 	 * @param year 0 if not defined.
 	 */
-	public MoviesParsedName(String movieName, int year) {
-		super();
+	public MoviesParsedName(Path file, String movieName, int year) {
+		this(file);
 		this.movieName = movieName;
 		this.year = year;
 	}

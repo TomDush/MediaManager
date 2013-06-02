@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +23,7 @@ import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExists;
 import fr.dush.mediamanager.exceptions.ScanningException;
 
@@ -32,10 +37,15 @@ public abstract class AbstractScanner<F> implements Runnable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractScanner.class);
 
+	@Inject
 	private IRootDirectoryDAO rootDirectoryDAO;
 
 	/** Scanner's configuration */
+	@Inject
 	protected ScannerConfiguration scannerConfiguration;
+
+	@Inject
+	protected Event<AmbiguousEnrichment> ambiguousEnrichmentDispatcher;
 
 	/** Pattern to find date in filenames */
 	protected Pattern datePattern;
@@ -49,9 +59,8 @@ public abstract class AbstractScanner<F> implements Runnable {
 	/** Root paths to scan */
 	private Set<Path> rootPaths = newHashSet();
 
-	public AbstractScanner(IRootDirectoryDAO rootDirectoryDAO, ScannerConfiguration scannerConfiguration) {
-		this.rootDirectoryDAO = rootDirectoryDAO;
-		this.scannerConfiguration = scannerConfiguration;
+	@PostConstruct
+	public void initializePatterns() {
 
 		// Pre-compile patterns...
 		if (isNotEmpty(scannerConfiguration.getDateRegex())) {
@@ -59,16 +68,12 @@ public abstract class AbstractScanner<F> implements Runnable {
 		}
 
 		for (String regex : scannerConfiguration.getMoviesStacking()) {
-			final Pattern pattern = Pattern.compile(regex);
-//			if (pattern.flags() == 4) {
-				moviesStackingPatterns.add(pattern);
-//			} else {
-//				LOGGER.warn("{} pattern invalid for movies stacking. Expected 4 flags but was {}.", regex, pattern.flags());
-//			}
+			moviesStackingPatterns.add(Pattern.compile(regex));
 		}
 	}
 
-	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExists, ScanningException {
+	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExists,
+			ScanningException {
 
 		// Try to save (exception if path(s) aren't valid)
 		rootDirectoryDAO.save(rootDirectory);
@@ -121,10 +126,11 @@ public abstract class AbstractScanner<F> implements Runnable {
 		LOGGER.info("Start enrichment of {} medias.", files.size());
 		status.changePhase(Phase.ENRICH, files.size(), "Enrichment...");
 
-		for(F file : files) {
+		for (F file : files) {
 			final Media media = enrich(file);
-			status.incrementFinishedJob(1);
 			// TODO save media
+
+			status.incrementFinishedJob(1);
 		}
 	}
 

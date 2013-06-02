@@ -2,21 +2,27 @@ package fr.dush.mediamanager.business.mediatech.scanner;
 
 import static com.google.common.collect.Sets.*;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.events.scan.InprogressScanning;
 import fr.dush.mediamanager.events.scan.NewRootDirectoryEvent;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExists;
 import fr.dush.mediamanager.exceptions.ScanningException;
 
 /**
- * Scan directory's contents to find valuable media.
+ * Listen {@link RootDirectory}'s events to scan directory's contents and find valuable media.
  *
  * <p>
  * Warning : this bean is accessible only with events, no interface.
@@ -29,10 +35,13 @@ public class FileScanner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileScanner.class);
 
-	private final static ScannerConfiguration SCANNER_CONFIGURATION = new ScannerConfiguration();
+	public final static ScannerConfiguration SCANNER_CONFIGURATION = new ScannerConfiguration();
 
-//	@Inject
-	private IRootDirectoryDAO rootDirectoryDAO;
+	@Inject
+	private Event<InprogressScanning> bus;
+
+	@Inject
+	private Instance<MoviesScanner> moviesScanner;
 
 	static {
 		// TODO dynamic configuration
@@ -53,14 +62,22 @@ public class FileScanner {
 		SCANNER_CONFIGURATION.getMoviesStacking().add("(.*?)([ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck]|d)[ _.-]*[a-d])(.*?)(\\.[^.]+)$");
 	}
 
-	public void scanNewDirectory(@Observes NewRootDirectoryEvent event) throws RootDirectoryAlreadyExists, ScanningException, InterruptedException {
-		final MoviesScanner scanner = new MoviesScanner(rootDirectoryDAO, SCANNER_CONFIGURATION);
+	public void scanNewDirectory(@Observes NewRootDirectoryEvent event) throws RootDirectoryAlreadyExists, ScanningException,
+			InterruptedException {
+		LOGGER.debug("--> scanNewDirectory {}", event);
 
-		final ScanningStatus status = scanner.startScanning(event.getRootDirectory());
-		while(status.isInProgress()) {
-			LOGGER.info("Scanning in progress : {}", status);
-			Thread.sleep(1000);
-		}
+		// Get enricher
+		final ScanningStatus status = moviesScanner.get().startScanning(event.getRootDirectory());
+
+		// Fire event
+		bus.fire(new InprogressScanning(this, event.getRootDirectory(), status));
+
+	}
+
+	@Produces
+	@ApplicationScoped
+	public ScannerConfiguration produceScannerConfiguration() {
+		return SCANNER_CONFIGURATION;
 	}
 
 }

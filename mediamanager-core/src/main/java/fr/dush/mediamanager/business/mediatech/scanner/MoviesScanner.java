@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,17 +28,40 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.io.Files;
 
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
-import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.media.video.VideoFile;
+import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
+import fr.dush.mediamanager.exceptions.ModuleLoadingException;
+import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExists;
+import fr.dush.mediamanager.exceptions.ScanningException;
+import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
+import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 
 public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MoviesScanner.class);
 
-	public MoviesScanner(IRootDirectoryDAO rootDirectoryDAO, ScannerConfiguration scannerConfiguration) {
-		super(rootDirectoryDAO, scannerConfiguration);
+	@Inject
+	private IModulesManager modulesManager;
+
+	/** Media enricher */
+	private IMoviesEnricher enricher;
+
+	@Override
+	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExists, ScanningException {
+		try {
+			// Initialize enricher...
+			enricher = modulesManager.findModuleById(IMoviesEnricher.class, rootDirectory.getEnricherScanner());
+			return super.startScanning(rootDirectory);
+
+		} catch (ModuleLoadingException e) {
+			final String mess = String.format("Can't scan %s : enricher module '%s' not found.", rootDirectory.getPaths(),
+					rootDirectory.getEnricherScanner());
+			throw new ScanningException(mess, e);
+		}
 	}
 
 	@Override
@@ -48,8 +74,24 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 
 	@Override
 	protected Media enrich(MoviesParsedName file) {
-		LOGGER.info("Enrich file : {}", file);
-		// TODO Auto-generated method stub
+		LOGGER.debug("Enrich file : {}", file);
+		try {
+			final List<Movie> movies = enricher.findMediaData(file);
+
+			if (1 != movies.size()) {
+				// If enrichment is ambiguous, first one will be choose, but an event is fired to save this confusion, or display it.
+				final AmbiguousEnrichment event = new AmbiguousEnrichment(this, Movie.class, file.getFile(), movies);
+				ambiguousEnrichmentDispatcher.fire(event);
+			}
+
+			// Return first or null
+			if (movies.isEmpty()) return null;
+			return movies.get(0);
+
+		} catch (EnrichException e) {
+			LOGGER.error("Enrichement fail on '{}' movie : {}", file.getMovieName(), e.getMessage());
+		}
+
 		return null;
 	}
 
@@ -85,7 +127,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 				// Correct parsed file name : remove volume information if necessary
 				final FileStacking fileStacking = volumeList.get(0);
 				if (fileStacking.getParsedFileName().getMovieName().length() > fileStacking.getName().length()) {
-					fileStacking.getParsedFileName().setMovieName(fileStacking.getName());
+					fileStacking.getParsedFileName().setMovieName(removeSpaces(fileStacking.getName()));
 				}
 
 				// Complete good VideoFile and remove duplicate MoviesParsedName
@@ -94,7 +136,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 
 					fileStacking.getParsedFileName().getVideoFile().getNextParts().add(s.getParsedFileName().getVideoFile().getFile());
 
-					movies.remove(s);
+					movies.remove(s.getParsedFileName());
 				}
 			}
 		}
@@ -106,24 +148,24 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 		final String ext = Files.getFileExtension(f.getName());
 		if (!scannerConfiguration.getVideoExtensions().contains("." + ext)) return null;
 
-		MoviesParsedName parsedFileName = new MoviesParsedName(Files.getNameWithoutExtension(f.getName()));
+		MoviesParsedName parsedFileName = new MoviesParsedName(f.toPath());
 
 		// Extension
 		parsedFileName.setExtension(ext);
 
 		// Name : cleaned and with space
-		String name = parsedFileName.getOriginalName().toLowerCase();
+		String simpleName = Files.getNameWithoutExtension(f.getName()).toLowerCase();
 		for (String regex : scannerConfiguration.getCleanStrings()) {
-			String[] splitted = name.split(regex, 2);
+			String[] splitted = simpleName.split(regex, 2);
 			if (splitted.length > 1) {
-				name = splitted[0];
+				simpleName = splitted[0];
 			}
 		}
-		parsedFileName.setMovieName(name.replaceAll("[ _\\.\\(\\)\\[\\]\\-]", " "));
+		parsedFileName.setMovieName(removeSpaces(simpleName));
 
 		// Date
 		if (null != datePattern) {
-			final Matcher matcher = datePattern.matcher(Files.getNameWithoutExtension(f.getName()));
+			final Matcher matcher = datePattern.matcher(Files.getNameWithoutExtension(f.getName()).toLowerCase());
 			if (matcher.matches()) {
 				final String year = matcher.group(2);
 				parsedFileName.setYear(Integer.parseInt(year));
@@ -144,6 +186,10 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 		parsedFileName.setVideoFile(new VideoFile(f.toPath()));
 
 		return parsedFileName;
+	}
+
+	protected String removeSpaces(String name) {
+		return name.replaceAll("[ _\\.\\(\\)\\[\\]\\-]", " ").trim();
 	}
 
 	@ToString
