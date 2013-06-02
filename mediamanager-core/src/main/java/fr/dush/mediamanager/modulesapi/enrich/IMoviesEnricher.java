@@ -5,8 +5,8 @@ import java.util.List;
 import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.video.BelongToCollection;
-import fr.dush.mediamanager.dto.media.video.Film;
-import fr.dush.mediamanager.dto.media.video.FilmsCollection;
+import fr.dush.mediamanager.dto.media.video.Movie;
+import fr.dush.mediamanager.dto.media.video.MoviesCollection;
 import fr.dush.mediamanager.dto.media.video.Trailer;
 
 /**
@@ -18,18 +18,18 @@ import fr.dush.mediamanager.dto.media.video.Trailer;
 public interface IMoviesEnricher {
 
 	/**
-	 * Search film from parsed file name.
+	 * Search movie from parsed file name.
 	 *
 	 * @param media
 	 * @return
 	 * @throws EnrichException If an error occurred, this exception is thrown.
 	 */
-	List<Film> findMediaData(MoviesParsedName filename) throws EnrichException;
+	List<Movie> findMediaData(MoviesParsedName filename) throws EnrichException;
 
 	/**
 	 * Get completed information on media.
 	 *
-	 * @param media Selected film
+	 * @param media Selected movie
 	 * @throws EnrichException
 	 */
 	void enrichMedia(Media media) throws EnrichException;
@@ -41,10 +41,10 @@ public interface IMoviesEnricher {
 	 * @return
 	 * @throws EnrichException
 	 */
-	FilmsCollection findCollection(BelongToCollection collection) throws EnrichException;
+	MoviesCollection findCollection(BelongToCollection collection) throws EnrichException;
 
 	/**
-	 * List available trailers for this film.
+	 * List available trailers for this movie.
 	 *
 	 * @param media
 	 * @param lang Expected trailer language.

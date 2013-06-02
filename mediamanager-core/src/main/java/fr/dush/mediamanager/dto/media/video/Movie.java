@@ -19,14 +19,14 @@ import com.google.common.collect.Lists;
 import fr.dush.mediamanager.dto.media.Media;
 
 /**
- * Media is film type.
+ * Media is movie type.
  *
  * @author Thomas Duchatelle
  */
 @SuppressWarnings("serial")
 @Data
 @EqualsAndHashCode(callSuper = true, of = {})
-public class Film extends Media {
+public class Movie extends Media {
 
 	/** Video files : can have multiple quality, or version ... */
 	private Set<VideoFile> videoFiles = newHashSet();
@@ -34,10 +34,10 @@ public class Film extends Media {
 	/** Release date */
 	private Date release;
 
-	/** Film overview */
+	/** Movie overview */
 	private String overview;
 
-	/** If film belong to collection */
+	/** If movie belong to collection */
 	private BelongToCollection collection;
 
 	/** Screenshot or fan arts to display back to the presentation. */
@@ -46,10 +46,10 @@ public class Film extends Media {
 	/** 1 - 5 main actors */
 	private List<Person> mainActors = newArrayList();
 
-	/** Film director */
+	/** Movie director */
 	private List<Person> directors = newArrayList();
 
-	/** Film types : actions, comedy, ... */
+	/** Movie types : actions, comedy, ... */
 	private Set<String> genres = newHashSet();
 
 	/** Trailers (downloaded, and not). Null if not initialized... */

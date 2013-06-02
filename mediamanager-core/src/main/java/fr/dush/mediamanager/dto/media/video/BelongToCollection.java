@@ -6,7 +6,7 @@ import lombok.Data;
 import fr.dush.mediamanager.dto.media.Sources;
 
 /**
- * "Link" to {@link FilmsCollection} saved in {@link Film}.
+ * "Link" to {@link MoviesCollection} saved in {@link Movie}.
  *
  * @author Thomas Duchatelle
  *
@@ -18,7 +18,7 @@ public class BelongToCollection implements Serializable {
 	/** Collection IDs */
 	private Sources mediaIds = new Sources();
 
-	/** Number of film in this collection */
+	/** Number of movie in this collection */
 	private int part;
 
 	/** Total part in this collection */

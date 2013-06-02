@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * Film or show trailer
+ * Movie or show trailer
  *
  * @author Thomas Duchatelle
  *

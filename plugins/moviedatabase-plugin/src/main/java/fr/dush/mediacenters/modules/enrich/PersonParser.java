@@ -16,7 +16,7 @@ import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.model.Person;
 
 /**
- * Sort film's casting and crew.
+ * Sort movie's casting and crew.
  *
  * @author Thomas Duchatelle
  *
