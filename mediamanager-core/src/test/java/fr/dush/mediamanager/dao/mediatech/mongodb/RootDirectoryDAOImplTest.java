@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.dao.mediatech.mongodb;
 
-import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
 import static org.fest.assertions.api.Assertions.*;
 
@@ -10,23 +9,17 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
-
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.engine.CdiJunitClassRunner;
 import fr.dush.mediamanager.engine.MongoJunitTest;
+import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 
-@RunWith(CdiJunitClassRunner.class)
+@DatabaseScript(clazz = RootDirectory.class, locations = "dataset/rootdirectory.json")
 public class RootDirectoryDAOImplTest extends MongoJunitTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RootDirectoryDAOImplTest.class);
@@ -34,44 +27,23 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 	@Inject
 	private IRootDirectoryDAO rootDirectoryDAO;
 
-	@Inject
-	private DB db;
-
-	@Before
-	public void cleanDatabase() {
-		// Clean
-		db.getCollection("RootDirectory").drop();
-
-		// Insert bases ...
-		DBObject movies = (DBObject) JSON
-				.parse(" { '_id' : 'Movies', 'paths' : [  '/home/medias/sagas',  '/home/medias/movies' ], 'enricherScanner' : 'movies-scanner' } ') }");
-		DBObject shows = (DBObject) JSON
-				.parse(" { '_id' : 'Shows', 'paths' : [  '/home/medias/shows',  '/external/drive/other shows' ], 'enricherScanner' : 'shows-scanner' } ') }");
-
-		db.getCollection("RootDirectory").insert(newArrayList(movies, shows));
-
-	}
-
 	@Test
 	public void testInstance() throws Exception {
 		assertThat(rootDirectoryDAO).isNotNull().isInstanceOf(RootDirectoryDAOImpl.class);
 	}
 
 	@Test
+	@DatabaseScript(clazz = RootDirectory.class, inherits = false)
 	public void testSave() throws Exception {
 		final RootDirectory root = new RootDirectory("My Directory", "my-scanner", "target/and-here/", "somewhere/else");
 		rootDirectoryDAO.persist(root);
 
 		final List<RootDirectory> roots = rootDirectoryDAO.findAll();
-		assertThat(roots).isNotEmpty();
+		assertThat(roots).hasSize(1);
 
 		LOGGER.info("Found : {}", roots);
 
-		RootDirectory found = null;
-		for (RootDirectory r : roots) {
-			if ("My Directory".equals(r.getName())) found = r;
-		}
-
+		RootDirectory found = roots.get(0);
 		assertThat(found).isNotNull();
 		assertThat(found.getName()).isEqualTo("My Directory");
 		assertThat(found.getEnricherScanner()).isEqualTo("my-scanner");

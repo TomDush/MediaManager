@@ -48,9 +48,14 @@ public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected Object createTest() throws Exception {
-		final BeanManager beanManager = lifecycle.getBeanManager();
 
-		final Set<Bean<?>> beans = beanManager.getBeans(getTestClass().getJavaClass(), new Any() {
+		return getBean(getTestClass().getJavaClass());
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> T getBean(final Class<T> javaClass) {
+		final BeanManager beanManager = lifecycle.getBeanManager();
+		final Set<Bean<?>> beans = beanManager.getBeans(javaClass, new Any() {
 
 			@Override
 			public Class<? extends Annotation> annotationType() {
@@ -59,12 +64,12 @@ public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 		});
 
 		if (beans.isEmpty()) {
-			LOGGER.error("No CDI bean found for class {}.", getTestClass().getJavaClass());
-			throw new RuntimeException("No CDI bean found for class " + getTestClass().getJavaClass());
+			LOGGER.error("No CDI bean found for class {}.", javaClass);
+			throw new RuntimeException("No CDI bean found for class " + javaClass);
 		}
 
 		final Bean<?> bean = beans.iterator().next();
-		return beanManager.getReference(bean, getTestClass().getJavaClass(), beanManager.createCreationalContext(bean));
+		return (T) beanManager.getReference(bean, javaClass, beanManager.createCreationalContext(bean));
 	}
 
 	@Override
