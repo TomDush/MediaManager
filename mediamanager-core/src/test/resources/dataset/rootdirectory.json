@@ -1,0 +1,18 @@
+[
+	{
+		'_id':'Movies',
+		'paths':[
+			'/home/medias/sagas',
+			'/home/medias/movies'
+		],
+		'enricherScanner':'movies-scanner'
+	},
+	{
+		'_id':'Shows',
+		'paths':[
+			'/home/medias/shows',
+			'/external/drive/othershows'
+		],
+		'enricherScanner':'shows-scanner'
+	}
+]

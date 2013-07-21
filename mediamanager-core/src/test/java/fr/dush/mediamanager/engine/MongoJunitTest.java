@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 
 import fr.dush.mediamanager.engine.mongodb.EmbeddedMongoDbControler;
 
-@RunWith(CdiJunitClassRunner.class)
+@RunWith(MongoDBJunitClassRunner.class)
 public abstract class MongoJunitTest {
 
 	@Inject
