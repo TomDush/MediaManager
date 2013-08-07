@@ -8,8 +8,11 @@ import java.util.List;
 import javax.inject.Inject;
 
 import com.google.code.morphia.Datastore;
+import com.google.code.morphia.DatastoreImpl;
+import com.google.code.morphia.mapping.Mapper;
 import com.google.code.morphia.query.Query;
 import com.google.code.morphia.query.QueryImpl;
+import com.google.code.morphia.query.UpdateOperations;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.mongodb.DBObject;
@@ -68,15 +71,30 @@ public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 	}
 
 	/**
+	 * Create update operation...
+	 *
+	 * @return
+	 */
+	protected UpdateOperations<T> createUpdateOperations() {
+		return ds.createUpdateOperations(clazz);
+	}
+
+	/**
 	 * Create basic Morphia query, for this class.
+	 *
 	 * @return
 	 */
 	protected Query<T> createQuery() {
 		return ds.createQuery(clazz);
 	}
 
+	protected Mapper getMapper() {
+		return ((DatastoreImpl) ds).getMapper();
+	}
+
 	/**
 	 * Format string array to JSON list.
+	 *
 	 * @param args
 	 * @return
 	 */
@@ -86,6 +104,7 @@ public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 
 	/**
 	 * Format object array to JSON list.
+	 *
 	 * @param args
 	 * @param function
 	 * @return

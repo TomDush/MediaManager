@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import fr.dush.mediamanager.dao.media.IMovieDAO;
@@ -50,7 +51,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
 		final Trailers ts = new Trailers();
 		ts.setRefreshed(FORMATER.parse("2013-08-05"));
-		ts.getSources().add("http://www.youtube.com/watch?v=KAE5ymVLmZg");
+		ts.getSources().add("MOVIES_DB");
 		final Trailer t = new Trailer();
 		t.setPublishDate(FORMATER.parse("2008-05-01"));
 		t.setQuality("HD1080");
@@ -66,19 +67,84 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		m.getMainActors().add(new Person("Robert Downey Jr.", new SourceId("MovieDB", "3223")));
 		m.getVideoFiles().add(new VideoFile(Paths.get("media/movies/ironman_1.mp4")));
 
-		// Saving ...
+		// 1ST EXEC : saving ...
 		movieDAO.saveOrUpdateMovie(m);
 
-		// Read
-		final List<Movie> movies = movieDAO.findAll();
+		// Tests ...
+		List<Movie> movies = movieDAO.findAll();
 		assertThat(movies).hasSize(1);
 
-		// Test...
 		Movie reloaded = movies.get(0);
 
-		assertThat(reloaded).hasTitle("Iron Man 1").hasBackdrops("/media/backdrops/ironman_1.jpg").hasSeen(2).hasGenres("action")
+		assertThat(reloaded).hasTitle("Iron Man 1").hasBackdrops("/media/backdrops/ironman_1.jpg").hasGenres("action")
 				.hasMediaIds(new SourceId("imdb", "0123654789"), new SourceId("junit", "IRONMAN_1"))
 				.hasVideoFiles("media/movies/ironman_1.mp4");
+		assertThat(reloaded).hasSeen(2);
+
+		// ** Changes ...
+		m.setTitle("Iron Man");
+		m.setOverview("No overview...");
+		m.setPoster("/media/posters/ironman_1_poster.jpg");
+		m.setSeen(22);
+
+		// 2ST EXEC : update ...
+		movieDAO.saveOrUpdateMovie(m);
+
+		// Tests ...
+		movies = movieDAO.findAll();
+		assertThat(movies).hasSize(1);
+
+		reloaded = movies.get(0);
+		assertThat(reloaded).hasTitle("Iron Man").hasOverview("No overview...").hasPoster("/media/posters/ironman_1_poster.jpg");
+		assertThat(reloaded).hasSeen(2); // no changed : read-only
+	}
+
+	@Test
+	public void test_updateExisting() throws Exception {
+		// Test adding video and genre...
+		Movie m = new Movie();
+
+		m.setTitle("Star Trek - The future begins");
+		m.setOverview("The future begins");
+
+		m.getMediaIds().addId("MoviesDB", "13475");
+		m.getMediaIds().addId("junit", "STAR_TREK");
+
+		m.setGenres(newHashSet("science fiction", "action", "adventure"));
+		m.getVideoFiles().add(new VideoFile(Paths.get("/media/movies/HD/star_trek_1.mkv")));
+
+		// EXEC
+		movieDAO.saveOrUpdateMovie(m);
+
+		// TEST
+		final Movie movie = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70c"));
+		assertThat(movie).hasTitle("Star Trek - The future begins").hasOverview("The future begins")
+				.hasMediaIds("MoviesDB", "13475", "junit", "STAR_TREK").hasVideoFiles("/media/movies/HD/star_trek_1.mkv", "/media/movies/star_trek.mp4");
+
+	}
+
+	@Test
+	public void test_incViewCount() throws Exception {
+		final Movie movie = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70a"));
+		assertThat(movie).as("DataTest invalid").isNotNull();
+
+		// Exec
+		movieDAO.incrementViewCount(movie, 2);
+
+		// Test
+		final Movie reloaded = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70a"));
+		assertThat(reloaded).hasSeen(4);
+
+		// ** Other test (field doesn't exist)
+		final Movie movie2 = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70b"));
+		assertThat(movie2).as("DataTest invalid").isNotNull();
+
+		// Exec
+		movieDAO.incrementViewCount(movie2, 1);
+
+		// Test
+		final Movie reloaded2 = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70b"));
+		assertThat(reloaded2).hasSeen(1);
 
 	}
 
@@ -87,7 +153,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		final List<Movie> movies = movieDAO.findUnseen();
 		assertThat(movies).hasSize(2);
 
-		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TRECK");
+		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 		assertThat(movies.get(1)).hasMediaIds("junit", "IRONMAN_4");
 	}
 
@@ -121,7 +187,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
 		assertThat(movies).hasSize(2);
 		assertThat(movies.get(0)).hasMediaIds("junit", "IRONMAN_4");
-		assertThat(movies.get(1)).hasMediaIds("junit", "STAR_TRECK");
+		assertThat(movies.get(1)).hasMediaIds("junit", "STAR_TREK");
 	}
 
 	@Test
@@ -139,15 +205,15 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
 	@Test
 	public void test_findByTitle() throws Exception {
-		List<Movie> movies = movieDAO.findByTitle("Star Treck");
+		List<Movie> movies = movieDAO.findByTitle("Star Trek");
 
 		assertThat(movies).hasSize(1);
-		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TRECK");
+		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 
 		// Full text searching...
-		movies = movieDAO.findByTitle("treck");
+		movies = movieDAO.findByTitle("trek");
 
 		assertThat(movies).hasSize(1);
-		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TRECK");
+		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 	}
 }
