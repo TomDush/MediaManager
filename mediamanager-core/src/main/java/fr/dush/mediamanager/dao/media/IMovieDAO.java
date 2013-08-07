@@ -24,6 +24,13 @@ public interface IMovieDAO extends IDao<Movie, ObjectId> {
 	void saveOrUpdateMovie(Movie movie);
 
 	/**
+	 * Increment {@link Movie#getSeen()} by inc.
+	 *
+	 * @param inc Number of view to add
+	 */
+	void incrementViewCount(Movie movie, int inc);
+
+	/**
 	 * Find movies by IDs provided by sources (imdb, movieDb, ...)
 	 *
 	 * @param sourceIds
