@@ -12,6 +12,7 @@ import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import com.google.code.morphia.annotations.Entity;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -23,6 +24,7 @@ import fr.dush.mediamanager.dto.media.Media;
  *
  * @author Thomas Duchatelle
  */
+@Entity("Movies")
 @SuppressWarnings("serial")
 @Data
 @EqualsAndHashCode(callSuper = true, of = {})
@@ -57,9 +59,15 @@ public class Movie extends Media {
 
 	@Override
 	public String toString() {
-		final Calendar calendar = Calendar.getInstance();
-		calendar.setTime(getRelease());
-		return getTitle() + " (" + calendar.get(Calendar.YEAR) + ")";
+		StringBuilder sb = new StringBuilder(getTitle());
+		if (null != getRelease()) {
+			final Calendar calendar = Calendar.getInstance();
+			calendar.setTime(getRelease());
+
+			sb.append(" (").append(calendar.get(Calendar.YEAR)).append(")");
+		}
+
+		return sb.toString();
 	}
 
 	public StringBuffer prettyPrint(StringBuffer sb) {

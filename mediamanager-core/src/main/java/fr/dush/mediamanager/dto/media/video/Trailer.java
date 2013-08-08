@@ -23,10 +23,10 @@ public class Trailer implements Serializable {
 	/** Trailer title */
 	public String title;
 
-	/** Source (web site's name) */
+	/** Source (web site's name), example : "youtube" */
 	public String source;
 
-	/** Maximum available quality, example : "youtube" */
+	/** Maximum available quality*/
 	public String quality;
 
 	/** URL on web */
