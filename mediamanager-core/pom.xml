@@ -35,48 +35,18 @@
 			<artifactId>jul-to-slf4j</artifactId>
 			<version>${slf4j-version}</version>
 		</dependency>
-		
+
 		<!-- MongoDB DAO utils -->
 		<dependency>
-			<groupId>com.github.jmkgreen.morphia</groupId>
+			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>1.2.3</version>
+			<version>0.103-SNAPSHOT</version> <!-- 0.101.0 -->
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>cglib</groupId> -->
-		<!-- <artifactId>cglib-nodep</artifactId> -->
-		<!-- <version>[2.1_3,)</version> -->
-		<!-- <type>jar</type> -->
-		<!-- <optional>true</optional> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.thoughtworks.proxytoys</groupId> -->
-		<!-- <artifactId>proxytoys</artifactId> -->
-		<!-- <version>1.0</version> -->
-		<!-- <type>jar</type> -->
-		<!-- <optional>true</optional> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.google.code.morphia</groupId>
+			<artifactId>morphia-logging-slf4j</artifactId>
+			<version>0.103-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
-	<!-- <build> -->
-	<!-- <plugins> -->
-	<!-- <plugin> -->
-	<!-- <groupId>org.easytesting</groupId> -->
-	<!-- <artifactId>maven-fest-assertion-generator-plugin</artifactId> -->
-	<!-- <version>1.0</version> -->
-	<!-- <executions> -->
-	<!-- <execution> -->
-	<!-- <goals> -->
-	<!-- <goal>generate-assertions</goal> -->
-	<!-- </goals> -->
-	<!-- </execution> -->
-	<!-- </executions> -->
-	<!-- <configuration> -->
-	<!-- <packages> -->
-	<!-- <param>fr.dush.mediamanager.dto.configuration</param> -->
-	<!-- </packages> -->
-	<!-- </configuration> -->
-	<!-- </plugin> -->
-	<!-- </plugins> -->
-	<!-- </build> -->
 </project>

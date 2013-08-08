@@ -8,14 +8,17 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmkgreen.morphia.Datastore;
-import com.github.jmkgreen.morphia.Morphia;
+import com.google.code.morphia.Datastore;
+import com.google.code.morphia.Morphia;
+import com.google.code.morphia.logging.MorphiaLoggerFactory;
+import com.google.code.morphia.logging.slf4j.SLF4JLogrImplFactory;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.dao.mongodb.converters.PathConverter;
 
 /**
  * Provide configuration and utilities for MongoDB.
@@ -26,6 +29,10 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 public class MongoProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
+
+	static {
+		MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
+	}
 
 	@Inject
 	@Configuration(definition = "configuration/mongo-config.json")
@@ -50,6 +57,7 @@ public class MongoProvider {
 	public Datastore producesMorphiaConfig(DB mongodb) {
 		Morphia morphia = new Morphia();
 		morphia.mapPackage("fr.dush.mediamanager.dto");
+		morphia.getMapper().getConverters().addConverter(PathConverter.class);
 
 		return morphia.createDatastore(mongodb.getMongo(), configuration.getValue("mongodb.databaseName"));
 	}

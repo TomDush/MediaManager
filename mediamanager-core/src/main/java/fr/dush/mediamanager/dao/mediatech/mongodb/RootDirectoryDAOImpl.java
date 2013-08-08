@@ -15,12 +15,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jmkgreen.morphia.Datastore;
-import com.github.jmkgreen.morphia.dao.BasicDAO;
-import com.github.jmkgreen.morphia.query.Criteria;
-import com.github.jmkgreen.morphia.query.CriteriaContainer;
-import com.github.jmkgreen.morphia.query.Query;
-import com.github.jmkgreen.morphia.query.WhereCriteria;
+import com.google.code.morphia.Datastore;
+import com.google.code.morphia.dao.BasicDAO;
+import com.google.code.morphia.query.Criteria;
+import com.google.code.morphia.query.CriteriaContainer;
+import com.google.code.morphia.query.Query;
+import com.google.code.morphia.query.WhereCriteria;
 import com.google.common.base.Function;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;

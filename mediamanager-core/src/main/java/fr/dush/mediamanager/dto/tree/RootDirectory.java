@@ -9,8 +9,8 @@ import java.util.Set;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.github.jmkgreen.morphia.annotations.Entity;
-import com.github.jmkgreen.morphia.annotations.Id;
+import com.google.code.morphia.annotations.Entity;
+import com.google.code.morphia.annotations.Id;
 
 /**
  * Media root directory.

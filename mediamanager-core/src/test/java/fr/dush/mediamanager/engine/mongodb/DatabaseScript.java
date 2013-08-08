@@ -7,8 +7,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.jmkgreen.morphia.annotations.Entity;
-
 /**
  * Declare how to load a <code>MongoDB</code> collection.
  *
