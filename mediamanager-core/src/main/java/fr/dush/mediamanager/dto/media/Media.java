@@ -6,6 +6,10 @@ import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.bson.types.ObjectId;
+
+import com.google.code.morphia.annotations.Id;
+
 /**
  * Meta-data on media, or group of medias.
  *
@@ -20,6 +24,10 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(of = "mediaIds")
 public abstract class Media implements Serializable {
+
+	/** Generated ID. DAO has business logic to use {@link #mediaIds} as complex ID. */
+	@Id
+	private ObjectId id;
 
 	/** Media pretty name : prefer resolved than file name. */
 	private String title;

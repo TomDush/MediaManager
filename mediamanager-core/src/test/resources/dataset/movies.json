@@ -1,0 +1,168 @@
+[
+	{
+		"_id":"5200c7a884ae0d25732cd70a",
+		"className":"fr.dush.mediamanager.dto.media.video.Movie",
+		"videoFiles":[
+			{
+				"file":"media/movies/ironman_1.mp4"
+			}
+			
+		],
+		"release":{
+			"$date":"2008-04-30T22:00:00Z"
+		},
+		"overview":"Heroes aren't born. They're built.",
+		"backdrops":[
+			"/media/backdrops/ironman_1.jpg"
+		],
+		"mainActors":[
+			{
+				"sourceIds":[
+					{
+						"type":"MovieDB",
+						"value":"3223"
+					}
+					
+				],
+				"name":"Robert Downey Jr."
+			}
+			
+		],
+		"directors":[
+			{
+				"sourceIds":[
+					{
+						"type":"MovieDB",
+						"value":"15277"
+					}
+					
+				],
+				"name":"Jon Favreau"
+			}
+			
+		],
+		"genres":[
+			"action"
+		],
+		"trailers":{
+			"refreshed":{
+				"$date":"2013-08-04T22:00:00Z"
+			},
+			"sources":[
+				"http://www.youtube.com/watch?v=KAE5ymVLmZg"
+			],
+			"trailers":[
+				{
+					"publishDate":{
+						"$date":"2008-04-30T22:00:00Z"
+					},
+					"title":"Iron Man (trailer)",
+					"source":"youtube",
+					"quality":"HD1080",
+					"url":"http://www.youtube.com/watch?v=KAE5ymVLmZg",
+					"trailer":{
+						"file":"/media/trailers/paths/ironman_1_HD_trailer.mp4"
+					}
+					
+				}
+				
+			]
+			
+		},
+		"title":"Iron Man 1",
+		"poster":"/some/poster.jpg",
+		"mediaIds":[
+			{
+				"type":"junit",
+				"value":"IRONMAN_1"
+			},
+			{
+				"type":"imdb",
+				"value":"0123654789"
+			}
+			
+		],
+		"seen":2,
+		"creation":{
+			"$date":"2013-08-04T22:00:00Z"
+		},
+		"otherMetaData":"No other data on this films..."
+	},
+	{
+		"_id":"5200c7a884ae0d25732cd70b",
+		"className":"fr.dush.mediamanager.dto.media.video.Movie",
+		"title":"Iron Man 4",
+		"mediaIds":[
+			{
+				"type":"junit",
+				"value":"IRONMAN_4"
+			}
+			
+		],
+		"mainActors":[
+			{
+				"sourceIds":[
+					{
+						"type":"MovieDB",
+						"value":"3223"
+					}
+					
+				],
+				"name":"Robert Downey Jr."
+			},
+			{
+				"sourceIds":[
+					{
+						"type":"junit",
+						"value":"3224"
+					}
+					
+				],
+				"name":"Will Smith"
+			}
+			
+		],
+		"genres":[
+			"action",
+			"fantastic"
+		],
+		"seen":0,
+		"creation":{
+			"$date":"2012-01-04T22:00:00Z"
+		}
+		
+	},
+	{
+		"_id":"5200c7a884ae0d25732cd70c",
+		"className":"fr.dush.mediamanager.dto.media.video.Movie",
+		"title":"Star Treck",
+		"mediaIds":[
+			{
+				"type":"junit",
+				"value":"STAR_TRECK"
+			}
+			
+		],
+		"directors":[
+			{
+				"sourceIds":[
+					{
+						"type":"junit",
+						"value":"jjabrams"
+					}
+					
+				],
+				"name":"J. J. ABRAMS"
+			}
+			
+		],
+		"genres":[
+			"fantastic"
+		],
+		"seen":0,
+		"creation":{
+			"$date":"2013-04-04T22:00:00Z"
+		}
+		
+	}
+]
