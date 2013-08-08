@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
@@ -16,6 +18,8 @@ import fr.dush.mediamanager.engine.mongodb.DatabaseScripts;
 import fr.dush.mediamanager.engine.mongodb.MongoDBDatasetManager;
 
 public class MongoDBJunitClassRunner extends CdiJunitClassRunner {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBJunitClassRunner.class);
 
 	public MongoDBJunitClassRunner(Class<?> klass) throws InitializationError {
 		super(klass);
@@ -41,6 +45,7 @@ public class MongoDBJunitClassRunner extends CdiJunitClassRunner {
 		}
 
 		// Initialize data set...
+		LOGGER.debug("Initialize with scrips : {}", scripts);
 		for (DatabaseScript script : Lists.reverse(scripts)) {
 			final MongoDBDatasetManager datasetManager = getBean(MongoDBDatasetManager.class);
 			datasetManager.initializeDataset(script);

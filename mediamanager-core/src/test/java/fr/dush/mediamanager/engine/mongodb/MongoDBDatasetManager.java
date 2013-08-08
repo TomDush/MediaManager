@@ -13,12 +13,12 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 
-import com.github.jmkgreen.morphia.annotations.Entity;
 import com.mongodb.BasicDBList;
 import com.mongodb.DB;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 
+import fr.dush.mediamanager.dao.mongodb.EntityUtils;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 /**
@@ -53,14 +53,7 @@ public class MongoDBDatasetManager {
 		// Get collection name
 		String collectionName = script.collectionName();
 		if (isEmpty(collectionName) && null != script.clazz()) {
-			// Find name in Entity annotation
-			final Entity entityAnnotation = script.clazz().getAnnotation(Entity.class);
-			if (null != entityAnnotation) {
-				collectionName = entityAnnotation.value();
-			}
-
-			// Use class name
-			collectionName = script.clazz().getSimpleName();
+			collectionName = EntityUtils.getCollectionName(script.clazz());
 		}
 
 		if (isEmpty(collectionName)) throw new ConfigurationException("[TestCofiguration] No collection name specified for : " + script);
@@ -80,5 +73,6 @@ public class MongoDBDatasetManager {
 		}
 
 	}
+
 
 }
