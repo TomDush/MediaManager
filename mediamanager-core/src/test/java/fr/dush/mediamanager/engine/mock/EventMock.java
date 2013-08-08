@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Alternative;
 import javax.enterprise.util.TypeLiteral;
 
 import lombok.Getter;
@@ -17,6 +18,7 @@ import fr.dush.mediamanager.annotations.Module;
  * @author Thomas Duchatelle
  *
  */
+@Alternative
 @Module(id = "not-managed", name = "EventMock")
 @Getter
 public class EventMock<T> implements Event<T> {

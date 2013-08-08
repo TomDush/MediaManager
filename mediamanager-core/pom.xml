@@ -14,28 +14,6 @@
 	<name>MediaManager - CORE</name>
 	<packaging>jar</packaging>
 
-	<!-- <build> -->
-	<!-- <plugins> -->
-	<!-- <plugin> -->
-	<!-- <groupId>org.easytesting</groupId> -->
-	<!-- <artifactId>maven-fest-assertion-generator-plugin</artifactId> -->
-	<!-- <version>1.0</version> -->
-	<!-- <executions> -->
-	<!-- <execution> -->
-	<!-- <goals> -->
-	<!-- <goal>generate-assertions</goal> -->
-	<!-- </goals> -->
-	<!-- </execution> -->
-	<!-- </executions> -->
-	<!-- <configuration> -->
-	<!-- <packages> -->
-	<!-- <param>fr.dush.mediamanager.dto.configuration</param> -->
-	<!-- </packages> -->
-	<!-- </configuration> -->
-	<!-- </plugin> -->
-	<!-- </plugins> -->
-	<!-- </build> -->
-
 	<dependencies>
 		<!-- Downloader Youtube and Vimeo -->
 		<dependency>
@@ -57,5 +35,48 @@
 			<artifactId>jul-to-slf4j</artifactId>
 			<version>${slf4j-version}</version>
 		</dependency>
+		
+		<!-- MongoDB DAO utils -->
+		<dependency>
+			<groupId>com.github.jmkgreen.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>cglib</groupId> -->
+		<!-- <artifactId>cglib-nodep</artifactId> -->
+		<!-- <version>[2.1_3,)</version> -->
+		<!-- <type>jar</type> -->
+		<!-- <optional>true</optional> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.thoughtworks.proxytoys</groupId> -->
+		<!-- <artifactId>proxytoys</artifactId> -->
+		<!-- <version>1.0</version> -->
+		<!-- <type>jar</type> -->
+		<!-- <optional>true</optional> -->
+		<!-- </dependency> -->
 	</dependencies>
+
+	<!-- <build> -->
+	<!-- <plugins> -->
+	<!-- <plugin> -->
+	<!-- <groupId>org.easytesting</groupId> -->
+	<!-- <artifactId>maven-fest-assertion-generator-plugin</artifactId> -->
+	<!-- <version>1.0</version> -->
+	<!-- <executions> -->
+	<!-- <execution> -->
+	<!-- <goals> -->
+	<!-- <goal>generate-assertions</goal> -->
+	<!-- </goals> -->
+	<!-- </execution> -->
+	<!-- </executions> -->
+	<!-- <configuration> -->
+	<!-- <packages> -->
+	<!-- <param>fr.dush.mediamanager.dto.configuration</param> -->
+	<!-- </packages> -->
+	<!-- </configuration> -->
+	<!-- </plugin> -->
+	<!-- </plugins> -->
+	<!-- </build> -->
 </project>

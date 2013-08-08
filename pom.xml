@@ -86,6 +86,24 @@
 			<version>${slf4j-version}</version>
 		</dependency>
 
+		<!-- PERSISTENCE : MongoDB -->
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<version>1.28</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>de.flapdoodle.embed</groupId> -->
+		<!-- <artifactId>de.flapdoodle.embed.process</artifactId> -->
+		<!-- <version>1.25</version> -->
+		<!-- </dependency> -->
+
 		<!-- Utils : Guava, Apache commons, ... -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -104,6 +122,23 @@
 			<artifactId>lombok</artifactId>
 			<version>0.11.6</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j-version}</version>
 		</dependency>
 
 		<!-- TESTS DEPENDANCIES -->
