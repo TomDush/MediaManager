@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.configuration;
+package fr.dush.mediamanager.business.configuration.producers;
 
 import javax.enterprise.inject.Produces;
 

@@ -24,7 +24,7 @@ import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExists;
+import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 import fr.dush.mediamanager.exceptions.ScanningException;
 
 /**
@@ -72,17 +72,14 @@ public abstract class AbstractScanner<F> implements Runnable {
 		}
 	}
 
-	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExists,
+	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException,
 			ScanningException {
 
-		// Try to save (exception if path(s) aren't valid)
-		rootDirectoryDAO.save(rootDirectory);
-
 		// Scanning recursively directory. Put parsed file's name into ScanningResult
-		for (Path path : rootDirectory.getPaths()) {
-			final File dir = path.toFile();
+		for (String path : rootDirectory.getPaths()) {
+			final File dir = new File(path);
 			if (dir.exists() && dir.isDirectory()) {
-				rootPaths.add(path);
+				rootPaths.add(dir.toPath());
 
 			} else {
 				StringBuffer sb = new StringBuffer(dir.getPath());

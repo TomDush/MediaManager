@@ -67,6 +67,19 @@ public class ModuleConfiguration {
 	}
 
 	/**
+	 * Get value for this key
+	 *
+	 * @param key
+	 * @return Null if not defined.
+	 */
+	public Integer getValueAsInt(String key) throws NumberFormatException {
+		final String value = getValue(key);
+		if (null == value) return null;
+
+		return Integer.valueOf(value);
+	}
+
+	/**
 	 * If pattern <code>${...}</code> is found, replace it by value found in generic properties, or system. This method is recursive.
 	 *
 	 * @param value

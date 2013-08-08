@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 
 /**
- * This annotation must be define to inject {@link ModuleConfiguration}.
+ * This annotation must be define to inject {@link ModuleConfiguration}s.
  *
  * <p>
  * There is 2 modes to use this annotation :

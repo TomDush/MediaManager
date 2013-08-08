@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import fr.dush.mediamanager.engine.mongodb.EmbeddedMongoDbControler;
 
 @RunWith(CdiJunitClassRunner.class)
-public class MongoJunitTest {
+public abstract class MongoJunitTest {
 
 	@Inject
 	private EmbeddedMongoDbControler embeddedMongoDbControler;
@@ -17,12 +17,12 @@ public class MongoJunitTest {
 	@Before
 	public void setUp() {
 		// Start mongoDB
-		embeddedMongoDbControler.startEmbeddedMogonDB();
+//		embeddedMongoDbControler.startEmbeddedMogonDB();
 	}
 
 	@After
 	public void tearDown() {
-		// Start mongoDB
-		embeddedMongoDbControler.stopEmbeddedMogonDB();
+		// Stop mongoDB...
+//		embeddedMongoDbControler.stopEmbeddedMogonDB();
 	}
 }

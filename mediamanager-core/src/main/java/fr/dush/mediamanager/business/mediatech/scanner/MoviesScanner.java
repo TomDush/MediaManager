@@ -35,7 +35,7 @@ import fr.dush.mediamanager.dto.media.video.VideoFile;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExists;
+import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 import fr.dush.mediamanager.exceptions.ScanningException;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
@@ -51,7 +51,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 	private IMoviesEnricher enricher;
 
 	@Override
-	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExists, ScanningException {
+	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException, ScanningException {
 		try {
 			// Initialize enricher...
 			enricher = modulesManager.findModuleById(IMoviesEnricher.class, rootDirectory.getEnricherScanner());

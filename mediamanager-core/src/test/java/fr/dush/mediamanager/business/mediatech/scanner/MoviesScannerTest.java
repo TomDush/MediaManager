@@ -24,8 +24,8 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
 import fr.dush.mediamanager.business.modules.IModulesManager;
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
@@ -41,10 +41,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
 	private MoviesScanner scanner;
 
 	@Spy
-	protected ScannerConfiguration scannerConfiguration = FileScanner.SCANNER_CONFIGURATION;
-
-	@Mock
-	private IRootDirectoryDAO rootDirectoryDAO;
+	protected ScannerConfiguration scannerConfiguration = ScannerConfigurationProducer.SCANNER_CONFIGURATION;
 
 	@Mock
 	private IModulesManager modulesManager;
@@ -68,7 +65,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
 
 		final RootDirectory rootDirectory = new RootDirectory();
 		rootDirectory.setName("Movies Junit Database");
-		rootDirectory.getPaths().add(Paths.get("target/movies"));
+		rootDirectory.getPaths().add("target/movies");
 		rootDirectory.setEnricherScanner("my-junit-enricher");
 
 		// Exec
@@ -80,7 +77,6 @@ public class MoviesScannerTest extends SimpleJunitTest {
 		}
 
 		// Test
-		verify(rootDirectoryDAO).save(rootDirectory);
 		verify(modulesManager).findModuleById(IMoviesEnricher.class, "my-junit-enricher");
 
 		verify(enricher).findMediaData(argParsedName("2012", 0));
@@ -159,7 +155,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
 	public void testDateParser() throws Exception {
 		String filmName = "Sherlock.Holmes.2009.CD1";
 
-		final Pattern pattern = Pattern.compile(FileScanner.SCANNER_CONFIGURATION.getDateRegex());
+		final Pattern pattern = Pattern.compile(ScannerConfigurationProducer.SCANNER_CONFIGURATION.getDateRegex());
 		final Matcher m = pattern.matcher(filmName);
 
 		assertThat(m.matches()).isTrue();

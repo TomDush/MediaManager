@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 
+import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
+import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.engine.mock.EventMock;
@@ -30,6 +32,9 @@ public class FileScannerTest extends SimpleJunitTest {
 
 	@Mock
 	private MoviesScanner moviesScanner;
+
+	@Mock
+	private IRootDirectoryDAO rootDirectoryDAO;
 
 	@Spy
 	private EventMock<InprogressScanning> bus = new EventMock<InprogressScanning>();
@@ -50,15 +55,16 @@ public class FileScannerTest extends SimpleJunitTest {
 		assertThat(bus.getEvents()).isNotEmpty().hasSize(1);
 		verify(moviesScannerProvider).get();
 		verify(moviesScanner).startScanning(rootDirectory);
+		verify(rootDirectoryDAO).persist(rootDirectory);
 
-		verifyNoMoreInteractions(moviesScannerProvider, moviesScanner);
+		verifyNoMoreInteractions(moviesScannerProvider, moviesScanner, rootDirectoryDAO);
 	}
 
 	@Test
 	public void testDateParser() throws Exception {
 		String filmName = "Sherlock.Holmes.2009.CD1";
 
-		final Pattern pattern = Pattern.compile(FileScanner.SCANNER_CONFIGURATION.getDateRegex());
+		final Pattern pattern = Pattern.compile(ScannerConfigurationProducer.SCANNER_CONFIGURATION.getDateRegex());
 		final Matcher m = pattern.matcher(filmName);
 
 		assertThat(m.matches()).isTrue();
