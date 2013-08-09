@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
  * @author Thomas Duchatelle
  *
  */
+@ApplicationScoped
 public class RootDirectoryDAOImpl extends BasicDAO<RootDirectory, String> implements IRootDirectoryDAO {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RootDirectoryDAOImpl.class);

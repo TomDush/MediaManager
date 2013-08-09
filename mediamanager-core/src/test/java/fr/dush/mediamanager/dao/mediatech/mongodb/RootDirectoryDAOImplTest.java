@@ -28,11 +28,6 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 	private IRootDirectoryDAO rootDirectoryDAO;
 
 	@Test
-	public void testInstance() throws Exception {
-		assertThat(rootDirectoryDAO).isNotNull().isInstanceOf(RootDirectoryDAOImpl.class);
-	}
-
-	@Test
 	@DatabaseScript(clazz = RootDirectory.class, inherits = false)
 	public void testSave() throws Exception {
 		final RootDirectory root = new RootDirectory("My Directory", "my-scanner", "target/and-here/", "somewhere/else");

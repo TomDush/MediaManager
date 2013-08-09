@@ -15,6 +15,10 @@ public class ConfigurationException extends RuntimeException {
 		super(message);
 	}
 
+	public ConfigurationException(String pattern, Object... args) {
+		super(String.format(pattern, args));
+	}
+
 	public ConfigurationException(Throwable cause) {
 		super(cause);
 	}

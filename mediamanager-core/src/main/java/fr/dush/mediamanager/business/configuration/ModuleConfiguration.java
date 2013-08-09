@@ -27,7 +27,8 @@ public class ModuleConfiguration {
 	/** Pattern to detect values containing variables */
 	private static Pattern pattern = Pattern.compile("\\$\\{([\\w\\._-]*)\\}");
 
-	private ModuleConfiguration generic;
+	/** If null, it's the generic ! */
+	private final ModuleConfiguration generic;
 
 	/** Wrapped field set */
 	private FieldSet fieldSet;

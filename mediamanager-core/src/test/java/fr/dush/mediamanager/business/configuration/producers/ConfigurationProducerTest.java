@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.configuration.impl;
+package fr.dush.mediamanager.business.configuration.producers;
 
 import static com.google.common.collect.Lists.*;
 import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
@@ -14,17 +14,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.Module;
-import fr.dush.mediamanager.business.configuration.IConfigurationManager;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.dto.configuration.Field;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.engine.CdiJunitTest;
 
-@Module(name = "JUNIT Module", description = "Fake description", id="junit-configurationmanager")
-public class ConfigurationManagerImplTest extends CdiJunitTest {
-
-	@Inject
-	private IConfigurationManager configurationManager;
+@Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")
+public class ConfigurationProducerTest extends CdiJunitTest {
 
 	@Inject
 	private ObjectMapper mapper;
@@ -34,11 +30,6 @@ public class ConfigurationManagerImplTest extends CdiJunitTest {
 	private ModuleConfiguration config;
 
 	@Test
-	public void testName() throws Exception {
-		assertThat(configurationManager).isNotNull().isInstanceOf(ConfigurationManagerImpl.class);
-	}
-
-	@Test
 	public void testConfigurationInjection() throws Exception {
 		assertThat(config).isNotNull().hasName("JUNIT Module").hasPackageName("fr.dush.mediamanager.business.foobar").hasFieldsSize(2);
 		final Field host = config.getField("host");
@@ -46,7 +37,7 @@ public class ConfigurationManagerImplTest extends CdiJunitTest {
 
 		assertThat(config.readValue("port")).isEqualTo("8080");
 		assertThat(config.readValue("foo", "bar")).isEqualTo("bar");
-		assertThat(config.readValue("foo", "baz")).isEqualTo("bar"); // Default value is saved...
+		assertThat(config.readValue("foo", "baz")).isEqualTo("baz"); // Default value isn't saved...
 
 		final Field foo = config.getField("foo");
 		assertThat(foo).isDefaultValue();

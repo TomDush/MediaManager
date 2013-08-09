@@ -4,8 +4,12 @@ import static org.fest.assertions.api.Assertions.*;
 
 import java.util.Collection;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+
+import lombok.Getter;
+import lombok.ToString;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import fr.dush.mediamanager.engine.CdiJunitTest;
 
 @ApplicationScoped
 @Module(id = "junit-modulesmanagement", name = "Testing Module Management")
+@ToString(of = "instanceId")
 public class ModulesManagerImplTest extends CdiJunitTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModulesManagerImplTest.class);
@@ -24,8 +29,17 @@ public class ModulesManagerImplTest extends CdiJunitTest {
 	@Inject
 	private IModulesManager modulesManagement;
 
-	public ModulesManagerImplTest() {
+	private static int instanceCount = 0;
+
+	@Getter
+	private int instanceId;
+
+	@PostConstruct
+	public void modulesManagerImplTest() {
 		LOGGER.debug("New instance of ModulesManagementImplTest");
+		synchronized (ModulesManagerImplTest.class) {
+			instanceId = instanceCount++;
+		}
 	}
 
 	@Test
@@ -36,8 +50,8 @@ public class ModulesManagerImplTest extends CdiJunitTest {
 		final Collection<ModulesManagerImplTest> modules2 = modulesManagement.findModuleByType(ModulesManagerImplTest.class);
 		LOGGER.debug("{}", modules2.toString());
 
-		assertThat(modules).isNotEmpty().contains(this);
-		assertThat(modules2).isNotEmpty().contains(this);
+		assertThat(extractProperty("instanceId").from(modules)).hasSize(1).contains(instanceId);
+		assertThat(extractProperty("instanceId").from(modules2)).hasSize(1).contains(instanceId);
 	}
 
 	@Test
@@ -45,4 +59,5 @@ public class ModulesManagerImplTest extends CdiJunitTest {
 		final CdiJunitTest module = modulesManagement.findModuleById(CdiJunitTest.class, "junit-modulesmanagement");
 		assertThat(module).isNotNull();
 	}
+
 }

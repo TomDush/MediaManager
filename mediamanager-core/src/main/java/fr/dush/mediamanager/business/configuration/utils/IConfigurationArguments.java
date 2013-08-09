@@ -1,23 +1,23 @@
-package fr.dush.mediamanager.business.configuration.impl;
+package fr.dush.mediamanager.business.configuration.utils;
 
 public interface IConfigurationArguments {
 
 	/**
-	 * Get package name
+	 * Package's name : configuration's identifier (mandatory)
 	 *
 	 * @return package name, never NULL or empty.
 	 */
 	public String getPackage();
 
 	/**
-	 * Get configuration name (or module name)
+	 * Configuration's display name (or module name)
 	 *
 	 * @return Return can be null...
 	 */
 	public String getName();
 
 	/**
-	 * Get definition, if any.
+	 * File's URL (in class path) containing properties descriptions and default value. Used to initialize configuration.
 	 *
 	 * @return can be null or empty.
 	 */

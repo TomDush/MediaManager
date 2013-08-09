@@ -2,6 +2,7 @@ package fr.dush.mediamanager.dao.mongodb;
 
 import java.net.UnknownHostException;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
@@ -16,6 +17,7 @@ import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
 import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.dao.mongodb.converters.PathConverter;
@@ -25,7 +27,8 @@ import fr.dush.mediamanager.dao.mongodb.converters.PathConverter;
  *
  * @author Thomas Duchatelle
  */
-@Module(id = "mongo-provider", name="MongoDB Configurator")
+@Module(id = "mongo-provider", name = "MongoDB Configurator", packageName = "persistence")
+@ApplicationScoped
 public class MongoProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
@@ -35,11 +38,12 @@ public class MongoProvider {
 	}
 
 	@Inject
+	@ConfigurationWithoutDatabase
 	@Configuration(definition = "configuration/mongo-config.json")
 	private ModuleConfiguration configuration;
 
 	@Produces
-//	@ApplicationScoped
+	@ApplicationScoped
 	public MongoClient producesMogoClient() throws UnknownHostException {
 		LOGGER.debug("Instanciate new MongoDB and connection");
 		return new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));

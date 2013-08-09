@@ -2,6 +2,7 @@ package fr.dush.mediamanager.dto.configuration;
 
 import static com.google.common.collect.Maps.*;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -30,6 +31,39 @@ public class FieldSet {
 
 	public FieldSet(String packageName) {
 		this.packageName = packageName;
+	}
+
+	/**
+	 * Add or Set value
+	 *
+	 * @param key
+	 * @param value
+	 * @param defaultValue if this value is default value...
+	 */
+	public void addValue(String key, String value, boolean defaultValue) {
+		if (fields.containsKey(key)) {
+			final Field f = fields.get(key);
+			f.setValue(value);
+			f.setDefaultValue(defaultValue);
+
+		} else {
+			fields.put(key, new Field(key, value));
+		}
+	}
+
+	public void addAllFields(List<Field> fields, boolean b) {
+		for (Field f : fields) {
+			addField(f);
+		}
+	}
+
+	/**
+	 * Add field, replace existing one if any.
+	 *
+	 * @param f
+	 */
+	private void addField(Field f) {
+		fields.put(f.getKey(), f);
 	}
 
 }

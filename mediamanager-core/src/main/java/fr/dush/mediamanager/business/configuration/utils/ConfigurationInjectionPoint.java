@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.configuration.impl;
+package fr.dush.mediamanager.business.configuration.utils;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -62,10 +62,6 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getPackage()
-	 */
 	@Override
 	public String getPackage() {
 		// package is overrided in configuration annotation
@@ -86,10 +82,6 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		return point.getBean().getBeanClass().getPackage().getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getName()
-	 */
 	@Override
 	public String getName() {
 		// Name is overrided in configuration annotation
@@ -106,10 +98,6 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see fr.dush.mediamanager.business.configuration.IConfigurationArguments#getDefinition()
-	 */
 	@Override
 	public String getDefinition() {
 		return configurationAnnotation.definition();

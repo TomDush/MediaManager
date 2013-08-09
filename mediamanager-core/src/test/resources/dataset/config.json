@@ -1,0 +1,10 @@
+[
+	{
+		"_id":"junit.answers",
+		"values":{
+			"TheAnswer":"42",
+			"season":"winter is coming"
+		}
+		
+	}
+]

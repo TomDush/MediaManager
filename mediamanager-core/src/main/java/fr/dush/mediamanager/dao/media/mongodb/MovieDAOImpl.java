@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ import fr.dush.mediamanager.dto.media.video.Movie;
  * @author Thomas Duchatelle
  *
  */
+@ApplicationScoped
 public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovieDAO {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);
