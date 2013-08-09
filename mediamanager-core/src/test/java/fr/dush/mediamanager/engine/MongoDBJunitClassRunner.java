@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScripts;
 import fr.dush.mediamanager.engine.mongodb.MongoDBDatasetManager;
+import fr.dush.mediamanager.tools.CDIUtils;
 
 public class MongoDBJunitClassRunner extends CdiJunitClassRunner {
 
@@ -47,7 +48,7 @@ public class MongoDBJunitClassRunner extends CdiJunitClassRunner {
 		// Initialize data set...
 		LOGGER.debug("Initialize with scrips : {}", scripts);
 		for (DatabaseScript script : Lists.reverse(scripts)) {
-			final MongoDBDatasetManager datasetManager = getBean(MongoDBDatasetManager.class);
+			final MongoDBDatasetManager datasetManager = CDIUtils.getBean(MongoDBDatasetManager.class);
 			datasetManager.initializeDataset(script);
 		}
 

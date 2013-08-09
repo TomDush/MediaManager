@@ -40,12 +40,12 @@
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia</artifactId>
-			<version>0.103-SNAPSHOT</version> <!-- 0.101.0 -->
+			<version>0.103</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.morphia</groupId>
 			<artifactId>morphia-logging-slf4j</artifactId>
-			<version>0.103-SNAPSHOT</version>
+			<version>0.103</version>
 		</dependency>
 	</dependencies>
 
