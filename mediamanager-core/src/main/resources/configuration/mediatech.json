@@ -1,12 +1,14 @@
-[ {
-  "key" : "downloader.imagespath",
-  "value" : "${mediamanager.root}/images",
-  "name" : "Images directory",
-  "description" : "Directory where poster and backdrops are stored."
-}, 
-{
-  "key" : "downloader.trailerpath",
-  "value" : "${mediamanager.root}/trailers",
-  "name" : "Trailer directory",
-  "description" : "Directory where trailers are downloaded."
-} ]
+[
+	{
+		"key":"downloader.imagespath",
+		"value":"${mediamanager.root}/images",
+		"name":"Images directory",
+		"description":"Directory where poster and backdrops are stored."
+	},
+	{
+		"key":"downloader.trailerpath",
+		"value":"${mediamanager.root}/trailers",
+		"name":"Trailer directory",
+		"description":"Directory where trailers are downloaded."
+	}
+]

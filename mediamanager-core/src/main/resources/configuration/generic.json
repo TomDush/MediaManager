@@ -1,6 +1,8 @@
-[ {
-  "key" : "mediamanager.root",
-  "value" : "${user.home}/.mediamanager",
-  "name" : "Root directory",
-  "description" : "Directory where MediaManager file will be stored."
-} ]
+[
+	{
+		"key":"mediamanager.root",
+		"value":"${user.home}/.mediamanager",
+		"name":"Root directory",
+		"description":"Directory where MediaManager files will be stored."
+	}
+]

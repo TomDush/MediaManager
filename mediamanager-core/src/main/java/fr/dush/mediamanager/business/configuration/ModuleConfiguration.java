@@ -14,8 +14,8 @@ import fr.dush.mediamanager.dto.configuration.Field;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 
 /**
- * An <code>Configuration</code> instance is created for each module. It initialized by properties file with default values, and it saved
- * into database or properties file to persist changes.
+ * An <code>ModuleConfiguration</code> instance is created for each module. It initialized by properties file with default values, and it
+ * saved into database or properties file to persist changes.
  *
  * @author Thomas Duchatelle
  *
@@ -43,13 +43,13 @@ public class ModuleConfiguration {
 	 * @param key
 	 * @return Null if not defined.
 	 */
-	public String getGenericValue(String key) {
+	public String readGenericValue(String key) {
 		if (null == generic) {
 			// Generic is itself !
-			return getValue(key);
+			return readValue(key);
 		}
 
-		return generic.getValue(key);
+		return generic.readValue(key);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class ModuleConfiguration {
 	 * @param key
 	 * @return Null if not defined.
 	 */
-	public String getValue(String key) {
+	public String readValue(String key) {
 		if (fieldSet.getFields().containsKey(key)) {
 			return resolveGenericProperties(fieldSet.getFields().get(key).getValue());
 		}
@@ -72,8 +72,8 @@ public class ModuleConfiguration {
 	 * @param key
 	 * @return Null if not defined.
 	 */
-	public Integer getValueAsInt(String key) throws NumberFormatException {
-		final String value = getValue(key);
+	public Integer readValueAsInt(String key) throws NumberFormatException {
+		final String value = readValue(key);
 		if (null == value) return null;
 
 		return Integer.valueOf(value);
@@ -90,11 +90,11 @@ public class ModuleConfiguration {
 		while (matcher.find()) {
 			// Find corresponding value
 			LOGGER.debug("Resolve property : {} (full var : {})", matcher.group(1), matcher.group());
-			String prop = getValue(matcher.group(1));
+			String prop = readValue(matcher.group(1));
 
 			// Search in generic if value not found.
 			if (isEmpty(prop) && null != generic) {
-				prop = generic.getValue(matcher.group(1));
+				prop = generic.readValue(matcher.group(1));
 			}
 
 			// Else, search in System
@@ -112,15 +112,13 @@ public class ModuleConfiguration {
 	}
 
 	/**
-	 * Get value for this key, return defaultValue if it's null or empty.
+	 * Get value for this key, return defaultValue if it's null, empty or default. Given default value will not be saved.
 	 *
 	 * @param key
-	 * @param defaultValue Returned value if expected value is empty.
+	 * @param defaultValue returned value if expected value is empty or default
 	 * @return
 	 */
-	public String getValue(String key, String defaultValue) {
-		// TODO event "changed" / "added"
-
+	public String readValue(String key, String defaultValue) {
 		Field field = fieldSet.getFields().get(key);
 		if (null == field) {
 			// If field wasn't known, create field with default value.
@@ -131,10 +129,9 @@ public class ModuleConfiguration {
 			return resolveGenericProperties(defaultValue);
 		}
 
-		// If no value, save default
-		if (isEmpty(field.getValue())) {
-			field.setValue(defaultValue);
-			field.setDefaultValue(true);
+		// If no value or default, return given default
+		if (isEmpty(field.getValue()) || field.isDefaultValue()) {
+			return defaultValue;
 		}
 
 		return resolveGenericProperties(field.getValue());

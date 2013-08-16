@@ -44,9 +44,9 @@ public class ConfigurationManagerImplTest extends CdiJunitTest {
 		final Field host = config.getField("host");
 		assertThat(host).isNotNull().hasKey("host").hasValue("localhost").isDefaultValue();
 
-		assertThat(config.getValue("port")).isEqualTo("8080");
-		assertThat(config.getValue("foo", "bar")).isEqualTo("bar");
-		assertThat(config.getValue("foo", "baz")).isEqualTo("bar"); // Default value is saved...
+		assertThat(config.readValue("port")).isEqualTo("8080");
+		assertThat(config.readValue("foo", "bar")).isEqualTo("bar");
+		assertThat(config.readValue("foo", "baz")).isEqualTo("bar"); // Default value is saved...
 
 		final Field foo = config.getField("foo");
 		assertThat(foo).isDefaultValue();
@@ -69,14 +69,14 @@ public class ConfigurationManagerImplTest extends CdiJunitTest {
 		final ModuleConfiguration generic = new ModuleConfiguration(null, new FieldSet("generic"));
 		ModuleConfiguration config = new ModuleConfiguration(generic, new FieldSet("foobar"));
 
-		final String temp = config.getValue("temp", "temp_dir");
+		final String temp = config.readValue("temp", "temp_dir");
 		assertThat(temp).isEqualTo("temp_dir");
 
 		generic.addField(new Field("mediamanager.root", "${user.home}/.mediamanager"));
 		final String root = System.getProperty("user.home") + "/.mediamanager";
-		assertThat(generic.getValue("mediamanager.root")).isEqualTo(root);
+		assertThat(generic.readValue("mediamanager.root")).isEqualTo(root);
 
-		final String value = config.getValue("foobar", "${mediamanager.root}/${temp}");
+		final String value = config.readValue("foobar", "${mediamanager.root}/${temp}");
 		assertThat(value).isEqualTo(root + "/temp_dir");
 	}
 }

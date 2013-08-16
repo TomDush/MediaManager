@@ -22,6 +22,6 @@ public class TheMovieDBProvider {
 	@Produces
 	public TheMovieDbApi provideTheMovieDbApi() throws MovieDbException {
 		// TODO MoviesDB : how to protect this private key ?
-		return new TheMovieDbApi(configuration.getValue("moviesdb.key", "21fa5e6aa76429cedfa1d628ecc7abeb"));
+		return new TheMovieDbApi(configuration.readValue("moviesdb.key", "21fa5e6aa76429cedfa1d628ecc7abeb"));
 	}
 }

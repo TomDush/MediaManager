@@ -50,8 +50,8 @@ public class ArtDownloaderImpl implements IArtDownloader {
 	 */
 	@PostConstruct
 	public void readConfiguration() {
-		imageRootPath = FileSystems.getDefault().getPath(configuration.getValue("downloader.imagespath"));
-		trailersRootPath = FileSystems.getDefault().getPath(configuration.getValue("downloader.trailerpath"));
+		imageRootPath = FileSystems.getDefault().getPath(configuration.readValue("downloader.imagespath"));
+		trailersRootPath = FileSystems.getDefault().getPath(configuration.readValue("downloader.trailerpath"));
 	}
 
 	@Override

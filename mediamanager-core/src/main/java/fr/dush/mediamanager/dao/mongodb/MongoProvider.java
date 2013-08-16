@@ -42,14 +42,14 @@ public class MongoProvider {
 //	@ApplicationScoped
 	public MongoClient producesMogoClient() throws UnknownHostException {
 		LOGGER.debug("Instanciate new MongoDB and connection");
-		return new MongoClient(configuration.getValue("mongodb.host"), configuration.getValueAsInt("mongodb.port"));
+		return new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));
 	}
 
 	@Produces
 //	@ApplicationScoped
 	public DB producesMogoDB(MongoClient mongoClient) throws UnknownHostException {
 		LOGGER.debug("Instanciate new MongoDB and connection");
-		return mongoClient.getDB(configuration.getValue("mongodb.databaseName"));
+		return mongoClient.getDB(configuration.readValue("mongodb.databaseName"));
 	}
 
 	@Produces
@@ -59,7 +59,7 @@ public class MongoProvider {
 		morphia.mapPackage("fr.dush.mediamanager.dto");
 		morphia.getMapper().getConverters().addConverter(PathConverter.class);
 
-		return morphia.createDatastore(mongodb.getMongo(), configuration.getValue("mongodb.databaseName"));
+		return morphia.createDatastore(mongodb.getMongo(), configuration.readValue("mongodb.databaseName"));
 	}
 
 }
