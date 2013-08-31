@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner;
+package fr.dush.mediamanager.business.mediatech.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
@@ -18,12 +18,13 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
 import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus.Phase;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
+import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 import fr.dush.mediamanager.exceptions.ScanningException;
 
@@ -125,11 +126,16 @@ public abstract class AbstractScanner<F> implements Runnable {
 
 		for (F file : files) {
 			final Media media = enrich(file);
-			// TODO save media
+			if(media != null) {
+				save(media); // FIXME : may not be null !
+			}
 
 			status.incrementFinishedJob(1);
 		}
 	}
+
+	/** Save media */
+	protected abstract void save(Media media) ;
 
 	/**
 	 * Get directory file list. TODO Filter file to ignore.

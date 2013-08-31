@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.events.scan;
+package fr.dush.mediamanager.events.scan.reponses;
 
 import static com.google.common.collect.Lists.*;
 

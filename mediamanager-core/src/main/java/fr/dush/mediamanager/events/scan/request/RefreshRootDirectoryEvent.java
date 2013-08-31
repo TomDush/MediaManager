@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.events.scan;
+package fr.dush.mediamanager.events.scan.request;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,9 +13,9 @@ import fr.dush.mediamanager.dto.tree.RootDirectory;
 @SuppressWarnings("serial")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class NewRootDirectoryEvent extends AbstractRootDirectoryEvent {
+public class RefreshRootDirectoryEvent extends AbstractRootDirectoryEvent {
 
-	public NewRootDirectoryEvent(Object source, RootDirectory rootDirectory) {
+	public RefreshRootDirectoryEvent(Object source, RootDirectory rootDirectory) {
 		super(source, rootDirectory);
 	}
 

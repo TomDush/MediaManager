@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.events.scan;
+package fr.dush.mediamanager.events.scan.reponses;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,12 +16,12 @@ import fr.dush.mediamanager.dto.tree.RootDirectory;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class InprogressScanning extends AbstractRootDirectoryEvent {
+public class InprogressScanningResponseEvent extends ScanningResponseEvent {
 
 	private ScanningStatus status;
 
-	public InprogressScanning(Object source, RootDirectory rootDirectory, ScanningStatus status) {
-		super(source, rootDirectory);
+	public InprogressScanningResponseEvent(Object source, Object eventSource, RootDirectory rootDirectory, ScanningStatus status) {
+		super(source, eventSource, rootDirectory);
 		this.status = status;
 	}
 

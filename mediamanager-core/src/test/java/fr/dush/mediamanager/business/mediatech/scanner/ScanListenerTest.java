@@ -15,17 +15,18 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 
 import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
+import fr.dush.mediamanager.business.mediatech.scanner.impl.MoviesScanner;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.engine.mock.EventMock;
-import fr.dush.mediamanager.events.scan.InprogressScanning;
-import fr.dush.mediamanager.events.scan.NewRootDirectoryEvent;
+import fr.dush.mediamanager.events.scan.reponses.InprogressScanningResponseEvent;
+import fr.dush.mediamanager.events.scan.request.NewRootDirectoryEvent;
 
-public class FileScannerTest extends SimpleJunitTest {
+public class ScanListenerTest extends SimpleJunitTest {
 
 	@InjectMocks
-	private FileScanner scanner;
+	private ScanListener scanner;
 
 	@Mock
 	private Instance<MoviesScanner> moviesScannerProvider;
@@ -37,7 +38,7 @@ public class FileScannerTest extends SimpleJunitTest {
 	private IRootDirectoryDAO rootDirectoryDAO;
 
 	@Spy
-	private EventMock<InprogressScanning> bus = new EventMock<InprogressScanning>();
+	private EventMock<InprogressScanningResponseEvent> bus = new EventMock<InprogressScanningResponseEvent>();
 
 	@Before
 	public void postConstruct() {

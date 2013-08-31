@@ -3,6 +3,7 @@ package fr.dush.mediamanager.business.mediatech;
 import static org.fest.assertions.api.Assertions.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import org.junit.Before;
@@ -32,7 +33,7 @@ public class ArtDownloaderImplTest {
 			"target/");
 
 	@Before
-	public void initMockito() {
+	public void initMockito() throws IOException {
 		MockitoAnnotations.initMocks(this);
 		artDownloader.readConfiguration();
 	}

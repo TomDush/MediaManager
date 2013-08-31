@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner;
+package fr.dush.mediamanager.business.mediatech.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
 import static org.fest.assertions.api.Assertions.*;
@@ -25,11 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
+import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
+import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.business.mediatech.scanner.impl.MoviesScanner;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
-import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
+import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 

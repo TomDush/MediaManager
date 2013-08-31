@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner;
+package fr.dush.mediamanager.business.mediatech.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
 
@@ -28,12 +28,15 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.io.Files;
 
+import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
+import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
 import fr.dush.mediamanager.business.modules.IModulesManager;
+import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.media.video.VideoFile;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
+import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 import fr.dush.mediamanager.exceptions.ScanningException;
@@ -47,6 +50,9 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 	@Inject
 	private IModulesManager modulesManager;
 
+	@Inject
+	private IMovieDAO movieDAO;
+
 	/** Media enricher */
 	private IMoviesEnricher enricher;
 
@@ -54,6 +60,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException, ScanningException {
 		try {
 			// Initialize enricher...
+			// TODO We choose "movie enricher", but not movies scanner... ?
 			enricher = modulesManager.findModuleById(IMoviesEnricher.class, rootDirectory.getEnricherScanner());
 			return super.startScanning(rootDirectory);
 
@@ -85,11 +92,16 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 			}
 
 			// Return first or null
-			if (movies.isEmpty()) return null;
+			if (movies.isEmpty()) {
+				LOGGER.info("No movies found for file {}", file);
+				return null;
+			}
+			// TODO better enrichment ?
+			// TODO movie file isn't saved...
 			return movies.get(0);
 
 		} catch (EnrichException e) {
-			LOGGER.error("Enrichement fail on '{}' movie : {}", file.getMovieName(), e.getMessage());
+			LOGGER.error("Enrichement fail on file {} (movie : {}).", file, file.getMovieName(), e);
 		}
 
 		return null;
@@ -213,5 +225,11 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 		public int compareTo(FileStacking o) {
 			return volume.compareTo(o.getVolume());
 		}
+	}
+
+	@Override
+	protected void save(Media media) {
+		movieDAO.save((Movie) media); // TODO add type safe...
+		// TODO save and collection ?
 	}
 }

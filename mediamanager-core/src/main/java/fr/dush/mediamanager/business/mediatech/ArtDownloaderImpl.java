@@ -6,9 +6,9 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -38,20 +38,22 @@ public class ArtDownloaderImpl implements IArtDownloader {
 
 	private Path trailersRootPath;
 
-	public ArtDownloaderImpl() throws IOException {
+	/**
+	 * Read the configuration once.
+	 * @throws IOException
+	 */
+	@PostConstruct
+	public void readConfiguration() throws IOException {
+		imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
+		trailersRootPath = Paths.get(configuration.readValue("downloader.trailerpath"));
+
 		temp = Files.createTempDirectory("MM_Downloader");
 
 		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath,
 				trailersRootPath, temp);
-	}
 
-	/**
-	 * Read the configuration once.
-	 */
-	@PostConstruct
-	public void readConfiguration() {
-		imageRootPath = FileSystems.getDefault().getPath(configuration.readValue("downloader.imagespath"));
-		trailersRootPath = FileSystems.getDefault().getPath(configuration.readValue("downloader.trailerpath"));
+		imageRootPath.toFile().mkdirs();
+		trailersRootPath.toFile().mkdirs();
 	}
 
 	@Override

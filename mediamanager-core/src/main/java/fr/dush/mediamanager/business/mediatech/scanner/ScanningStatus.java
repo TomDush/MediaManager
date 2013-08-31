@@ -1,5 +1,7 @@
 package fr.dush.mediamanager.business.mediatech.scanner;
 
+import java.io.Serializable;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,11 +12,12 @@ import lombok.Setter;
  * @author Thomas Duchatelle
  *
  */
+@SuppressWarnings("serial")
 @Getter
-public class ScanningStatus {
+public class ScanningStatus implements Serializable {
 
 	@Getter(value = AccessLevel.PROTECTED)
-	private Thread scanningThread;
+	private transient Thread scanningThread;
 
 	/** Current phase */
 	private Phase phase = Phase.INIT;
@@ -29,13 +32,26 @@ public class ScanningStatus {
 	@Setter
 	private String stepName;
 
-	/** Progress in phase 0 to 100. Negative if progression isn't known. */
-	public double getPercent() {
-		return jobNumber <= 0 ? -1 : 100.0 * jobDone / jobNumber;
-	}
+	@Setter
+	private String message;
 
 	public ScanningStatus(Thread scanningThread) {
 		this.scanningThread = scanningThread;
+	}
+
+	/**
+	 * Constructor for failed process
+	 *
+	 * @param message
+	 */
+	public ScanningStatus(String message) {
+		phase = Phase.FAILED;
+		this.message = message;
+	}
+
+	/** Progress in phase 0 to 100. Negative if progression isn't known. */
+	public double getPercent() {
+		return jobNumber <= 0 ? -1 : 100.0 * jobDone / jobNumber;
 	}
 
 	public synchronized void changePhase(Phase phase, int jobNumber) {
@@ -64,10 +80,13 @@ public class ScanningStatus {
 
 	@Override
 	public String toString() {
+		if(phase == Phase.FAILED) {
+			return "FAILED : " + message;
+		}
 		return phase + " " + stepName + " : " + getPercent() + "% (" + jobDone + "/" + jobNumber + ")";
 	}
 
-	public enum Phase {
+	public enum Phase implements Serializable {
 		/** Intiale step ... */
 		INIT,
 
@@ -75,7 +94,10 @@ public class ScanningStatus {
 		SCANNING,
 
 		/** Get from internet missing data on medias. */
-		ENRICH;
+		ENRICH,
+
+		/** Failed to finish process */
+		FAILED;
 
 	}
 }

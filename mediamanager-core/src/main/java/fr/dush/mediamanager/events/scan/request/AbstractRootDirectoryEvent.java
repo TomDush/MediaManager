@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.events.scan;
+package fr.dush.mediamanager.events.scan.request;
 
 import java.io.Serializable;
 
