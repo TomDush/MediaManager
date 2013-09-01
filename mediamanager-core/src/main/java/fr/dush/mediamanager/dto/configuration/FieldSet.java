@@ -54,6 +54,7 @@ public class FieldSet {
 	public void addAllFields(List<Field> fields, boolean b) {
 		for (Field f : fields) {
 			addField(f);
+			f.setDefaultValue(b);
 		}
 	}
 

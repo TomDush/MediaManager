@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
 import fr.dush.mediamanager.annotations.FileConfigurationDAO;
+import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.configuration.utils.ConfigurationInjectionPoint;
 import fr.dush.mediamanager.business.configuration.utils.IConfigurationArguments;
@@ -68,8 +69,12 @@ public class ConfigurationProducer {
 	@Inject
 	private ObjectMapper objectMapper;
 
+	@Inject
+	private IConfigurationRegister configurationRegister;
+
 	/** Configuration generic for all application : it doesn't depend on any module */
 	private ModuleConfiguration generic;
+
 
 	/**
 	 * Instanciate generic module
@@ -143,7 +148,9 @@ public class ConfigurationProducer {
 
 		// Load default value and displayable data...
 		FieldSet fieldSet = new FieldSet(wrapper.getPackage());
-		if (isEmpty(fieldSet.getName())) fieldSet.setName(wrapper.getName());
+		if (isEmpty(fieldSet.getName())) {
+			fieldSet.setName(wrapper.getName());
+		}
 
 		final String file = wrapper.getDefinition();
 		if (isNotBlank(file)) {
@@ -159,7 +166,14 @@ public class ConfigurationProducer {
 		}
 
 		// Create module configuration
-		return new ModuleConfiguration(generic, fieldSet);
+		return newModuleConfiguration(fieldSet);
+	}
+
+	private ModuleConfiguration newModuleConfiguration(FieldSet fieldSet) {
+		final ModuleConfiguration config = new ModuleConfiguration(generic, fieldSet);
+		configurationRegister.registerConfiguration(config);
+
+		return config;
 	}
 
 	/**

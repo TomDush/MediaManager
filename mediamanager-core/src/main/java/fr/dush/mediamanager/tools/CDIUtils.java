@@ -1,6 +1,9 @@
 package fr.dush.mediamanager.tools;
 
+import static com.google.common.collect.Lists.*;
+
 import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -84,5 +87,30 @@ public class CDIUtils {
 
 		final Bean<?> bean = beans.iterator().next();
 		return (T) beanManager.getReference(bean, javaClass, beanManager.createCreationalContext(bean));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> getBeans(final Class<T> javaClass) {
+		final BeanManager beanManager = getCdiContainer().getBeanManager();
+
+		final Set<Bean<?>> beans = beanManager.getBeans(javaClass, new Any() {
+
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return Any.class;
+			}
+		});
+
+		if (beans.isEmpty()) {
+			LOGGER.error("No CDI bean found for class {}.", javaClass);
+			throw new RuntimeException("No CDI bean found for class " + javaClass);
+		}
+
+		List<T> list = newArrayList();
+		for (Bean<?> bean : beans) {
+			list.add((T) beanManager.getReference(bean, javaClass, beanManager.createCreationalContext(bean)));
+		}
+
+		return list;
 	}
 }

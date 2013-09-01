@@ -21,7 +21,11 @@ import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 /**
- * Use property file
+ * Use property file to overload default configuration.
+ *
+ * <p>
+ * Path to file must be in <code>mediamanager.propertiesfile</code> system's properties. If it is defined, file must exist.
+ * </p>
  *
  * @author Thomas Duchatelle
  *

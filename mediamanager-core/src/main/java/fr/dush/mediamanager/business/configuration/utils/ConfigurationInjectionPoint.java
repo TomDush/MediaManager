@@ -38,7 +38,7 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		this.point = point;
 		configurationAnnotation = point.getAnnotated().getAnnotation(Configuration.class);
 
-		if (null == configurationAnnotation) {
+		if (configurationAnnotation == null) {
 			throw new ConfigurationException(generateErrorString(point,
 					"To inject ModuleConfiguration, Configuration annotation is mandatory"));
 		}
@@ -47,14 +47,15 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		if (NULL_ENTRY_POINT.equals(configurationAnnotation.entryPoint())) {
 			// No entry point is defined, class may be directly Module...
 			module = point.getBean().getBeanClass().getAnnotation(Module.class);
-			if (null != module) {
+			if (module != null) {
 				moduleClass = point.getBean().getBeanClass();
 			}
 
 		} else {
 			// Module is defined, it must be valid (has Module annotation)
-			module = configurationAnnotation.entryPoint().getAnnotation(Module.class);
-			if (null == module) {
+			moduleClass = configurationAnnotation.entryPoint();
+			module = moduleClass.getAnnotation(Module.class);
+			if (module == null) {
 				throw new ConfigurationException(generateErrorString(point, "Class %s must be Module to be used as entryPoint.",
 						configurationAnnotation.entryPoint().getName()));
 			}
@@ -70,7 +71,7 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
 		}
 
 		// If module defined, get module package
-		if (null != module) {
+		if (module != null) {
 			if (isNotEmpty(module.packageName())) {
 				return module.packageName();
 			}

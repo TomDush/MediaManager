@@ -1,7 +1,10 @@
 package fr.dush.mediamanager.business.modules.impl;
 
+import static com.google.common.collect.Lists.*;
+
 import java.lang.annotation.Annotation;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,6 +13,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.Nonbinding;
 import javax.inject.Inject;
+
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -30,13 +35,32 @@ public class ModulesManagementImpl implements IModulesManager {
 
 		// If bean not found, or too many found...
 		if (beans.size() != 1) {
-			throw new ModuleLoadingException(String.format(
-					"Expected one and only one module with type <%s> with id <%s>, but found %s : %s.", moduleClass, id, beans.size(),
-					beans));
+			final String mess = String.format(
+					"Expected one and only one module with type <%s> with id <%s>, but found %s : %s. Available Ids are : %s", moduleClass,
+					id, beans.size(), beans, getAvailableModuleIds(moduleClass));
+
+			throw new ModuleLoadingException(mess);
 		}
 
 		// Create instance bean return
 		return this.beanInstanciator(moduleClass).apply(beans.iterator().next());
+	}
+
+	private <T> List<String> getAvailableModuleIds(Class<? extends T> moduleClass) {
+		List<String> availablesId = newArrayList();
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		final Set<Bean<T>> allBeans = (Set) BeanProvider.getBeanDefinitions(moduleClass, true, true);
+
+		for (Bean<T> b : allBeans) {
+			final Set<Annotation> qualifiers = b.getQualifiers();
+			for (Annotation a : qualifiers) {
+				if (a instanceof Module) {
+					availablesId.add(((Module) a).id());
+				}
+			}
+		}
+		return availablesId;
 	}
 
 	@Override
