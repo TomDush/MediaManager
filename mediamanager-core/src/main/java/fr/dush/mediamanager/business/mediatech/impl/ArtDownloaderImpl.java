@@ -23,6 +23,7 @@ import com.google.common.hash.Hashing;
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 @ApplicationScoped
@@ -42,6 +43,7 @@ public class ArtDownloaderImpl implements IArtDownloader {
 
 	/**
 	 * Read the configuration once.
+	 *
 	 * @throws IOException
 	 */
 	@PostConstruct
@@ -59,11 +61,14 @@ public class ArtDownloaderImpl implements IArtDownloader {
 				trailersRootPath, temp);
 
 		imageRootPath.toFile().mkdirs();
+		for(ImageType t : ImageType.values()) {
+			imageRootPath.resolve(getPath(t)).toFile().mkdirs();
+		}
 		trailersRootPath.toFile().mkdirs();
 	}
 
 	@Override
-	public String storeImage(URL url, String basename) {
+	public String storeImage(ImageType imageType, URL url, String basename) {
 		try {
 			// Download to temporary directory
 			final Path tempFile = createNewTempPath();
@@ -71,7 +76,9 @@ public class ArtDownloaderImpl implements IArtDownloader {
 			LOGGER.debug("{} donwloaded into {}", url, tempFile);
 
 			// Move to real directory if not already existing, rename it with hash
-			final Path downloadedFile = imageRootPath.resolve(newFinalName(tempFile.toFile(), basename, getFileExtension(url.getFile())));
+			final Path downloadedFile = imageRootPath.resolve(getPath(imageType)).resolve(
+					newFinalName(tempFile.toFile(), basename, getFileExtension(url.getFile())));
+
 			if (!downloadedFile.toFile().exists()) {
 				LOGGER.debug("{} moved into {}", url, downloadedFile);
 				Files.move(tempFile, downloadedFile);
@@ -85,6 +92,14 @@ public class ArtDownloaderImpl implements IArtDownloader {
 			return null;
 		}
 
+	}
+
+	private String getPath(ImageType imageType) {
+		if (imageType == null) {
+			return getPath(ImageType.OTHER);
+		}
+
+		return imageType.toString().toLowerCase() + "s";
 	}
 
 	/**

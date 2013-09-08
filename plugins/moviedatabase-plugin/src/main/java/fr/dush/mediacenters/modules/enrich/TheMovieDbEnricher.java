@@ -27,6 +27,7 @@ import com.omertron.themoviedbapi.model.Trailer;
 
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.SourceId;
 import fr.dush.mediamanager.dto.media.Sources;
@@ -64,7 +65,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 	public List<Movie> findMediaData(MoviesParsedName filename) throws EnrichException {
 		LOGGER.debug("--> findMediaData({})", filename);
 
-		if(isEmpty(filename.getMovieName())) {
+		if (isEmpty(filename.getMovieName())) {
 			return newArrayList();
 		}
 
@@ -147,8 +148,8 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 			MoviesCollection collection = new MoviesCollection();
 			collection.getMediaIds().addId(createId(info.getId()));
 			collection.setCreation(new Date());
-			collection.setPoster(downloadImage(info.getPosterPath(), collection.getTitle() + "_poster"));
-			collection.setBackdrop(downloadImage(info.getBackdropPath(), collection.getTitle() + "_backdrop"));
+			collection.setPoster(downloadImage(ImageType.POSTER, info.getPosterPath(), collection.getTitle() + "_poster"));
+			collection.setBackdrop(downloadImage(ImageType.BACKDROP, info.getBackdropPath(), collection.getTitle() + "_backdrop"));
 
 			// List of movies
 			collection.setMovies(Lists.transform(info.getParts(), movieCollectionConverter));
@@ -161,8 +162,12 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 		}
 	}
 
-	public String downloadImage(String posterPath, String baseName) throws MovieDbException {
-		return downloader.storeImage(api.createImageUrl(posterPath, "original"), baseName);
+	public String downloadImage(ImageType imageType, String imagePath, String baseName) throws MovieDbException {
+		if (isNotEmpty(imagePath)) {
+			return downloader.storeImage(imageType, api.createImageUrl(imagePath, "original"), baseName);
+		}
+
+		return null;
 	}
 
 	/**
@@ -198,7 +203,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 				}));
 			}
 			movie.setOverview(movieDb.getOverview());
-			movie.getBackdrops().add(downloadImage(movieDb.getBackdropPath(), movieDb.getTitle()));
+			movie.getBackdrops().add(downloadImage(ImageType.BACKDROP, movieDb.getBackdropPath(), movieDb.getTitle()));
 
 			// Find main actors...
 			PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
@@ -247,7 +252,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
 			// Posters, ....
 			try {
-				movie.setPoster(downloadImage(movieDb.getPosterPath(), movieDb.getTitle()));
+				movie.setPoster(downloadImage(ImageType.POSTER, movieDb.getPosterPath(), movieDb.getTitle()));
 			} catch (MovieDbException e) {
 				LOGGER.warn("Can't download file {} : {}", movieDb.getPosterPath(), e.getMessage(), e);
 			}
@@ -279,7 +284,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
 			// Posters, ....
 			try {
-				movie.setPoster(downloadImage(collection.getPosterPath(), collection.getTitle()));
+				movie.setPoster(downloadImage(ImageType.POSTER, collection.getPosterPath(), collection.getTitle()));
 			} catch (MovieDbException e) {
 				LOGGER.warn("Can't download file {} : {}", collection.getPosterPath(), e.getMessage(), e);
 			}

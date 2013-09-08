@@ -26,6 +26,7 @@ import com.omertron.themoviedbapi.TheMovieDbApi;
 import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.scan.MoviesParsedName;
@@ -53,11 +54,11 @@ public class TheMovieDbEnricherTest {
 
 		MockitoAnnotations.initMocks(this);
 
-		when(metaMediaManager.storeImage(any(URL.class), anyString())).thenAnswer(new Answer<String>() {
+		when(metaMediaManager.storeImage(any(ImageType.class), any(URL.class), anyString())).thenAnswer(new Answer<String>() {
 
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
-				return invocation.getArguments()[0].toString();
+				return invocation.getArguments()[1].toString();
 			}
 		});
 	}

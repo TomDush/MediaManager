@@ -15,6 +15,8 @@ import com.google.common.base.Predicate;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.model.Person;
 
+import fr.dush.mediamanager.business.mediatech.ImageType;
+
 /**
  * Sort movie's casting and crew.
  *
@@ -81,7 +83,7 @@ public class PersonParser {
 
 			if (isNotBlank(info.getProfilePath())) {
 				try {
-					person.setPicture(parent.downloadImage(info.getProfilePath(), info.getName()));
+					person.setPicture(parent.downloadImage(ImageType.ACTOR, info.getProfilePath(), info.getName()));
 				} catch (MovieDbException e) {
 					LOGGER.warn("Couldn't find person picture from URL {}", info.getProfilePath());
 				}

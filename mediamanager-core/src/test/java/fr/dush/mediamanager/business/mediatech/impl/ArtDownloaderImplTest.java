@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.business.mediatech.impl.ArtDownloaderImpl;
+import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.engine.mock.MockedConfiguration;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -42,8 +42,8 @@ public class ArtDownloaderImplTest {
 	@Test
 	@Ignore("Long test (depends on connection ;)")
 	public void testDownloadFile() throws Exception {
-		final String image = artDownloader.storeImage(new URL(
-				"http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/bgSHbGEA1OM6qDs3Qba4VlSZsNG.jpg"), null);
+		final String image = artDownloader.storeImage(ImageType.OTHER, new URL(
+						"http://d3gtl9l2a4fn1j.cloudfront.net/t/p/original/bgSHbGEA1OM6qDs3Qba4VlSZsNG.jpg"), null);
 
 		final File file = artDownloader.getImagePath(image).toFile();
 		LOGGER.info("Image {} downloaded into : {} ", image, file.getAbsoluteFile());

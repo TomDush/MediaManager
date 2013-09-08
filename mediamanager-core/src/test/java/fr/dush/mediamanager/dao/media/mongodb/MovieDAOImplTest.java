@@ -78,7 +78,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
 		assertThat(reloaded).hasTitle("Iron Man 1").hasBackdrops("/media/backdrops/ironman_1.jpg").hasGenres("action")
 				.hasMediaIds(new SourceId("imdb", "0123654789"), new SourceId("junit", "IRONMAN_1"))
-				.hasVideoFiles("media/movies/ironman_1.mp4");
+				.hasVideoFiles(Paths.get("media/movies/ironman_1.mp4").toAbsolutePath().normalize().toString());
 		assertThat(reloaded).hasSeen(2);
 
 		// ** Changes ...
@@ -119,7 +119,8 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		// TEST
 		final Movie movie = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70c"));
 		assertThat(movie).hasTitle("Star Trek - The future begins").hasOverview("The future begins")
-				.hasMediaIds("MoviesDB", "13475", "junit", "STAR_TREK").hasVideoFiles("/media/movies/HD/star_trek_1.mkv", "/media/movies/star_trek.mp4");
+				.hasMediaIds("MoviesDB", "13475", "junit", "STAR_TREK")
+				.hasVideoFiles("/media/movies/HD/star_trek_1.mkv", "/media/movies/star_trek.mp4");
 
 	}
 
