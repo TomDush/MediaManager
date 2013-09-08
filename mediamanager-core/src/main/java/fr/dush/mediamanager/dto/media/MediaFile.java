@@ -22,9 +22,13 @@ public class MediaFile implements Serializable {
 	private String hash;
 
 	/** Full path file */
-	private Path file;
+	private String file;
+
+	public MediaFile(String file) {
+		this.file = file;
+	}
 
 	public MediaFile(Path file) {
-		this.file = file;
+		this.file = file.toAbsolutePath().normalize().toString();
 	}
 }

@@ -25,7 +25,7 @@ public class VideoFile extends MediaFile {
 	private Quality quality;
 
 	/** Next files if video is split between multiple part. */
-	private List<Path> nextParts = newArrayList();
+	private List<String> nextParts = newArrayList();
 
 	public VideoFile(Path file) {
 		super(file);
