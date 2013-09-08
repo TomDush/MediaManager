@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -49,13 +48,13 @@ public class ContextLauncher extends Thread {
 			// Register remote interface
 			startRegistry();
 
-			final MediaManagerRMI remoteInterface = BeanProvider.getContextualReference(MediaManagerRMI.class, false);
-			//CDIUtils.getBean(MediaManagerRMI.class);
+			final MediaManagerRMI remoteInterface = CDIUtils.getBean(MediaManagerRMI.class);
 			Naming.rebind("rmi://localhost/" + MediaManagerRMI.class.getSimpleName(), remoteInterface);
 
 			// Wait application end...
 			fireInitialized();
 			final Stopper stopper = CDIUtils.getBean(Stopper.class);
+			LOGGER.info("Server started.");
 			stopper.waitApplicationEnd();
 
 			// Stopping CDI
@@ -82,6 +81,7 @@ public class ContextLauncher extends Thread {
 	}
 
 	private synchronized void fireInitialized() {
+		// TODO force application scoped "Startup" beans to be initialized.
 		notifyAll();
 	}
 

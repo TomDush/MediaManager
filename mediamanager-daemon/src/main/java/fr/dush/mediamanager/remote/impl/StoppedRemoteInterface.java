@@ -7,7 +7,8 @@ import java.util.List;
 
 import javax.enterprise.inject.Alternative;
 
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.launcher.Status;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.MediaManagerRMI;
@@ -19,22 +20,23 @@ public class StoppedRemoteInterface implements MediaManagerRMI {
 	}
 
 	@Override
-	public void scan(String scanerName, String absolutePath) {
-	}
-
-	@Override
 	public Status getStatus() {
 		return Status.STOPPED;
 	}
 
 	@Override
-	public List<ScanningStatus> getInprogressScanning() {
+	public List<ScanStatus> getInprogressScanning() {
 		return newArrayList();
 	}
 
 	@Override
 	public List<ConfigurationField> getFullConfiguration() throws RemoteException {
 		return newArrayList();
+	}
+
+	@Override
+	public void scan(MediaType type, String absolutePath, String enricher) throws RemoteException {
+		throw new RemoteException("Server is stopped.");
 	}
 
 }

@@ -4,7 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.launcher.Status;
 
 /**
@@ -30,10 +31,11 @@ public interface MediaManagerRMI extends Remote {
 	/**
 	 * Scan or refresh absolute path
 	 *
-	 * @param scanerName File enricher's name
+	 * @param type Path content's type
 	 * @param absolutePath
+	 * @param enricher File enricher's name
 	 */
-	void scan(String scanerName, String absolutePath) throws RemoteException;
+	public void scan(MediaType type, String absolutePath, String enricher) throws RemoteException;
 
 	/**
 	 * Get Inprogress process...
@@ -41,7 +43,7 @@ public interface MediaManagerRMI extends Remote {
 	 * @return
 	 * @throws RemoteException
 	 */
-	List<ScanningStatus> getInprogressScanning() throws RemoteException;
+	List<ScanStatus> getInprogressScanning() throws RemoteException;
 
 	/**
 	 * Get configuration for each modules...

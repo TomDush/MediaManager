@@ -23,7 +23,8 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 import fr.dush.mediamanager.launcher.ContextLauncher;
 import fr.dush.mediamanager.launcher.Status;
@@ -126,12 +127,17 @@ public class MediaManager {
 		// Control daemon
 		options.addOption("s", "start", false, "start daemon, if it isn't started");
 		options.addOption(OptionBuilder.withDescription("stop daemon, if it started").withLongOpt("stop").create());
-		options.addOption(OptionBuilder.withDescription("get daemon status, and scanning progression if any").withLongOpt("status").create());
+		options.addOption(OptionBuilder.withDescription("get daemon status, and scanning progression if any").withLongOpt("status")
+				.create());
 
-		options.addOption(OptionBuilder.withDescription("scan given directory with defined scanner, server must be started.").hasArgs(2)
-				.withArgName("scannerName> <directoryPath").withLongOpt("scan").create());
+		options.addOption(OptionBuilder
+				.withDescription("scan given directory with defined scanner, server must be started. Can be used with --enricher")
+				.hasArgs(2).withArgName("media type> <directoryPath").withLongOpt("scan").create());
+		options.addOption(OptionBuilder.withDescription("Used with --scan : define default enricher.").hasArgs(1)
+				.withArgName("enricher").withLongOpt("enricher").create());
 		options.addOption(OptionBuilder.withDescription("show current configuration").withLongOpt("show").create());
-		options.addOption(OptionBuilder.withDescription("set variable").hasArgs(3).withArgName("package> <name> <value").withLongOpt("set").create());
+		options.addOption(OptionBuilder.withDescription("set variable").hasArgs(3).withArgName("package> <name> <value").withLongOpt("set")
+				.create());
 
 		return options;
 	}
@@ -202,10 +208,10 @@ public class MediaManager {
 			// Scanning process
 			final String[] arguments = args.getOptionValues("scan");
 			try {
-				getRemoteInterface().scan(arguments[0], arguments[1]);
+				getRemoteInterface().scan(MediaType.valueOfMediaType(arguments[0]), toAbsolute(arguments[1]), args.getOptionValue("enricher"));
 				System.out.println("Scanning in progress...");
 
-			} catch (RemoteException e) {
+			} catch (RemoteException | IllegalArgumentException e) {
 				exitWithError(false, e.getMessage());
 			}
 
@@ -217,11 +223,15 @@ public class MediaManager {
 		}
 	}
 
+	private String toAbsolute(final String p) {
+		return Paths.get(p).toAbsolutePath().normalize().toString();
+	}
+
 	private void showConfig() {
 		try {
 			final List<ConfigurationField> configs = getRemoteInterface().getFullConfiguration();
-			if(configs.isEmpty()) {
-				if(getRemoteInterface().getStatus() == Status.STOPPED) {
+			if (configs.isEmpty()) {
+				if (getRemoteInterface().getStatus() == Status.STOPPED) {
 					System.out.println("Server is stopped.");
 				} else {
 					System.out.println("No copnfiguration loaded...");
@@ -231,9 +241,10 @@ public class MediaManager {
 			}
 
 			System.out.println("Configuration : ");
-			for(ConfigurationField f : configs) {
-				System.out.println(String.format("\t- %-40s = %s %s", f.getFullname(), f.getValue(), f.isDefaultValue() ? "(default)" : ""));
-				if(isNotEmpty(f.getDescription())) {
+			for (ConfigurationField f : configs) {
+				System.out
+						.println(String.format("\t- %-40s = %s %s", f.getFullname(), f.getValue(), f.isDefaultValue() ? "(default)" : ""));
+				if (isNotEmpty(f.getDescription())) {
 					System.out.println("\t\t\t(" + f.getDescription() + ")");
 				}
 			}
@@ -277,12 +288,12 @@ public class MediaManager {
 
 		if (st == Status.STARTED) {
 			try {
-				final List<ScanningStatus> inprogress = getRemoteInterface().getInprogressScanning();
+				final List<ScanStatus> inprogress = getRemoteInterface().getInprogressScanning();
 				if (inprogress.isEmpty()) {
 					System.out.println("No process in progress.");
 				} else {
 					System.out.println("In progress process : ");
-					for (ScanningStatus s : inprogress) {
+					for (ScanStatus s : inprogress) {
 						System.out.println("\t- " + s);
 					}
 				}
@@ -344,7 +355,7 @@ public class MediaManager {
 				remoteInterface = (MediaManagerRMI) Naming.lookup("rmi://localhost/" + MediaManagerRMI.class.getSimpleName());
 
 			} catch (Exception e) {
-				LOGGER.warn("Can't bind server remote interface : {}", e.getMessage(), e);
+				LOGGER.debug("Can't bind server remote interface : {}", e.getMessage(), e);
 				remoteInterface = new StoppedRemoteInterface();
 			}
 		}

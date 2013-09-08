@@ -1,33 +1,28 @@
 package fr.dush.mediamanager.remote.impl;
 
 import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-
 import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.business.scanner.IScanRegister;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.events.scan.reponses.InprogressScanningResponseEvent;
-import fr.dush.mediamanager.events.scan.reponses.ScanningErrorResponseEvent;
-import fr.dush.mediamanager.events.scan.reponses.ScanningResponseEvent;
-import fr.dush.mediamanager.events.scan.request.AbstractRootDirectoryEvent;
-import fr.dush.mediamanager.events.scan.request.ScanningRequestEvent;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.dto.tree.MediaType;
+import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.launcher.Status;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.MediaManagerRMI;
@@ -40,10 +35,10 @@ import fr.dush.mediamanager.remote.Stopper;
  *
  */
 @SuppressWarnings("serial")
-//@ApplicationScoped
+// @ApplicationScoped
 public class RemoteController extends UnicastRemoteObject implements MediaManagerRMI {
 
-	private static final int TIMEOUT = 3000;
+	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteController.class);
 
 	@Inject
 	private Stopper stopper;
@@ -52,28 +47,20 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 	private IRootDirectoryDAO rootDirectoryDAO;
 
 	@Inject
-	private Event<ScanningRequestEvent> scanningRequestEventBus;
+	private Event<ScanRequestEvent> requestBus;
 
 	@Inject
 	private IConfigurationRegister configurationRegister;
 
 	@Inject
-	private IMovieDAO movieDAO;
+	private IScanRegister scanRegister;
 
-	private static ResponseReceiver responseReceiver;
+	@Inject
+	private IMovieDAO movieDAO;
 
 	public RemoteController() throws RemoteException {
 		super();
 	}
-
-	@PostConstruct
-	public void initialize() {
-		if(responseReceiver == null) {
-			responseReceiver = new ResponseReceiver();
-		}
-	}
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteController.class);
 
 	@Override
 	public synchronized void stop() {
@@ -88,21 +75,26 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 	}
 
 	@Override
-	public void scan(String scannerName, String absolutePath) throws RemoteException {
+	public void scan(MediaType type, String absolutePath, String enricher) throws RemoteException {
 		try {
-			final ScanningRequestEvent event = new ScanningRequestEvent(this, absolutePath, scannerName);
-			scanningRequestEventBus.fire(event);
-
-			final ScanningResponseEvent response = responseReceiver.waitForResponse(event);
-			if (response == null) {
-				throw new RemoteException("No response received... Ask status command to know if process has been start.");
-
-			} else if (response instanceof ScanningErrorResponseEvent) {
-				throw new RemoteException("Error, can't scan of " + absolutePath + " : "
-						+ ((ScanningErrorResponseEvent) response).getMessage(), ((ScanningErrorResponseEvent) response).getException());
+			final ScanRequestEvent event = new ScanRequestEvent(this, type, absolutePath);
+			if (isNotEmpty(enricher)) {
+				event.getRootDirectory().setEnricher(enricher);
 			}
+
+			requestBus.fire(event);
+
+			final ScanStatus response = scanRegister.waitResponseFor(event);
+			if (response == null) {
+				LOGGER.warn("Scan status was not received...");
+				throw new RemoteException("No response received... Execute 'status' command to know if process has been started.");
+
+			} else if (response.hasFailed()) {
+				LOGGER.error("Failed to scan %s", response.getException());
+				throw new RemoteException(response.getMessage() + " [on " + absolutePath + "]");
+			}
+
 		} catch (RemoteException e) {
-			LOGGER.error("{}", e.getMessage(), e);
 			throw e;
 
 		} catch (Exception e) {
@@ -112,10 +104,11 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 	}
 
 	@Override
-	public List<ScanningStatus> getInprogressScanning() throws RemoteException {
+	public List<ScanStatus> getInprogressScanning() throws RemoteException {
 		try {
-			final List<ScanningStatus> list = responseReceiver.getInprogressStatus();
+			final List<ScanStatus> list = scanRegister.getInprogressScans();
 			return newArrayList(list);
+
 		} catch (Exception e) {
 			LOGGER.error("getInprogressScanning failed", e);
 			throw new RemoteException("Can't get Inprogress list : " + e.getMessage());
@@ -149,73 +142,4 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 		}
 	}
 
-	public void observeResponse(@Observes ScanningResponseEvent event) {
-		responseReceiver.add(event);
-	}
-
-	private class ResponseReceiver {
-
-		private List<ScanningResponseEvent> events = newArrayList();
-
-		public synchronized void add(ScanningResponseEvent event) {
-			// Clean old inprogress process...
-			cleanOldEvents();
-
-			// Add new one
-			events.add(event);
-
-			notifyAll();
-		}
-
-		public List<ScanningStatus> getInprogressStatus() {
-			cleanOldEvents();
-
-			return transform(events, new Function<AbstractRootDirectoryEvent, ScanningStatus>() {
-				@Override
-				public ScanningStatus apply(AbstractRootDirectoryEvent e) {
-					if (e instanceof InprogressScanningResponseEvent) {
-						return ((InprogressScanningResponseEvent) e).getStatus();
-					} else if (e instanceof ScanningErrorResponseEvent) {
-						return new ScanningStatus(e.getRootDirectory().getName() + " process failed. "
-								+ ((ScanningErrorResponseEvent) e).getMessage());
-					}
-
-					return null;
-				}
-			});
-		}
-
-		private void cleanOldEvents() {
-//			for (AbstractRootDirectoryEvent e : newArrayList(events)) {
-//				if (e instanceof InprogressScanningResponseEvent && !((InprogressScanningResponseEvent) e).getStatus().isInProgress()) {
-//					events.remove(e);
-//				}
-//			}
-		}
-
-		public synchronized ScanningResponseEvent waitForResponse(Object sourceEvent) {
-			ScanningResponseEvent response = hasResponse(sourceEvent);
-
-			if (response == null) {
-				try {
-					wait(TIMEOUT);
-				} catch (InterruptedException e) {
-				}
-				response = hasResponse(sourceEvent);
-			}
-
-			return response;
-		}
-
-		private ScanningResponseEvent hasResponse(Object sourceEvent) {
-			for (ScanningResponseEvent e : events) {
-				if (sourceEvent.equals(e.getEventSource())) {
-					return e;
-				}
-			}
-
-			return null;
-		}
-
-	}
 }
