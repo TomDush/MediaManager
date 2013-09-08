@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner;
+package fr.dush.mediamanager.dto.scan;
 
 import java.nio.file.Path;
 

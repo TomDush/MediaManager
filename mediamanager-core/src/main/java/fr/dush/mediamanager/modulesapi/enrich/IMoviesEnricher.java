@@ -2,12 +2,12 @@ package fr.dush.mediamanager.modulesapi.enrich;
 
 import java.util.List;
 
-import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.video.BelongToCollection;
 import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.media.video.MoviesCollection;
 import fr.dush.mediamanager.dto.media.video.Trailer;
+import fr.dush.mediamanager.dto.scan.MoviesParsedName;
 
 /**
  * Bean to enrich medias meta-data : find on web informations from file name.

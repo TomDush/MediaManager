@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner.impl;
+package fr.dush.mediamanager.business.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
 import static org.fest.assertions.api.Assertions.*;
@@ -24,15 +24,18 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
-import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
-import fr.dush.mediamanager.business.mediatech.scanner.impl.MoviesScanner;
 import fr.dush.mediamanager.business.modules.IModulesManager;
+import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.dto.media.video.Movie;
+import fr.dush.mediamanager.dto.scan.MoviesParsedName;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
-import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
+import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 
@@ -55,11 +58,19 @@ public class MoviesScannerTest extends SimpleJunitTest {
 	@Mock
 	protected Event<AmbiguousEnrichment> ambiguousEnrichmentDispatcher;
 
+	@Mock
+	private ModuleConfiguration moduleConfiguration;
+
+	@Mock
+	private IMovieDAO movieDAO;
+
 	@SuppressWarnings("unchecked")
 	@Before
 	public void postConstruct() throws ModuleLoadingException {
 		when(modulesManager.findModuleById(any(Class.class), anyString())).thenReturn(enricher);
 		scanner.initializePatterns();
+
+		when(moduleConfiguration.readValue(anyString())).thenReturn("default-enricher");
 	}
 
 	@Test
@@ -67,27 +78,28 @@ public class MoviesScannerTest extends SimpleJunitTest {
 		create_files();
 
 		final RootDirectory rootDirectory = new RootDirectory();
+		rootDirectory.setMediaType(MediaType.MOVIE);
 		rootDirectory.setName("Movies Junit Database");
 		rootDirectory.getPaths().add("target/movies");
-		rootDirectory.setEnricherScanner("my-junit-enricher");
+		rootDirectory.setEnricher("");
 
 		// Exec
-		final ScanningStatus status = scanner.startScanning(rootDirectory);
+		final ScanStatus status = scanner.startScanning(rootDirectory);
 
 		while (status.isInProgress()) {
 			LOGGER.info("Scanning in progress : {}", status);
-			Thread.sleep(1000);
+			Thread.sleep(30);
 		}
 
 		// Test
-		verify(modulesManager).findModuleById(IMoviesEnricher.class, "my-junit-enricher");
+		verify(modulesManager).findModuleById(IMoviesEnricher.class, "default-enricher");
 
 		verify(enricher).findMediaData(argParsedName("2012", 0));
 		verify(enricher).findMediaData(argParsedName("angels and demons", 0));
 		verify(enricher).findMediaData(argParsedName("battle los angeles", 2011));
 		verify(enricher).findMediaData(argParsedName("5 days of war", 2011));
 		verify(enricher).findMediaData(argParsedName("the postman", 1998));
-//		verify(enricher).findMediaData(argParsedName("the postman", 1998));
+		verify(movieDAO, times(5)).save(any(Movie.class));
 
 	}
 

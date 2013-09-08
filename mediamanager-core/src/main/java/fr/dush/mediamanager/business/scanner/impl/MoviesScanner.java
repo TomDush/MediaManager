@@ -1,9 +1,13 @@
-package fr.dush.mediamanager.business.mediatech.scanner.impl;
+package fr.dush.mediamanager.business.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,24 +30,26 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
-import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
+import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.dto.media.SourceId;
 import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.media.video.VideoFile;
+import fr.dush.mediamanager.dto.scan.MoviesParsedName;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
+import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
-import fr.dush.mediamanager.exceptions.ScanningException;
+import fr.dush.mediamanager.exceptions.ScanException;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 
-public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
+public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MoviesScanner.class);
 
@@ -53,21 +59,29 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 	@Inject
 	private IMovieDAO movieDAO;
 
+	@Inject
+	@Configuration(definition = "configuration/scanners.json", packageName = "fr.dush.mediamanager.business.scanner")
+	private ModuleConfiguration moduleConfiguration;
+
 	/** Media enricher */
 	private IMoviesEnricher enricher;
 
 	@Override
-	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException, ScanningException {
+	public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
+		String enricherName = rootDirectory.getEnricher();
+		if (isBlank(enricherName)) {
+			enricherName = moduleConfiguration.readValue("movies.defaultenricher");
+		}
+
 		try {
 			// Initialize enricher...
-			// TODO We choose "movie enricher", but not movies scanner... ?
-			enricher = modulesManager.findModuleById(IMoviesEnricher.class, rootDirectory.getEnricherScanner());
+			enricher = modulesManager.findModuleById(IMoviesEnricher.class, enricherName);
+
 			return super.startScanning(rootDirectory);
 
 		} catch (ModuleLoadingException e) {
-			final String mess = String.format("Can't scan %s : enricher module '%s' not found.", rootDirectory.getPaths(),
-					rootDirectory.getEnricherScanner());
-			throw new ScanningException(mess, e);
+			final String mess = String.format("Can't scan %s : enricher module '%s' not found.", rootDirectory.getPaths(), enricherName);
+			throw new ScanException(mess, e);
 		}
 	}
 
@@ -80,7 +94,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 	}
 
 	@Override
-	protected Media enrich(MoviesParsedName file) {
+	protected Movie enrich(MoviesParsedName file) {
 		LOGGER.debug("Enrich file : {}", file);
 		try {
 			final List<Movie> movies = enricher.findMediaData(file);
@@ -92,19 +106,66 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 			}
 
 			// Return first or null
+			Movie choosenMovie = null;
 			if (movies.isEmpty()) {
 				LOGGER.info("No movies found for file {}", file);
-				return null;
+				choosenMovie = newEmptyMovie(file);
+
+			} else {
+				choosenMovie = movies.get(0); // FIXME Check do no download all jackets
 			}
-			// TODO better enrichment ?
-			// TODO movie file isn't saved...
-			return movies.get(0);
+
+			// Add video informations
+			choosenMovie.getVideoFiles().add(file.getVideoFile());
+
+			// Finish to get meta data
+			if(!movies.isEmpty()) {
+				enricher.enrichMedia(choosenMovie);
+			}
+
+			return choosenMovie;
 
 		} catch (EnrichException e) {
 			LOGGER.error("Enrichement fail on file {} (movie : {}).", file, file.getMovieName(), e);
 		}
 
 		return null;
+	}
+
+	@Override
+	protected void save(Movie media) {
+		movieDAO.save(media);
+		// TODO Save collection ?
+	}
+
+	/**
+	 * Set title and date with file name.
+	 *
+	 * @param file
+	 * @return
+	 */
+	private Movie newEmptyMovie(MoviesParsedName file) {
+		Movie m = new Movie();
+
+		if (isNotEmpty(file.getMovieName())) {
+			m.setTitle(file.getMovieName());
+		} else {
+			m.setTitle(file.getFile().getFileName().toString());
+		}
+
+		try {
+			if (file.getYear() != 0) {
+				DateFormat yearFormatter = new SimpleDateFormat("yyyy");
+				m.setRelease(yearFormatter.parse(String.valueOf(file.getYear())));
+			}
+		} catch (ParseException e) {
+			LOGGER.warn("Can't parse date with year = {}", file.getYear());
+		}
+
+		// Internal ID based on title (from file name)
+		m.getMediaIds().add(new SourceId(SourceId.INTERNAL, Hashing.sha1().hashString(m.getTitle()).toString()));
+
+		return m;
 	}
 
 	protected void appendScanningFile(File root, Set<MoviesParsedName> movies) {
@@ -225,11 +286,5 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName> {
 		public int compareTo(FileStacking o) {
 			return volume.compareTo(o.getVolume());
 		}
-	}
-
-	@Override
-	protected void save(Media media) {
-		movieDAO.save((Movie) media); // TODO add type safe...
-		// TODO save and collection ?
 	}
 }

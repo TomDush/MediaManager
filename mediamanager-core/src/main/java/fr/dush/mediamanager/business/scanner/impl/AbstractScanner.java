@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech.scanner.impl;
+package fr.dush.mediamanager.business.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
@@ -18,15 +18,14 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus;
-import fr.dush.mediamanager.business.mediatech.scanner.ScanningStatus.Phase;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.dto.scan.Phase;
+import fr.dush.mediamanager.dto.scan.ScanStatus;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.events.scan.reponses.AmbiguousEnrichment;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
-import fr.dush.mediamanager.exceptions.ScanningException;
+import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
+import fr.dush.mediamanager.exceptions.ScanException;
 
 /**
  * DO NOT USE AS SINGLETON.
@@ -34,7 +33,7 @@ import fr.dush.mediamanager.exceptions.ScanningException;
  * @author Thomas Duchatelle
  *
  */
-public abstract class AbstractScanner<F> implements Runnable {
+public abstract class AbstractScanner<F, M extends Media> implements Runnable {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractScanner.class);
 
@@ -55,7 +54,7 @@ public abstract class AbstractScanner<F> implements Runnable {
 	protected Set<Pattern> moviesStackingPatterns = newHashSet();
 
 	/** Progress status */
-	private ScanningStatus status;
+	private ScanStatus status;
 
 	/** Root paths to scan */
 	private Set<Path> rootPaths = newHashSet();
@@ -73,8 +72,7 @@ public abstract class AbstractScanner<F> implements Runnable {
 		}
 	}
 
-	public ScanningStatus startScanning(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException,
-			ScanningException {
+	public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
 
 		// Scanning recursively directory. Put parsed file's name into ScanningResult
 		for (String path : rootDirectory.getPaths()) {
@@ -85,16 +83,20 @@ public abstract class AbstractScanner<F> implements Runnable {
 			} else {
 				StringBuffer sb = new StringBuffer(dir.getPath());
 				sb.append(" can't be scanning because ");
-				if (!dir.exists()) sb.append(" it doesn't exist.");
-				else sb.append(" it not a directory.");
+				if (!dir.exists()) {
+					sb.append(" it doesn't exist.");
+				}
+				else {
+					sb.append(" it not a directory.");
+				}
 
-				throw new ScanningException(sb.toString());
+				throw new ScanException(sb.toString());
 			}
 		}
 
 		// Initialize status, and thread.
 		final Thread thread = new Thread(this);
-		status = new ScanningStatus(thread);
+		status = new ScanStatus();
 
 		// Starting job(s) in other thread
 		thread.start();
@@ -125,17 +127,22 @@ public abstract class AbstractScanner<F> implements Runnable {
 		status.changePhase(Phase.ENRICH, files.size(), "Enrichment...");
 
 		for (F file : files) {
-			final Media media = enrich(file);
-			if(media != null) {
-				save(media); // FIXME : may not be null !
+			final M media = enrich(file);
+			if (media != null) {
+				save(media);
+			} else {
+				LOGGER.warn("No media created for {}", file);
 			}
 
 			status.incrementFinishedJob(1);
 		}
+
+		// ** FINISH
+		status.changePhase(Phase.SUCCED, 0);
 	}
 
 	/** Save media */
-	protected abstract void save(Media media) ;
+	protected abstract void save(M media);
 
 	/**
 	 * Get directory file list. TODO Filter file to ignore.
@@ -149,6 +156,11 @@ public abstract class AbstractScanner<F> implements Runnable {
 
 	protected abstract Collection<? extends F> scanDirectory(Path root);
 
-	protected abstract Media enrich(F file);
+	/**
+	 * Create media file
+	 * @param file
+	 * @return Must not be null
+	 */
+	protected abstract M enrich(F file);
 
 }

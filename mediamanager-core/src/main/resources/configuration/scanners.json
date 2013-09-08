@@ -1,0 +1,8 @@
+[
+	{
+		"key":"movies.defaultenricher",
+		"value":"enricher-themoviesdb",
+		"name":"Movie default enricher",
+		"description":"Enricher used by default."
+	}
+]
