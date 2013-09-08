@@ -1,18 +1,23 @@
 [
 	{
-		'_id':'Movies',
-		'paths':[
-			'/home/medias/sagas',
-			'/home/medias/movies'
+		"_id":"Movies",
+		"mediaType":"MOVIE",
+		"lastRefresh":{
+			"$date":"2013-09-07T22:00:00Z"
+		},
+		"paths":[
+			"/home/medias/sagas",
+			"/home/medias/movies"
 		],
-		'enricherScanner':'movies-scanner'
+		"enricherScanner":"movies-scanner"
 	},
 	{
-		'_id':'Shows',
-		'paths':[
-			'/home/medias/shows',
-			'/external/drive/othershows'
+		"_id":"Shows",
+		"mediaType":"SHOWS",
+		"paths":[
+			"/home/medias/shows",
+			"/external/drive/othershows"
 		],
-		'enricherScanner':'shows-scanner'
+		"enricherScanner":"shows-scanner"
 	}
 ]

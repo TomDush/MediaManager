@@ -2,26 +2,42 @@ package fr.dush.mediamanager.dao.mediatech;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import fr.dush.mediamanager.dto.tree.RootDirectory;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 
 /**
- * Provide access to persisted data on mediatech location (root directory), contains low level business rules.
+ * Provide access to persisted data on mediatech location (root directory), there is no constrains containing on implementations.
  *
- * <p>
- * Business rules are :
- * <ul>
- * <li>{@link RootDirectory#getPaths()} must be absolute</li>
- * <li><code>Paths</code> mustn't have duplicate, be include or include paths of others {@link RootDirectory}.
- * </ul>
- * </p>
  *
  * @author Thomas Duchatelle
  *
  */
 public interface IRootDirectoryDAO {
+
+	/**
+	 * Find RootDirectory by its name.
+	 *
+	 * @param name
+	 * @return
+	 */
+	RootDirectory findById(String name);
+
+	/**
+	 * Save or update RootDirectory, no constrains...
+	 *
+	 * @param rootDirectory
+	 * @return Return updated RootDirectory
+	 */
+	RootDirectory saveOrUpdate(RootDirectory rootDirectory);
+
+	/**
+	 * Find all root directory, sorted by name.
+	 *
+	 * @return
+	 */
+	List<RootDirectory> findAll();
 
 	/**
 	 * Find {@link RootDirectory} corresponding to path.
@@ -40,24 +56,10 @@ public interface IRootDirectoryDAO {
 	List<RootDirectory> findUsingPath(Collection<String> paths);
 
 	/**
-	 * Save root directory if all its path aren't already used.
+	 * Update "last update" date
 	 *
-	 * @param rootDirectory
+	 * @param rootDirectoryName
+	 * @param updatedDate New lastUpdate's value
 	 */
-	void persist(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException;
-
-	/**
-	 * Update root directory, check it already exists and check new path aren't used.
-	 *
-	 * @param rootDirectory
-	 * @throws RootDirectoryAlreadyExistsException
-	 */
-	void update(RootDirectory rootDirectory) throws RootDirectoryAlreadyExistsException;
-
-	/**
-	 * Find all root directory, sorted by name.
-	 *
-	 * @return
-	 */
-	List<RootDirectory> findAll();
+	void markAsUpdated(String rootDirectoryName, Date updatedDate);
 }

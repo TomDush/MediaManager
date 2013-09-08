@@ -23,7 +23,7 @@ import fr.dush.mediamanager.dao.IDao;
 public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 
 	@Inject
-	protected Datastore ds;
+	private Datastore ds;
 
 	private final Class<T> clazz;
 
@@ -54,6 +54,10 @@ public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 	@Override
 	public void delete(T dto) {
 		ds.delete(dto);
+	}
+
+	protected Datastore getDs() {
+		return ds;
 	}
 
 	/**

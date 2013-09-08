@@ -4,13 +4,16 @@ import static com.google.common.collect.Lists.*;
 
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import com.google.common.base.Joiner;
+
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 
-@Data
-@EqualsAndHashCode(callSuper = true, of = {})
+@Getter
+@Setter
 @SuppressWarnings("serial")
 @NoArgsConstructor
 public class RootDirectoryAlreadyExistsException extends Exception {
@@ -22,9 +25,25 @@ public class RootDirectoryAlreadyExistsException extends Exception {
 	private List<String> pathConcerned = newArrayList();
 
 	public RootDirectoryAlreadyExistsException(String message, RootDirectory rootDirectory, List<String> pathConcerned) {
-		super(message);
+		super(generateMessage(message, rootDirectory, pathConcerned));
+
 		this.rootDirectory = rootDirectory;
 		this.pathConcerned = pathConcerned;
+	}
+
+	private static String generateMessage(String message, RootDirectory rootDirectory, List<String> pathConcerned) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Couldn't save RootDirectory '").append(rootDirectory.getName()).append("' : ");
+		sb.append(message);
+		if (!message.endsWith(".")) {
+			sb.append(".");
+		}
+
+		if (pathConcerned != null && !pathConcerned.isEmpty()) {
+			sb.append("Conflicts paths : ").append(Joiner.on(", ").join(pathConcerned)).append(".");
+		}
+
+		return sb.toString();
 	}
 
 }

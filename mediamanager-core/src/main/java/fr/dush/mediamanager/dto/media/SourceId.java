@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SourceId implements Serializable {
 
+	public static final String INTERNAL = "internal";
+
 	/** Identifier source. Exemple : internal, imdb, ... */
 	private String type;
 

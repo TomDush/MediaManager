@@ -43,7 +43,9 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 	@Override
 	public void saveOrUpdateMovie(Movie movie) {
 		// Force creation date
-		if (null == movie.getCreation()) movie.setCreation(new Date());
+		if (null == movie.getCreation()) {
+			movie.setCreation(new Date());
+		}
 
 		// Convert to DBObject, without 'id', if present.
 		final DBObject dbMovie = getMapper().toDBObject(movie);
@@ -84,7 +86,7 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 			LOGGER.debug("Update query is : {}", updateQuery);
 		}
 
-		ds.getCollection(Movie.class).update(query.getQueryObject(), updateQuery, true, true);
+		getDs().getCollection(Movie.class).update(query.getQueryObject(), updateQuery, true, true);
 
 	}
 
@@ -101,18 +103,20 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 
 		if (null != movie.getId()) {
 			// Classic update (by ID)
-			ds.update(movie, updateOp);
+			getDs().update(movie, updateOp);
 
 		} else {
 			final Query<Movie> query = createQueryOnIds(movie.getMediaIds());
 
-			ds.update(query, updateOp);
+			getDs().update(query, updateOp);
 		}
 	}
 
 	@Override
 	public List<Movie> findBySourceId(SourceId... sourceIds) {
-		if (null == sourceIds || sourceIds.length <= 0) throw new IllegalArgumentException("sourceIds must be defined");
+		if (null == sourceIds || sourceIds.length <= 0) {
+			throw new IllegalArgumentException("sourceIds must be defined");
+		}
 
 		final Query<Movie> query = createQueryOnIds(Arrays.asList(sourceIds));
 

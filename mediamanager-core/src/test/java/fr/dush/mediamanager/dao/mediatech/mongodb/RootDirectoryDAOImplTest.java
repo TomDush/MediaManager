@@ -1,10 +1,11 @@
 package fr.dush.mediamanager.dao.mediatech.mongodb;
 
 import static com.google.common.collect.Sets.*;
+import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
 import static org.fest.assertions.api.Assertions.*;
 
-import java.io.File;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
+import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
-import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 
 @DatabaseScript(clazz = RootDirectory.class, locations = "dataset/rootdirectory.json")
 public class RootDirectoryDAOImplTest extends MongoJunitTest {
@@ -30,8 +31,9 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 	@Test
 	@DatabaseScript(clazz = RootDirectory.class, inherits = false)
 	public void testSave() throws Exception {
-		final RootDirectory root = new RootDirectory("My Directory", "my-scanner", "target/and-here/", "somewhere/else");
-		rootDirectoryDAO.persist(root);
+		final RootDirectory root = new RootDirectory("My Directory", MediaType.MOVIE, "target/and-here/", "somewhere/else");
+		root.setEnricher("my-scanner");
+		rootDirectoryDAO.saveOrUpdate(root);
 
 		final List<RootDirectory> roots = rootDirectoryDAO.findAll();
 		assertThat(roots).hasSize(1);
@@ -41,40 +43,17 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 		RootDirectory found = roots.get(0);
 		assertThat(found).isNotNull();
 		assertThat(found.getName()).isEqualTo("My Directory");
-		assertThat(found.getEnricherScanner()).isEqualTo("my-scanner");
-		assertThat(found.getPaths()).containsOnly(new File("target/and-here").getAbsolutePath(),
-				new File("somewhere/else").getAbsolutePath());
-	}
-
-	@Test
-	public void testSave_KO() throws Exception {
-		// Root path of existing RootDirectory
-		try {
-			final RootDirectory root = new RootDirectory("My Directory", "my-scanner", "/home/medias");
-			rootDirectoryDAO.persist(root);
-
-			failBecauseExceptionWasNotThrown(RootDirectoryAlreadyExistsException.class);
-
-		} catch (Exception e) {
-			assertThat(e).isInstanceOf(RootDirectoryAlreadyExistsException.class);
-		}
-
-		// Subpath of existing...
-		try {
-			final RootDirectory root = new RootDirectory("My Directory", "my-scanner", "/home/medias/movies/favorites");
-			rootDirectoryDAO.persist(root);
-
-			failBecauseExceptionWasNotThrown(RootDirectoryAlreadyExistsException.class);
-
-		} catch (Exception e) {
-			assertThat(e).isInstanceOf(RootDirectoryAlreadyExistsException.class);
-		}
+		assertThat(found.getMediaType()).isEqualTo(MediaType.MOVIE);
+		assertThat(found.getEnricher()).isEqualTo("my-scanner");
+		// Path are kept like there are...
+		assertThat(found.getPaths()).containsOnly("target/and-here/", "somewhere/else");
 	}
 
 	@Test
 	public void testUpdate() throws Exception {
-		final RootDirectory root = new RootDirectory("Movies", "other-movies-scanner", "/home/medias/movies/", "/external/drive/movies");
-		rootDirectoryDAO.update(root);
+		final RootDirectory root = new RootDirectory("Movies", MediaType.MOVIE, "/home/medias/movies/", "/external/drive/movies");
+		root.setEnricher("other-movies-scanner");
+		rootDirectoryDAO.saveOrUpdate(root);
 
 		// Checking...
 		final List<RootDirectory> roots = rootDirectoryDAO.findAll();
@@ -89,7 +68,8 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 
 		assertThat(found).isNotNull();
 		assertThat(found.getName()).isEqualTo("Movies");
-		assertThat(found.getEnricherScanner()).isEqualTo("other-movies-scanner");
+		assertThat(found.getEnricher()).isEqualTo("other-movies-scanner");
+		assertThat(found.getMediaType()).isEqualTo(MediaType.MOVIE);
 		assertThat(found.getPaths()).containsOnly("/home/medias/movies/", "/external/drive/movies");
 	}
 
@@ -122,5 +102,20 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 		final RootDirectory movies = rootDirectoryDAO.findBySubPath(Paths.get("/home/medias/movies/Tron - Legacy"));
 		assertThat(movies).isNotNull();
 		assertThat(movies.getName()).isEqualTo("Movies");
+	}
+
+	@Test
+	public void testFindById() throws Exception {
+		final RootDirectory root = rootDirectoryDAO.findById("Movies");
+		assertThat(root).isNotNull().hasName("Movies");
+	}
+
+	@Test
+	public void testLastUpdateDate() throws Exception {
+		final Date date = new Date();
+		rootDirectoryDAO.markAsUpdated("Movies", date);
+
+		final RootDirectory root = rootDirectoryDAO.findById("Movies");
+		assertThat(root).isNotNull().hasName("Movies").hasLastRefresh(date);
 	}
 }

@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech;
+package fr.dush.mediamanager.business.mediatech.impl;
 
 import static com.google.common.io.Files.*;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -22,6 +22,8 @@ import com.google.common.hash.Hashing;
 
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 @ApplicationScoped
 public class ArtDownloaderImpl implements IArtDownloader {
@@ -43,11 +45,15 @@ public class ArtDownloaderImpl implements IArtDownloader {
 	 * @throws IOException
 	 */
 	@PostConstruct
-	public void readConfiguration() throws IOException {
+	public void readConfiguration() {
 		imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
 		trailersRootPath = Paths.get(configuration.readValue("downloader.trailerpath"));
 
-		temp = Files.createTempDirectory("MM_Downloader");
+		try {
+			temp = Files.createTempDirectory("MM_Downloader");
+		} catch (IOException e) {
+			throw new ConfigurationException("Can't create new temporary directory.", e);
+		}
 
 		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath,
 				trailersRootPath, temp);

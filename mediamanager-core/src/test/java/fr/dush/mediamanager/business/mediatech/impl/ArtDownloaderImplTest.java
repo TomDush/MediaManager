@@ -1,4 +1,4 @@
-package fr.dush.mediamanager.business.mediatech;
+package fr.dush.mediamanager.business.mediatech.impl;
 
 import static org.fest.assertions.api.Assertions.*;
 
@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.business.mediatech.impl.ArtDownloaderImpl;
 import fr.dush.mediamanager.engine.mock.MockedConfiguration;
 
 @RunWith(BlockJUnit4ClassRunner.class)

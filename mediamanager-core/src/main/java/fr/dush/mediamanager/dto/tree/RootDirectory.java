@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Set;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import com.google.code.morphia.annotations.Entity;
@@ -21,6 +22,7 @@ import com.google.code.morphia.annotations.Id;
 @SuppressWarnings("serial")
 @Entity(noClassnameStored = true)
 @Data
+@EqualsAndHashCode(of = "name")
 @NoArgsConstructor
 public class RootDirectory implements Serializable {
 
@@ -28,26 +30,27 @@ public class RootDirectory implements Serializable {
 	@Id
 	private String name;
 
+	/** Expected media type found */
+	private MediaType mediaType;
+
+	/** Module to use to enrich medias */
+	private String enricher;
+
 	/** Local directories (Using String because Morphia can't convert Path :( ) */
 	private Set<String> paths = newHashSet();
 
 	/** Last scanning date */
-	private Date lastRefresh;
+	private Date lastRefresh = null;
 
-	/** Module to use to enrich medias */
-	private String enricherScanner;
-
-
-	public RootDirectory(String name, String enricherScanner, String... paths) {
+	public RootDirectory(String name, MediaType mediaType, String... paths) {
 		this.name = name;
-		this.enricherScanner = enricherScanner;
+		this.mediaType = mediaType;
 		this.paths = newHashSet(paths);
 	}
 
-	public RootDirectory(String name, String enricherScanner, Set<String> paths) {
+	public RootDirectory(String name, MediaType mediaType, Set<String> paths) {
 		this.name = name;
-		this.enricherScanner = enricherScanner;
+		this.mediaType = mediaType;
 		this.paths = paths;
 	}
-
 }
