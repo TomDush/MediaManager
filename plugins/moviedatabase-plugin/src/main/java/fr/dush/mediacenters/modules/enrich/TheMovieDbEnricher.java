@@ -1,6 +1,6 @@
 package fr.dush.mediacenters.modules.enrich;
 
-import static com.google.common.collect.Collections2.*;
+import static com.google.common.collect.Lists.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 import java.text.DateFormat;
@@ -27,7 +27,6 @@ import com.omertron.themoviedbapi.model.Trailer;
 
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.business.mediatech.scanner.MoviesParsedName;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.media.SourceId;
 import fr.dush.mediamanager.dto.media.Sources;
@@ -35,6 +34,7 @@ import fr.dush.mediamanager.dto.media.video.BelongToCollection;
 import fr.dush.mediamanager.dto.media.video.Movie;
 import fr.dush.mediamanager.dto.media.video.MoviesCollection;
 import fr.dush.mediamanager.dto.media.video.Trailers;
+import fr.dush.mediamanager.dto.scan.MoviesParsedName;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
@@ -45,7 +45,7 @@ import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
  * @author Thomas Duchatelle
  *
  */
-@Module(name = "MoviesDB Plugin", description = "Find data on movies and shows with http://www.themoviedb.org/", id="enricher-themoviesdb")
+@Module(name = "MoviesDB Plugin", id = "enricher-themoviesdb", description = "Find data on movies and shows with http://www.themoviedb.org/")
 public class TheMovieDbEnricher implements IMoviesEnricher {
 
 	public static final String MOVIEDB_ID_TYPE = "moviedb";
@@ -62,6 +62,11 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
 	@Override
 	public List<Movie> findMediaData(MoviesParsedName filename) throws EnrichException {
+		LOGGER.debug("--> findMediaData({})", filename);
+
+		if(isEmpty(filename.getMovieName())) {
+			return newArrayList();
+		}
 
 		try {
 			// Search in database
@@ -79,6 +84,8 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
 	@Override
 	public void enrichMedia(Media media) throws EnrichException {
+		LOGGER.debug("--> enrichMedia({} ids : {})", media.getTitle(), media.getMediaIds());
+
 		// Get movieDB id, exception if not.
 		final int id = getId(media.getMediaIds(), media.getTitle());
 
@@ -116,7 +123,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 				Movie movie = (Movie) event.getMedia();
 				final List<fr.dush.mediamanager.dto.media.video.Trailer> trailers = findTrailers(movie, event.getLang());
 
-				if(movie.getTrailers() == null) {
+				if (movie.getTrailers() == null) {
 					movie.setTrailers(new Trailers());
 				}
 				movie.getTrailers().getSources().add(MOVIEDB_ID_TYPE);
@@ -182,7 +189,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 			final MovieDb movieDb = api.getMovieInfo(id, "en");
 
 			if (movieDb.getGenres() != null) {
-				movie.getGenres().addAll(transform(movieDb.getGenres(), new Function<Genre, String>() {
+				movie.getGenres().addAll(Lists.transform(movieDb.getGenres(), new Function<Genre, String>() {
 
 					@Override
 					public String apply(Genre genre) {

@@ -6,7 +6,7 @@
 
 	<parent>
 		<groupId>fr.dush</groupId>
-		<artifactId>mediamanager</artifactId>
+		<artifactId>builtin-mediamanager-plugins</artifactId>
 		<version>0.1-SNAPSHOT</version>
 	</parent>
 
