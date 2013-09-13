@@ -1,0 +1,8 @@
+[
+	{
+		"key":"webui.port",
+		"value":"8080",
+		"name":"Web UI port",
+		"description":"HTTP access port to UI"
+	}
+]

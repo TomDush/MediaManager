@@ -1,0 +1,8 @@
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure id="JettyServer" class="org.eclipse.jetty.server.Server">
+	<Arg>
+		<New class="java.lang.Integer">
+			<Arg>8080</Arg>
+		</New>
+	</Arg>
+</Configure>
