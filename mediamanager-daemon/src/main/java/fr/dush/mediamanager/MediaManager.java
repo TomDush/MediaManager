@@ -62,6 +62,7 @@ public class MediaManager {
 	private MediaManagerRMI remoteInterface;
 
 	public static void main(String[] argsArray) {
+
 		CommandLineParser parser = new GnuParser();
 
 		try {
@@ -121,7 +122,7 @@ public class MediaManager {
 
 		// Configuration
 		options.addOption("p", "port", true, "port used to communicate with daemon, default is " + DEFAULT_PORT);
-		options.addOption(OptionBuilder.withDescription("configuration file, default is " + DEFAULT_CONFIG_PATH).withLongOpt("config")
+		options.addOption(OptionBuilder.withDescription("configuration file, default is " + DEFAULT_CONFIG_PATH).hasArg().withLongOpt("config")
 				.withArgName("config file").create("c"));
 
 		// Control daemon
@@ -133,8 +134,8 @@ public class MediaManager {
 		options.addOption(OptionBuilder
 				.withDescription("scan given directory with defined scanner, server must be started. Can be used with --enricher")
 				.hasArgs(2).withArgName("media type> <directoryPath").withLongOpt("scan").create());
-		options.addOption(OptionBuilder.withDescription("Used with --scan : define default enricher.").hasArgs(1)
-				.withArgName("enricher").withLongOpt("enricher").create());
+		options.addOption(OptionBuilder.withDescription("Used with --scan : define default enricher.").hasArgs(1).withArgName("enricher")
+				.withLongOpt("enricher").create());
 		options.addOption(OptionBuilder.withDescription("show current configuration").withLongOpt("show").create());
 		options.addOption(OptionBuilder.withDescription("set variable").hasArgs(3).withArgName("package> <name> <value").withLongOpt("set")
 				.create());
@@ -155,14 +156,18 @@ public class MediaManager {
 			if (!configFile.toFile().exists()) {
 				throw new ConfigurationException("Configuration file %s doesn't exist.", configFile);
 			}
-		} else {
+		} else if (DEFAULT_CONFIG_PATH.toFile().exists()) {
 			configFile = DEFAULT_CONFIG_PATH;
+		} else {
+			configFile = null;
 		}
 
 		if (args.hasOption('p')) {
 			port = castPort(args.getOptionValue('p'));
-		} else {
+		} else if (configFile != null) {
 			port = readPort(configFile);
+		} else {
+			port = DEFAULT_PORT; // FIXME What is this port ??
 		}
 	}
 
@@ -208,7 +213,8 @@ public class MediaManager {
 			// Scanning process
 			final String[] arguments = args.getOptionValues("scan");
 			try {
-				getRemoteInterface().scan(MediaType.valueOfMediaType(arguments[0]), toAbsolute(arguments[1]), args.getOptionValue("enricher"));
+				getRemoteInterface().scan(MediaType.valueOfMediaType(arguments[0]), toAbsolute(arguments[1]),
+						args.getOptionValue("enricher"));
 				System.out.println("Scanning in progress...");
 
 			} catch (RemoteException | IllegalArgumentException e) {

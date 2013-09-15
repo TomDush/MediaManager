@@ -1,6 +1,8 @@
 package fr.dush.mediamanager.launcher;
 
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -10,6 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
+import fr.dush.mediacenters.modules.webui.WebUIModule;
+import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.business.scanner.impl.MoviesScanner;
+import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.remote.MediaManagerRMI;
 import fr.dush.mediamanager.remote.Stopper;
 import fr.dush.mediamanager.tools.CDIUtils;
@@ -38,6 +45,17 @@ public class ContextLauncher extends Thread {
 		setDaemon(true);
 
 		// TODO Do something with params (configFile and port)
+
+		final URL installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation();
+		System.setProperty("mediamanager.install", pathToString(Paths.get(installPath.getPath()).getParent()));
+		if (configFile != null) {
+			System.setProperty("mediamanager.propertiesfile", pathToString(configFile));
+		}
+	}
+
+	/** Get normalized absolute path. */
+	private static String pathToString(Path configFile) {
+		return configFile.toAbsolutePath().normalize().toString();
 	}
 
 	@Override
@@ -82,6 +100,12 @@ public class ContextLauncher extends Thread {
 
 	private synchronized void fireInitialized() {
 		// TODO force application scoped "Startup" beans to be initialized.
+		CDIUtils.getBean(WebUIModule.class).toString();
+		CDIUtils.getBean(IMovieDAO.class).toString();
+		CDIUtils.getBean(TheMovieDBProvider.class).toString();
+		CDIUtils.getBean(IArtDownloader.class).toString();
+		CDIUtils.getBean(MoviesScanner.class).toString();
+
 		notifyAll();
 	}
 

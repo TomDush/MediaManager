@@ -33,6 +33,10 @@ public class MongoProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
 
+	private DB db = null;
+
+	private Datastore datastore = null;
+
 	static {
 		MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
 	}
@@ -45,25 +49,31 @@ public class MongoProvider {
 	@Produces
 	@ApplicationScoped
 	public MongoClient producesMogoClient() throws UnknownHostException {
-		LOGGER.debug("Instanciate new MongoDB and connection");
+		LOGGER.debug("Instanciate new MongoClient");
 		return new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));
 	}
 
 	@Produces
-//	@ApplicationScoped
 	public DB producesMogoDB(MongoClient mongoClient) throws UnknownHostException {
-		LOGGER.debug("Instanciate new MongoDB and connection");
-		return mongoClient.getDB(configuration.readValue("mongodb.databaseName"));
+		if (db == null) {
+			LOGGER.debug("Instanciate new MongoDB and connection");
+			db = mongoClient.getDB(configuration.readValue("mongodb.databaseName"));
+		}
+
+		return db;
 	}
 
 	@Produces
-//	@ApplicationScoped
 	public Datastore producesMorphiaConfig(DB mongodb) {
-		Morphia morphia = new Morphia();
-		morphia.mapPackage("fr.dush.mediamanager.dto");
-		morphia.getMapper().getConverters().addConverter(PathConverter.class);
+		if (datastore == null) {
+			Morphia morphia = new Morphia();
+			morphia.mapPackage("fr.dush.mediamanager.dto");
+			morphia.getMapper().getConverters().addConverter(PathConverter.class);
 
-		return morphia.createDatastore(mongodb.getMongo(), configuration.readValue("mongodb.databaseName"));
+			datastore = morphia.createDatastore(mongodb.getMongo(), configuration.readValue("mongodb.databaseName"));
+		}
+
+		return datastore;
 	}
 
 }

@@ -26,7 +26,7 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
 
 	@Test
 	public void testCreateContextAndStop() throws Exception {
-		ContextLauncher launcher = new ContextLauncher(Paths.get("src/test/resources", "test-config.properties"), DEFAULT_JUNIT_PORT);
+		ContextLauncher launcher = new ContextLauncher(Paths.get("../mediamanager-core/src/test/resources/dbconfig-junit.properties"), DEFAULT_JUNIT_PORT);
 		launcher.setUncaughtExceptionHandler(this);
 		synchronized (launcher) {
 			launcher.start();

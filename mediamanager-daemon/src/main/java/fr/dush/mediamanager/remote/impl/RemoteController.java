@@ -118,8 +118,6 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 	@Override
 	public List<ConfigurationField> getFullConfiguration() throws RemoteException {
 		try {
-			movieDAO.findAll(); // FIXME to remove : force init...
-
 			List<ConfigurationField> list = newArrayList();
 
 			for (ModuleConfiguration m : configurationRegister.findAll()) {

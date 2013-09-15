@@ -20,6 +20,11 @@
 			<artifactId>mediamanager-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>fr.dush</groupId>
+			<artifactId>webui-mediamanager-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Built-in (pre-installed) plugins -->
 		<dependency>
@@ -50,12 +55,14 @@
 							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 							<addClasspath>true</addClasspath>
 							<mainClass>fr.dush.mediamanager.MediaManager</mainClass>
-							<classpathPrefix>lib/</classpathPrefix>
+							<classpathPrefix>libs/</classpathPrefix>
 							<!-- <classpathLayoutType>repository</classpathLayoutType> -->
 						</manifest>
 					</archive>
 				</configuration>
 			</plugin>
+			
+			<!-- Create libs directory into target -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -67,11 +74,31 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
+							<outputDirectory>${project.build.directory}/libs</outputDirectory>
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- ZIP containing jar, dependencies and resources -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<descriptor>src/main/assembly/zip.xml</descriptor>
+					<finalName>MediaManager_${project.version}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
