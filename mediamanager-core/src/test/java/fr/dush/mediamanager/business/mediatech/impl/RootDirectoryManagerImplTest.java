@@ -6,8 +6,6 @@ import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import java.nio.file.Paths;
-
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,6 +15,7 @@ import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.dto.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
+import fr.dush.mediamanager.tools.PathsUtils;
 
 public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 
@@ -28,8 +27,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 
 	@Test
 	public void testSave_KO() throws Exception {
-		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(
-				newArrayList(new RootDirectory(), new RootDirectory()));
+		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(new RootDirectory(), new RootDirectory()));
 
 		// Root path of existing RootDirectory
 		try {
@@ -47,8 +45,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 	@Test
 	public void testNonUpdatable() throws Exception {
 
-		final RootDirectory existing = new RootDirectory("Existing Directory", MediaType.MOVIE, "/home/medias/movies/vf",
-				"/home/medias/collections");
+		final RootDirectory existing = new RootDirectory("Existing Directory", MediaType.MOVIE, "/home/medias/movies/vf", "/home/medias/collections");
 		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
 		when(rootDirectoryDAO.findById("My Directory")).thenReturn(existing);
 
@@ -70,8 +67,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 
 		assertThat(root2).isEqualTo(root);
 
-		verify(rootDirectoryDAO)
-				.findUsingPath(newHashSet("/home/medias/movies", Paths.get("../collections").toAbsolutePath().normalize().toString()));
+		verify(rootDirectoryDAO).findUsingPath(newHashSet(PathsUtils.toAbsolute("/home/medias/movies"), PathsUtils.toAbsolute("../collections")));
 		verify(rootDirectoryDAO).saveOrUpdate(root);
 	}
 
@@ -81,8 +77,8 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
 		when(rootDirectoryDAO.findById(anyString())).thenReturn(existing);
 
-		final RootDirectory returned = rootDirectoryManager.createOrUpdateRootDirectory(new RootDirectory("My Directory", MediaType.MOVIE,
-				"/home/medias"));
+		final RootDirectory returned = rootDirectoryManager
+				.createOrUpdateRootDirectory(new RootDirectory("My Directory", MediaType.MOVIE, "/home/medias"));
 
 		assertThat(returned).isEqualTo(existing);
 
@@ -98,13 +94,14 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 
 		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
 
-		final RootDirectory update = new RootDirectory("My Directory", MediaType.MOVIE, "/home/medias/movies", "/home/media",
-				"/home/medias/shows/pilots", "/mnt/remote/movies");
+		final RootDirectory update = new RootDirectory("My Directory", MediaType.MOVIE, "/home/medias/movies", "/home/media", "/home/medias/shows/pilots",
+				"/mnt/remote/movies");
 		update.setEnricher("newEnricher");
 		final RootDirectory returned = rootDirectoryManager.createOrUpdateRootDirectory(update);
 
 		assertThat(returned).isEqualTo(existing);
-		assertThat(returned.getPaths()).containsOnly("/home/medias/movies", "/home/media", "/home/medias/shows", "/mnt/remote/movies");
+		assertThat(returned.getPaths()).containsOnly(PathsUtils.toAbsolute("/home/medias/movies"), PathsUtils.toAbsolute("/home/media"),
+				"/home/medias/shows", PathsUtils.toAbsolute("/mnt/remote/movies"));
 		assertThat(returned.getEnricher()).isEqualTo("newEnricher");
 
 		verify(rootDirectoryDAO).saveOrUpdate(existing);

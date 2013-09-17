@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.dao.mediatech;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -42,10 +41,10 @@ public interface IRootDirectoryDAO {
 	/**
 	 * Find {@link RootDirectory} corresponding to path.
 	 *
-	 * @param path Path or subpath to directory...
+	 * @param string Path or subpath to directory...
 	 * @return
 	 */
-	RootDirectory findBySubPath(Path path);
+	RootDirectory findBySubPath(String string);
 
 	/**
 	 * Find {@link RootDirectory}s which have path containing or contained by this colleciton.

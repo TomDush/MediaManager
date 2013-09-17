@@ -59,13 +59,13 @@ public class ArtDownloaderImpl implements IArtDownloader {
 			throw new ConfigurationException("Can't create new temporary directory.", e);
 		}
 
-		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath,
-				trailersRootPath, temp);
+		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath, trailersRootPath, temp);
 
 		imageRootPath.toFile().mkdirs();
-		for(ImageType t : ImageType.values()) {
+		for (ImageType t : ImageType.values()) {
 			imageRootPath.resolve(getPath(t)).toFile().mkdirs();
 		}
+		imageRootPath.resolve(getPath(null)).toFile().mkdirs();
 		trailersRootPath.toFile().mkdirs();
 	}
 
@@ -79,21 +79,35 @@ public class ArtDownloaderImpl implements IArtDownloader {
 
 			// Move to real directory if not already existing, rename it with hash
 			final Path downloadedFile = imageRootPath.resolve(getPath(imageType)).resolve(
-					newFinalName(tempFile.toFile(), basename, getFileExtension(url.getFile())));
+					newFinalName(tempFile.toFile(), escape(basename), getFileExtension(url.getFile())));
 
 			if (!downloadedFile.toFile().exists()) {
 				LOGGER.debug("{} moved into {}", url, downloadedFile);
 				Files.move(tempFile, downloadedFile);
 			}
 
-			// Return relative file path
-			return imageRootPath.relativize(downloadedFile).toString();
+			// Return relative and normalized file path to be use in web url
+			return getWebRelativeUrl(downloadedFile);
 
 		} catch (IOException e) {
 			LOGGER.error("Error while downloading file {}.", url, e);
 			return null;
 		}
 
+	}
+
+	/**
+	 * Remove all non authorized chars.
+	 *
+	 * @param basename
+	 * @return
+	 */
+	private String escape(String basename) {
+		return basename.replaceAll("\\W", "_").replaceAll("_+", "_");
+	}
+
+	private String getWebRelativeUrl(final Path downloadedFile) {
+		return imageRootPath.relativize(downloadedFile).toString().replace("\\", "/");
 	}
 
 	private String getPath(ImageType imageType) {

@@ -154,7 +154,7 @@ public class ConfigurationProducer {
 
 		final String file = wrapper.getDefinition();
 		if (isNotBlank(file)) {
-			LOGGER.info("Initialize {} with {}", wrapper.getPackage(), file);
+			LOGGER.debug("Initialize {} with {}", wrapper.getPackage(), file);
 
 			fieldSet.addAllFields(readClasspathFile(file), true);
 		}
@@ -165,6 +165,7 @@ public class ConfigurationProducer {
 			fieldSet.addValue(f.getKey(), f.getValue(), false);
 		}
 
+		LOGGER.info("Create ModuleConfiguration from {}", fieldSet);
 		// Create module configuration
 		return newModuleConfiguration(fieldSet);
 	}

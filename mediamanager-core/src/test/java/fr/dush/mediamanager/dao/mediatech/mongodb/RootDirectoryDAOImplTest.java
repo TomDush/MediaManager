@@ -4,7 +4,6 @@ import static com.google.common.collect.Sets.*;
 import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
 import static org.fest.assertions.api.Assertions.*;
 
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
@@ -99,9 +98,8 @@ public class RootDirectoryDAOImplTest extends MongoJunitTest {
 
 	@Test
 	public void testFindBySubpath() throws Exception {
-		final RootDirectory movies = rootDirectoryDAO.findBySubPath(Paths.get("/home/medias/movies/Tron - Legacy"));
-		assertThat(movies).isNotNull();
-		assertThat(movies.getName()).isEqualTo("Movies");
+		final RootDirectory movies = rootDirectoryDAO.findBySubPath("/home/medias/movies/Tron - Legacy");
+		assertThat(movies).isNotNull().hasName("Movies");
 	}
 
 	@Test

@@ -2,10 +2,15 @@ package fr.dush.mediacenters.modules.enrich.moviesdb;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.util.Properties;
+
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import lombok.Setter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
@@ -14,8 +19,11 @@ import com.omertron.themoviedbapi.tools.WebBrowser;
 import fr.dush.mediacenters.modules.enrich.TheMovieDbEnricher;
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 public class TheMovieDBProvider {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBProvider.class);
 
 	@Inject
 	@Configuration(entryPoint = TheMovieDbEnricher.class)
@@ -24,6 +32,9 @@ public class TheMovieDBProvider {
 
 	@Produces
 	public TheMovieDbApi provideTheMovieDbApi() throws MovieDbException {
+		LOGGER.debug("Create TheMovieDbApi instance with proxy args : {}.",
+				configuration.resolveProperties("http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}", new Properties()));
+
 		String host = configuration.readDeepValue("proxy.host", null);
 		if (isNotEmpty(host)) {
 			WebBrowser.setProxyHost(host);
@@ -32,7 +43,12 @@ public class TheMovieDBProvider {
 			WebBrowser.setProxyPassword(configuration.readDeepValue("proxy.password", null));
 		}
 
-		// TODO MoviesDB : how to protect this private key ?
-		return new TheMovieDbApi(configuration.readValue("moviesdb.key", "21fa5e6aa76429cedfa1d628ecc7abeb"));
+		try {
+			// TODO MoviesDB : how to protect this private key ?
+			return new TheMovieDbApi(configuration.readValue("moviesdb.key", "21fa5e6aa76429cedfa1d628ecc7abeb"));
+
+		} catch (Exception e) {
+			throw new ConfigurationException("Can't initialize TheMovieDbApi, check your internet connection and proxy parameters.", e);
+		}
 	}
 }

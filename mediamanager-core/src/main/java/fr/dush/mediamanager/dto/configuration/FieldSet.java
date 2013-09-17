@@ -67,4 +67,14 @@ public class FieldSet {
 		fields.put(f.getKey(), f);
 	}
 
+	@Override
+	public String toString() {
+		final Map<String, String> map = newHashMap();
+		for (Field f : fields.values()) {
+			map.put(f.getKey(), f.getValue());
+		}
+
+		return "FieldSet [packageName=" + packageName + ", name=" + name + ", fields=" + map + "]";
+	}
+
 }

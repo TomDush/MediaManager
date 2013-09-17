@@ -136,7 +136,7 @@ public class RootDirectoryManagerImpl implements IRootDirectoryManager {
 
 	@Override
 	public RootDirectory findBySubPath(Path path) {
-		return rootDirectoryDAO.findBySubPath(path.toAbsolutePath());
+		return rootDirectoryDAO.findBySubPath(path.toAbsolutePath().normalize().toString());
 	}
 
 	@Override

@@ -1,8 +1,8 @@
 package fr.dush.mediamanager.launcher;
 
+
 import static com.google.common.collect.Lists.*;
 
-import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -42,8 +42,11 @@ public class ContextLauncher extends Thread {
 		setDaemon(true);
 		this.configFile = configFile;
 
-		final URL installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation();
-		System.setProperty("mediamanager.install", pathToString(Paths.get(installPath.getPath()).getParent()));
+		String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (installPath.matches("^/[A-Z]:/.*$")) {
+			installPath = installPath.substring(1);
+		}
+		System.setProperty("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
 		if (configFile != null) {
 			System.setProperty("mediamanager.propertiesfile", pathToString(configFile));
 		}

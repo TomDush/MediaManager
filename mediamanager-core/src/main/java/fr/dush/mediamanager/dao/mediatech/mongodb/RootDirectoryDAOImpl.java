@@ -2,7 +2,6 @@ package fr.dush.mediamanager.dao.mediatech.mongodb;
 
 import static com.google.common.collect.Lists.*;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -59,8 +58,8 @@ public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> imp
 	}
 
 	@Override
-	public RootDirectory findBySubPath(Path path) {
-		final List<RootDirectory> roots = findUsingPath(newArrayList(path.toFile().getAbsolutePath()));
+	public RootDirectory findBySubPath(String path) {
+		final List<RootDirectory> roots = findUsingPath(newArrayList(path));
 
 		if (1 == roots.size()) {
 			return roots.get(0);
@@ -81,8 +80,9 @@ public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> imp
 		js.append("function() { \n\tvar found = false; \n\tthis.paths.forEach(function(p) { \n");
 
 		for (String p : paths) {
-			or.add(query.criteria("paths").contains(p));
-			js.append("\t\tfound |= '").append(p).append("'.indexOf(p) == 0;\n");
+			String path = p.replaceAll("\\\\", "\\\\\\\\");
+			or.add(query.criteria("paths").contains(path));
+			js.append("\t\tfound |= '").append(path).append("'.indexOf(p) == 0;\n");
 		}
 
 		js.append("\t});\n\treturn found; \n}");

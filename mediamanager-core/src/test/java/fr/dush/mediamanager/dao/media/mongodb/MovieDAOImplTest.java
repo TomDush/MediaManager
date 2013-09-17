@@ -23,6 +23,7 @@ import fr.dush.mediamanager.dto.media.video.Trailers;
 import fr.dush.mediamanager.dto.media.video.VideoFile;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
+import fr.dush.mediamanager.tools.PathsUtils;
 
 @DatabaseScript(clazz = Movie.class, locations = "dataset/movies.json")
 public class MovieDAOImplTest extends MongoJunitTest {
@@ -120,7 +121,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		final Movie movie = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70c"));
 		assertThat(movie).hasTitle("Star Trek - The future begins").hasOverview("The future begins")
 				.hasMediaIds("MoviesDB", "13475", "junit", "STAR_TREK")
-				.hasVideoFiles("/media/movies/HD/star_trek_1.mkv", "/media/movies/star_trek.mp4");
+				.hasVideoFiles(PathsUtils.toAbsolute("/media/movies/HD/star_trek_1.mkv"), "/media/movies/star_trek.mp4");
 
 	}
 
