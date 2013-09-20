@@ -1,18 +1,15 @@
 package fr.dush.mediamanager.business.scanner.impl;
 
-import static com.google.common.collect.Lists.*;
 import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -64,10 +61,25 @@ public class MoviesScannerTest extends SimpleJunitTest {
 	@Mock
 	private IMovieDAO movieDAO;
 
+	@Mock
+	private Instance<ScanningExceptionHandler> scanningExceptionHandlerFactory;
+
+	@Spy
+	private ScanningExceptionHandler handler = new ScanningExceptionHandler() {
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			LOGGER.error("An error was throws", e);
+			fail(e.getMessage(), e);
+		}
+
+	};
+
 	@SuppressWarnings("unchecked")
 	@Before
 	public void postConstruct() throws ModuleLoadingException {
 		when(modulesManager.findModuleById(any(Class.class), anyString())).thenReturn(enricher);
+		when(scanningExceptionHandlerFactory.get()).thenReturn(handler);
 		scanner.initializePatterns();
 
 		when(moduleConfiguration.readValue(anyString())).thenReturn("default-enricher");
@@ -113,8 +125,8 @@ public class MoviesScannerTest extends SimpleJunitTest {
 				if (item instanceof MoviesParsedName) {
 					MoviesParsedName name = (MoviesParsedName) item;
 					if (!movieName.equals(name.getMovieName()) || year != name.getYear()) {
-						error = String.format("expected name equals <%s>, but was <%s> ; and date <%d>, but was <%d>", movieName,
-								name.getMovieName(), year, name.getYear());
+						error = String.format("expected name equals <%s>, but was <%s> ; and date <%d>, but was <%d>", movieName, name.getMovieName(),
+								year, name.getYear());
 						return false;
 					}
 
@@ -131,8 +143,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
 		});
 	}
 
-	// @Before
-	public void create_files() throws Exception {
+	private void create_files() throws Exception {
 		File root = new File("target/movies");
 
 		if (root.exists()) root.delete();
@@ -155,15 +166,6 @@ public class MoviesScannerTest extends SimpleJunitTest {
 		// new File(root, "Transformers Revenge Of The Fallen Truefrench Dvdrip Xvid-RLD.CD01.avi").createNewFile();
 		// new File(root, "Transformers Revenge Of The Fallen Truefrench Dvdrip Xvid-RLD.CD02.avi").createNewFile();
 
-	}
-
-	// @Test
-	public void list_files() throws Exception {
-		final List<File> files = newArrayList(Paths.get("/mnt/data/Films/Films vf/").toFile().listFiles());
-		Collections.sort(files);
-		for (File f : files) {
-			System.out.println("new File(root, \"" + f.getName() + "\").createNewFile();");
-		}
 	}
 
 	@Test

@@ -1,6 +1,7 @@
 package fr.dush.mediamanager.business.scanner.impl;
 
 import static com.google.common.collect.Lists.*;
+import static com.google.common.collect.Sets.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
@@ -18,6 +19,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import lombok.AllArgsConstructor;
@@ -66,6 +69,28 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 	/** Media enricher */
 	private IMoviesEnricher enricher;
 
+	@Inject
+	private Event<AmbiguousEnrichment> ambiguousEnrichmentDispatcher;
+
+	/** Pattern to find date in filenames */
+	protected Pattern datePattern;
+
+	/** Pattern matching movies split into 2 or more files. */
+	protected Set<Pattern> moviesStackingPatterns = newHashSet();
+
+	@PostConstruct
+	public void initializePatterns() {
+
+		// Pre-compile patterns...
+		if (isNotEmpty(getScannerConfiguration().getDateRegex())) {
+			datePattern = Pattern.compile(getScannerConfiguration().getDateRegex());
+		}
+
+		for (String regex : getScannerConfiguration().getMoviesStacking()) {
+			moviesStackingPatterns.add(Pattern.compile(regex));
+		}
+	}
+
 	@Override
 	public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
 		String enricherName = rootDirectory.getEnricher();
@@ -112,14 +137,14 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 				choosenMovie = newEmptyMovie(file);
 
 			} else {
-				choosenMovie = movies.get(0); // FIXME Check do no download all jackets
+				choosenMovie = movies.get(0);
 			}
 
 			// Add video informations
 			choosenMovie.getVideoFiles().add(file.getVideoFile());
 
 			// Finish to get meta data
-			if(!movies.isEmpty()) {
+			if (!movies.isEmpty()) {
 				enricher.enrichMedia(choosenMovie);
 			}
 
@@ -190,8 +215,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 		// Group file part
 		for (Entry<String, Collection<FileStacking>> entry : moviesStacking.asMap().entrySet()) {
 			if (entry.getValue().size() > 1) {
-				LOGGER.debug("{} in {} volumes : {}", entry.getValue().iterator().next().getName(), entry.getValue().size(),
-						entry.getValue());
+				LOGGER.debug("{} in {} volumes : {}", entry.getValue().iterator().next().getName(), entry.getValue().size(), entry.getValue());
 
 				// Sort multi-file
 				final ArrayList<FileStacking> volumeList = newArrayList(entry.getValue());
@@ -219,7 +243,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
 	private MoviesParsedName parseFile(File f, SetMultimap<String, FileStacking> moviesStacking) {
 		final String ext = Files.getFileExtension(f.getName());
-		if (!scannerConfiguration.getVideoExtensions().contains("." + ext)) return null;
+		if (!getScannerConfiguration().getVideoExtensions().contains("." + ext)) return null;
 
 		MoviesParsedName parsedFileName = new MoviesParsedName(f.toPath());
 
@@ -228,7 +252,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
 		// Name : cleaned and with space
 		String simpleName = Files.getNameWithoutExtension(f.getName()).toLowerCase();
-		for (String regex : scannerConfiguration.getCleanStrings()) {
+		for (String regex : getScannerConfiguration().getCleanStrings()) {
 			String[] splitted = simpleName.split(regex, 2);
 			if (splitted.length > 1) {
 				simpleName = splitted[0];

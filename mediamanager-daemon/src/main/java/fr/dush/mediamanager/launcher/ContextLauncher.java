@@ -35,6 +35,15 @@ public class ContextLauncher extends Thread {
 	static {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
+
+		// This default handler will be replaced by ThreadExceptionsHandler when CDI Context will be created.
+		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				LOGGER.error("Thread [{}] throw exception : {}", t.getName(), e.getMessage(), e);
+			}
+		});
 	}
 
 	public ContextLauncher(Path configFile, int port) {
@@ -80,12 +89,15 @@ public class ContextLauncher extends Thread {
 
 			fireStop(lifeCycleServices);
 
-		} catch (RuntimeException e) {
-			catchedException = e;
-			throw e;
+			LOGGER.info("Server stopped.");
 
 		} catch (Exception e) {
 			catchedException = e;
+
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
+
 			throw new RuntimeException(e);
 		}
 	}

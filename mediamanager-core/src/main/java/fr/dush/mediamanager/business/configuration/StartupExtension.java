@@ -40,11 +40,17 @@ public class StartupExtension implements Extension {
 	}
 
 	void afterDeploymentValidation(@Observes ApplicationStarted event) {
+		LOGGER.debug("Initialize beans : {}", startupBeans);
 		for (Class<?> clazz : startupBeans) {
-			// the call to toString() is a cheat to force the bean to be initialized
-			CDIUtils.getBean(clazz).toString();
+			try {
+				// the call to toString() is a cheat to force the bean to be initialized
+				CDIUtils.getBean(clazz).toString();
+
+			} catch (Exception e) {
+				LOGGER.error("Can't initialize bean of type '{}' : {}", clazz.getName(), e.getMessage(), e);
+			}
 		}
 
-		LOGGER.debug("All beans has been initilized.");
+		LOGGER.info("All beans has been initilized : {}", startupBeans);
 	}
 }

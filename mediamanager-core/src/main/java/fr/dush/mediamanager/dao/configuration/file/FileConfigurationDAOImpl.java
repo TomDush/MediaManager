@@ -76,7 +76,7 @@ public class FileConfigurationDAOImpl implements IConfigurationDAO {
 		for (Entry<Object, Object> entry : properties.entrySet()) {
 			if (entry.getKey() instanceof String && ((String) entry.getKey()).startsWith(packageName + ".")) {
 				final String key = (String) entry.getKey();
-				LOGGER.info("Read property for '{}' : {} = {}", packageName, key, entry.getValue());
+				LOGGER.debug("Read property for '{}' : {} = {}", packageName, key, entry.getValue());
 				set.add(new Field(key.substring(packageName.length() + 1), (String) entry.getValue()));
 			}
 		}
