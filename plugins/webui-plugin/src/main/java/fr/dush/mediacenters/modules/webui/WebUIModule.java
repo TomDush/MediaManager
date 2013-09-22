@@ -1,15 +1,12 @@
 package fr.dush.mediacenters.modules.webui;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Properties;
 import java.util.Scanner;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -19,35 +16,59 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 
-import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.exceptions.ModuleLoadingException;
+import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
 
-@ApplicationScoped
-@Module(name = "WEB UI", id = "web-ui", description = "Provide full UI by web browser.")
-public class WebUIModule {
+public class WebUIModule implements MediaManagerLifeCycleService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WebUIModule.class);
 
 	private Server server;
 
-	@Inject
-	@Configuration(definition = "configuration/webui.json")
-	private ModuleConfiguration configuration;
+	/** Start Jetty, and CDI container, before Daemon do it. */
+	@Override
+	public void beforeStartCdi(Path configFilePath) throws ModuleLoadingException {
 
-	@PostConstruct
-	public void startServer() throws Exception {
-		Properties props = new Properties();
-		props.load(Resources.getResource("configuration/jetty.properties").openStream());
+		try {
+			Properties props = new Properties();
+			props.load(Resources.getResource("configuration/jetty.properties").openStream());
+			if (configFilePath != null && configFilePath.toFile().exists()) {
+				props.load(new FileInputStream(configFilePath.toFile()));
+			}
 
+			startServer(props);
+
+		} catch (Exception e) {
+			LOGGER.error("Can't start Jetty server", e);
+			throw new ModuleLoadingException("Can't start jetty server.", e);
+		}
+	}
+
+	@Override
+	public void afterStopCdi() {
+		stopServer();
+	}
+
+	/** Waiting for server stop ... */
+	public void join() throws InterruptedException {
+		server.join();
+	}
+
+	private void startServer(Properties props) throws Exception {
 		server = (Server) new XmlConfiguration(readFile("jetty/jetty.xml", props)).configure();
 		server.setHandler((Handler) new XmlConfiguration(readFile("jetty/jetty-web.xml", props)).configure());
 
 		server.start();
+
+		LOGGER.debug("Jetty server started...");
 	}
 
-	@PreDestroy
+	/** Stopping server (and CDI context) ... */
 	private void stopServer() {
+		if (server == null) return;
+
 		LOGGER.info("Stopping webui server...");
 		try {
 			server.stop();
@@ -62,9 +83,13 @@ public class WebUIModule {
 
 		final String content = readResource(Resources.getResource(fileName));
 
-		final String resolved = configuration.resolveProperties(content, props);
+		// Use core resolver with values found in system and in properties file.
+		ModuleConfiguration conf = new ModuleConfiguration(null, new FieldSet("jetty"));
+
+		final String resolved = conf.resolveProperties(content, props);
 		LOGGER.debug("Jetty config : {}", resolved);
 
+		// final String resolved = content;
 		return resolved;
 	}
 
@@ -85,10 +110,5 @@ public class WebUIModule {
 		}
 
 		return sb.toString();
-	}
-
-	/** Waiting for server stop ... */
-	public void join() throws InterruptedException {
-		server.join();
 	}
 }

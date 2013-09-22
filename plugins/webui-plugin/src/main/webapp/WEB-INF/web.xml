@@ -35,8 +35,34 @@
 		<param-name>javax.faces.CONFIG_FILES</param-name>
 		<param-value>/WEB-INF/faces-config.xml</param-value>
 	</context-param>
+	
+	<!-- Test -->
+	<servlet>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>fr.dush.mediacenters.modules.webui.servlets.TestServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Images Servlet -->
+	<servlet>
+		<servlet-name>ImagesServlet</servlet-name>
+		<servlet-class>fr.dush.mediacenters.modules.webui.controllers.ImagesServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
 	<!-- Map these files with JSF -->
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/test/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ImagesServlet</servlet-name>
+		<url-pattern>/posters/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ImagesServlet</servlet-name>
+		<url-pattern>/backdrops/*</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Faces Servlet</servlet-name>
 		<url-pattern>/faces/*</url-pattern>

@@ -26,33 +26,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Web server (Jetty) -->
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-jsp</artifactId>
-			<version>${jetty-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-webapp</artifactId>
-			<version>${jetty-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-plus</artifactId>
-			<version>${jetty-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${jetty-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-xml</artifactId>
-			<version>${jetty-version}</version>
-		</dependency>
-
 		<!-- CDI Provider servlet -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
@@ -67,6 +40,11 @@
 
 		<!-- JSF Provider -->
 		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-api</artifactId>
 			<version>2.1.7</version>
@@ -76,27 +54,49 @@
 			<artifactId>jsf-impl</artifactId>
 			<version>2.1.7</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
-		</dependency>
 
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>standalone-dependencies</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+			<dependencies>
+				<!-- Web server (Jetty) -->
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+					<version>${jetty-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-xml</artifactId>
+					<version>${jetty-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-jsp</artifactId>
+					<version>${jetty-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-webapp</artifactId>
+					<version>${jetty-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-plus</artifactId>
+					<version>${jetty-version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
 	<build>
-		<!-- Jetty plugin, use 'mvn jetty:run' to start it. -->
+		<!-- Jetty plugin, use 'mvn jetty:run -P !standalone-dependencies' to start it. -->
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
@@ -109,6 +109,7 @@
 						<tempDirectory>target/jettytemp</tempDirectory>
 					</webApp>
 					<useTestScope>true</useTestScope>
+					<contextXml>src/test/resources/configuration/jetty-context.xml</contextXml>
 				</configuration>
 			</plugin>
 
