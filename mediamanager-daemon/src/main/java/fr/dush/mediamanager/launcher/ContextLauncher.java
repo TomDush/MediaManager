@@ -1,18 +1,20 @@
 package fr.dush.mediamanager.launcher;
 
+import static com.google.common.collect.Lists.*;
+
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import fr.dush.mediamanager.remote.MediaManagerRMI;
+import fr.dush.mediamanager.exceptions.ModuleLoadingException;
+import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
 import fr.dush.mediamanager.remote.Stopper;
 import fr.dush.mediamanager.tools.CDIUtils;
 
@@ -24,11 +26,11 @@ import fr.dush.mediamanager.tools.CDIUtils;
  */
 public class ContextLauncher extends Thread {
 
-	private static final int REGISTRY_PORT = 1099;
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ContextLauncher.class);
 
 	private Exception catchedException = null;
+
+	private Path configFile = null;
 
 	static {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -38,14 +40,14 @@ public class ContextLauncher extends Thread {
 	public ContextLauncher(Path configFile, int port) {
 		super("mediamanagerDaemon");
 		setDaemon(true);
-
-		// TODO Do something with params (configFile and port)
+		this.configFile = configFile;
 
 		final URL installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation();
 		System.setProperty("mediamanager.install", pathToString(Paths.get(installPath.getPath()).getParent()));
 		if (configFile != null) {
 			System.setProperty("mediamanager.propertiesfile", pathToString(configFile));
 		}
+		System.setProperty("mediamanager.port", String.valueOf(port));
 	}
 
 	/** Get normalized absolute path. */
@@ -55,14 +57,13 @@ public class ContextLauncher extends Thread {
 
 	@Override
 	public void run() {
+
+		// Find services...
+		final List<MediaManagerLifeCycleService> lifeCycleServices = findLifecycleListeners();
+
 		try {
+			fireStart(lifeCycleServices);
 			CDIUtils.bootCdiContainer();
-
-			// Register remote interface
-			startRegistry();
-
-			final MediaManagerRMI remoteInterface = CDIUtils.getBean(MediaManagerRMI.class);
-			Naming.rebind("rmi://localhost/" + MediaManagerRMI.class.getSimpleName(), remoteInterface);
 
 			// Wait application end...
 			final Stopper stopper = CDIUtils.getBean(Stopper.class);
@@ -74,6 +75,8 @@ public class ContextLauncher extends Thread {
 			LOGGER.info("Stopping server container.");
 			CDIUtils.stopCdiContainer();
 
+			fireStop(lifeCycleServices);
+
 		} catch (RuntimeException e) {
 			catchedException = e;
 			throw e;
@@ -84,13 +87,26 @@ public class ContextLauncher extends Thread {
 		}
 	}
 
-	/**
-	 * Create dynamic registry, if isn't started...
-	 *
-	 * @throws RemoteException
-	 */
-	private Registry startRegistry() throws RemoteException {
-		return LocateRegistry.createRegistry(REGISTRY_PORT);
+	private void fireStart(List<MediaManagerLifeCycleService> lifeCycleServices) throws ModuleLoadingException {
+		for (MediaManagerLifeCycleService serv : lifeCycleServices) {
+			serv.beforeStartCdi(configFile);
+		}
+	}
+
+	private void fireStop(List<MediaManagerLifeCycleService> lifeCycleServices) {
+		for (MediaManagerLifeCycleService serv : lifeCycleServices) {
+			serv.afterStopCdi();
+		}
+	}
+
+	private List<MediaManagerLifeCycleService> findLifecycleListeners() {
+		List<MediaManagerLifeCycleService> lifeCycleServices = newArrayList();
+
+		final ServiceLoader<MediaManagerLifeCycleService> services = ServiceLoader.load(MediaManagerLifeCycleService.class);
+		for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext();) {
+			lifeCycleServices.add(it.next());
+		}
+		return lifeCycleServices;
 	}
 
 	private synchronized void fireInitialized(Stopper stopper) {

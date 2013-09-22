@@ -3,17 +3,23 @@ package fr.dush.mediamanager.remote.impl;
 import static com.google.common.collect.Lists.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;
@@ -23,6 +29,7 @@ import fr.dush.mediamanager.dto.configuration.Field;
 import fr.dush.mediamanager.dto.scan.ScanStatus;
 import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
 import fr.dush.mediamanager.launcher.Status;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.MediaManagerRMI;
@@ -35,7 +42,8 @@ import fr.dush.mediamanager.remote.Stopper;
  *
  */
 @SuppressWarnings("serial")
-// @ApplicationScoped
+@ApplicationScoped
+@Startup
 public class RemoteController extends UnicastRemoteObject implements MediaManagerRMI {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteController.class);
@@ -60,6 +68,19 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
 	public RemoteController() throws RemoteException {
 		super();
+	}
+
+	/** Register remote interface RMI */
+	@PostConstruct
+	public void registerRmiImplementation() {
+		try {
+			startRegistry();
+
+			// TODO use ModuleConfiguration and not system properties ?
+			Naming.rebind("rmi://localhost:" + getRmiPort() + "/" + MediaManagerRMI.class.getSimpleName(), this);
+		} catch (Exception e) {
+			throw new ConfigurationException("Can't register RMI implementation.", e);
+		}
 	}
 
 	@Override
@@ -140,4 +161,16 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 		}
 	}
 
+	/**
+	 * Create dynamic registry, if isn't started...
+	 *
+	 * @throws RemoteException
+	 */
+	private Registry startRegistry() throws RemoteException {
+		return LocateRegistry.createRegistry(getRmiPort());
+	}
+
+	private int getRmiPort() {
+		return Integer.valueOf(System.getProperty("mediamanager.port"));
+	}
 }

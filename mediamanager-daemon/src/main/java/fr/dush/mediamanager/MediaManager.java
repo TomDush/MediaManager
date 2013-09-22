@@ -51,7 +51,7 @@ public class MediaManager {
 	private static final Path DEFAULT_CONFIG_PATH = Paths.get(System.getProperty("user.home"), ".mediamanager", "mediamanager.properties");
 
 	/** Port's default value, it can be override by command args, or in configuration file. */
-	private static final int DEFAULT_PORT = 3535;
+	private static final int DEFAULT_REGISTRY_PORT = 1099;
 
 	private final CommandLine args;
 
@@ -121,7 +121,7 @@ public class MediaManager {
 		options.addOption("v", "version", false, "print version");
 
 		// Configuration
-		options.addOption("p", "port", true, "port used to communicate with daemon, default is " + DEFAULT_PORT);
+		options.addOption("p", "port", true, "port used to communicate with daemon, default is " + DEFAULT_REGISTRY_PORT);
 		options.addOption(OptionBuilder.withDescription("configuration file, default is " + DEFAULT_CONFIG_PATH).hasArg().withLongOpt("config")
 				.withArgName("config file").create("c"));
 
@@ -167,7 +167,7 @@ public class MediaManager {
 		} else if (configFile != null) {
 			port = readPort(configFile);
 		} else {
-			port = DEFAULT_PORT; // FIXME What is this port ??
+			port = DEFAULT_REGISTRY_PORT;
 		}
 	}
 
@@ -378,18 +378,18 @@ public class MediaManager {
 	private static int readPort(Path configFile) {
 		final File file = configFile.toFile();
 		if (!file.exists()) {
-			return DEFAULT_PORT;
+			return DEFAULT_REGISTRY_PORT;
 		}
 
 		try {
 			Properties props = new Properties();
 			props.load(new FileInputStream(file));
 
-			return castPort(props.getProperty("mediamanager.port", String.valueOf(DEFAULT_PORT)));
+			return castPort(props.getProperty("mediamanager.port", String.valueOf(DEFAULT_REGISTRY_PORT)));
 
 		} catch (IOException e) {
 			LOGGER.warn("Can't read configuration file {} : {}", configFile, e.getMessage());
-			return DEFAULT_PORT;
+			return DEFAULT_REGISTRY_PORT;
 		}
 	}
 
