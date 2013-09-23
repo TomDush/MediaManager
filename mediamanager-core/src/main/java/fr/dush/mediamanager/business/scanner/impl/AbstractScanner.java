@@ -18,6 +18,7 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.dto.media.Media;
 import fr.dush.mediamanager.dto.scan.Phase;
@@ -43,13 +44,19 @@ public abstract class AbstractScanner<F, M extends Media> implements Runnable {
 	@Inject
 	private Instance<ScanningExceptionHandler> scanningExceptionHandlerFactory;
 
+	@Inject
+	private IRootDirectoryManager rootDirectoryManager;
+
 	/** Progress status */
 	private ScanStatus status;
+
+	private RootDirectory rootDirectory;
 
 	/** Root paths to scan */
 	private Set<Path> rootPaths = newHashSet();
 
 	public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
+		this.rootDirectory = rootDirectory;
 
 		// Scanning recursively directory. Put parsed file's name into ScanningResult
 		for (String path : rootDirectory.getPaths()) {
@@ -125,6 +132,7 @@ public abstract class AbstractScanner<F, M extends Media> implements Runnable {
 		// ** FINISH
 		LOGGER.info("Finish enrichment of {}", rootPaths);
 		status.changePhase(Phase.SUCCED, 0);
+		rootDirectoryManager.markAsUpdated(rootDirectory);
 	}
 
 	/** Save media */

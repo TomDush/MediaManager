@@ -125,7 +125,7 @@ public class ContextLauncher extends Thread {
 	}
 
 	private synchronized void fireInitialized(Stopper stopper) {
-		stopper.fireApplciationStarted(this);
+		stopper.fireApplicationStarted(this);
 
 		notifyAll();
 	}

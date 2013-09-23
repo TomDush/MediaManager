@@ -43,6 +43,11 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 	}
 
 	@Override
+	public void save(Movie dto) {
+		saveOrUpdateMovie(dto);
+	}
+
+	@Override
 	public void saveOrUpdateMovie(Movie movie) {
 		// Force creation date
 		if (null == movie.getCreation()) {

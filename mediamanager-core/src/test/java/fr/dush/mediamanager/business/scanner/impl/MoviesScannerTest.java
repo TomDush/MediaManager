@@ -13,6 +13,7 @@ import javax.enterprise.inject.Instance;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
+import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
@@ -64,16 +66,31 @@ public class MoviesScannerTest extends SimpleJunitTest {
 	@Mock
 	private Instance<ScanningExceptionHandler> scanningExceptionHandlerFactory;
 
+	@Mock
+	private IRootDirectoryManager rootDirectoryManager;
+
+	private Throwable exception = null;
+
 	@Spy
 	private ScanningExceptionHandler handler = new ScanningExceptionHandler() {
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
 			LOGGER.error("An error was throws", e);
+			exception = e;
 			fail(e.getMessage(), e);
 		}
 
 	};
+
+	@After
+	public void throwErrorIfAny() throws Exception {
+		if (exception != null) {
+			Throwable e = exception;
+			exception = null;
+			fail(e.getMessage(), e);
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	@Before
@@ -111,7 +128,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
 		verify(enricher).findMediaData(argParsedName("battle los angeles", 2011));
 		verify(enricher).findMediaData(argParsedName("5 days of war", 2011));
 		verify(enricher).findMediaData(argParsedName("the postman", 1998));
-		verify(movieDAO, times(5)).save(any(Movie.class));
+		verify(movieDAO, times(5)).saveOrUpdateMovie(any(Movie.class));
 
 	}
 

@@ -56,11 +56,14 @@ public class ScanListener {
 			final RootDirectory rootDirectory = rootDirectoryManager.createOrUpdateRootDirectory(event.getRootDirectory());
 
 			ScanStatus status = null;
-			if (rootDirectory.equals(event.getRootDirectory()) || rootDirectory.getLastRefresh() == null) {
+			if (rootDirectory.getLastRefresh() == null) {
+				LOGGER.info("Scan new root directory {} ; lastRefresh = {}", rootDirectory, rootDirectory.getLastRefresh());
 				// New directory
 				status = fullScan(event, rootDirectory);
 
 			} else {
+				LOGGER.info("Update root directory {}", rootDirectory);
+
 				// Update directory
 				final Set<String> subPaths = newHashSet();
 				if (isNotEmpty(event.getSubPath())) {
@@ -69,7 +72,7 @@ public class ScanListener {
 					subPaths.addAll(event.getRootDirectory().getPaths());
 				}
 
-				status = refresh(rootDirectory, event.getRootDirectory().getEnricher(), subPaths);
+				status = refresh(event, rootDirectory, subPaths);
 			}
 
 			scanBus.fire(new ScanResponseEvent(this, event, status));
@@ -86,9 +89,10 @@ public class ScanListener {
 		return getScanner(rootDirectory.getMediaType()).startScanning(rootDirectory);
 	}
 
-	private ScanStatus refresh(RootDirectory rootDirectory, String enricher, Set<String> paths) {
+	private ScanStatus refresh(ScanRequestEvent event, RootDirectory rootDirectory, Set<String> paths) throws ScanException {
 		// TODO implement this method : check/update RootDirectory, refresh content.
-		return new ScanStatus("refresh root directory is not implemented.");
+		LOGGER.warn("refresh root directory is not implemented, use full scan...");
+		return fullScan(event, rootDirectory);
 	}
 
 	private AbstractScanner<?, ?> getScanner(MediaType type) throws ScanException {

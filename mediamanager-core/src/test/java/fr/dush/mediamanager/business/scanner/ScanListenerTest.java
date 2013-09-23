@@ -68,7 +68,7 @@ public class ScanListenerTest extends SimpleJunitTest {
 	public void testScanning() throws Exception {
 		final RootDirectory rootDirectory = new RootDirectory();
 		rootDirectory.setEnricher("my-enricher");
-		rootDirectory.setLastRefresh(null); // TODO check last refresh updated
+		rootDirectory.setLastRefresh(null);
 		rootDirectory.setMediaType(MediaType.MOVIE);
 		rootDirectory.setName("Data");
 		rootDirectory.setPaths(newHashSet("medias/movies", "medias/best_movies"));

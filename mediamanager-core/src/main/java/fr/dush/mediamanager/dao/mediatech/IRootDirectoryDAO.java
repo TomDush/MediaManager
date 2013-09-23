@@ -24,7 +24,7 @@ public interface IRootDirectoryDAO {
 	RootDirectory findById(String name);
 
 	/**
-	 * Save or update RootDirectory, no constrains...
+	 * Save or update RootDirectory, without constrains... But do NOT merge existing with update.
 	 *
 	 * @param rootDirectory
 	 * @return Return updated RootDirectory

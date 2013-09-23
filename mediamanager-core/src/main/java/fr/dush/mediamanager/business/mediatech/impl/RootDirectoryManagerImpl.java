@@ -40,9 +40,12 @@ public class RootDirectoryManagerImpl implements IRootDirectoryManager {
 
 		} else if (roots.isEmpty() || containId(rootDirectory.getName(), roots)) {
 			// New one, or existing one to update
-			rootDirectoryDAO.saveOrUpdate(rootDirectory);
-
-			return rootDirectoryDAO.findById(rootDirectory.getName());
+			RootDirectory updated = rootDirectory;
+			if (!roots.isEmpty()) {
+				updated = roots.get(0);
+				update(updated, rootDirectory);
+			}
+			return rootDirectoryDAO.saveOrUpdate(updated);
 		}
 
 		// Try to merge new root to existing one.
@@ -68,9 +71,7 @@ public class RootDirectoryManagerImpl implements IRootDirectoryManager {
 		}
 
 		update(existing, rootDirectory);
-		rootDirectoryDAO.saveOrUpdate(existing);
-
-		return existing;
+		return rootDirectoryDAO.saveOrUpdate(existing);
 	}
 
 	/**

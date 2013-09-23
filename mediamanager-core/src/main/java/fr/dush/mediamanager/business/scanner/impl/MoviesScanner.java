@@ -124,7 +124,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 		try {
 			final List<Movie> movies = enricher.findMediaData(file);
 
-			if (1 != movies.size()) {
+			if (movies.size() != 1) {
 				// If enrichment is ambiguous, first one will be choose, but an event is fired to save this confusion, or display it.
 				final AmbiguousEnrichment event = new AmbiguousEnrichment(this, Movie.class, file.getFile(), movies);
 				ambiguousEnrichmentDispatcher.fire(event);
@@ -159,7 +159,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
 	@Override
 	protected void save(Movie media) {
-		movieDAO.save(media);
+		movieDAO.saveOrUpdateMovie(media);
 		// TODO Save collection ?
 	}
 
@@ -202,7 +202,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 		for (File f : getChildren(root)) {
 			if (f.isFile()) {
 				MoviesParsedName filename = parseFile(f, moviesStacking);
-				if (null != filename) {
+				if (filename != null) {
 					movies.add(filename);
 				}
 
@@ -242,7 +242,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 	}
 
 	private MoviesParsedName parseFile(File f, SetMultimap<String, FileStacking> moviesStacking) {
-		final String ext = Files.getFileExtension(f.getName());
+		final String ext = Files.getFileExtension(f.getName()).toLowerCase();
 		if (!getScannerConfiguration().getVideoExtensions().contains("." + ext)) return null;
 
 		MoviesParsedName parsedFileName = new MoviesParsedName(f.toPath());
@@ -261,7 +261,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 		parsedFileName.setMovieName(removeSpaces(simpleName));
 
 		// Date
-		if (null != datePattern) {
+		if (datePattern != null) {
 			final Matcher matcher = datePattern.matcher(Files.getNameWithoutExtension(f.getName()).toLowerCase());
 			if (matcher.matches()) {
 				final String year = matcher.group(2);

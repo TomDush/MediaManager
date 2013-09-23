@@ -46,7 +46,7 @@ public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> imp
 	public RootDirectory saveOrUpdate(RootDirectory rootDirectory) {
 		save(rootDirectory);
 
-		return findById(rootDirectory.getName());
+		return rootDirectory;
 	}
 
 	@Override

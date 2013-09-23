@@ -52,7 +52,7 @@ public class Stopper {
 		getInstance().waitApplicationEnd();
 	}
 
-	public void fireApplciationStarted(Object source) {
+	public void fireApplicationStarted(Object source) {
 		lifecycleBus.fire(new ApplicationStarted(source));
 	}
 
