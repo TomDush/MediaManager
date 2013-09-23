@@ -46,4 +46,7 @@ public abstract class Media implements Serializable {
 
 	/** Full meta-data in JSON language */
 	private String otherMetaData;
+
+	/** Vote average between 1 (fantastic) and 0 (poor) */
+	private double voteAverage;
 }

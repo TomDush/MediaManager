@@ -206,6 +206,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 			}
 			movie.setOverview(movieDb.getOverview());
 			movie.getBackdrops().add(downloadImage(ImageType.BACKDROP, movieDb.getBackdropPath(), movieDb.getTitle()));
+			movie.setVoteAverage(movieDb.getVoteAverage() / 10);
 
 			// Find main actors...
 			PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
