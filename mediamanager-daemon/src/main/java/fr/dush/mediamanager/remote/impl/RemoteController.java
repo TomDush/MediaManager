@@ -19,12 +19,12 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
 import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dto.configuration.Field;
 import fr.dush.mediamanager.dto.scan.ScanStatus;
 import fr.dush.mediamanager.dto.tree.MediaType;
@@ -48,11 +48,15 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RemoteController.class);
 
-	@Inject
-	private Stopper stopper;
+	private static final String REMOTECONTROL_URL = "remotecontrol.url";
 
 	@Inject
-	private IRootDirectoryDAO rootDirectoryDAO;
+	@Configuration(packageName = "daemon", definition = "configuration/rmi.json")
+	@ConfigurationWithoutDatabase
+	private ModuleConfiguration configuration;
+
+	@Inject
+	private Stopper stopper;
 
 	@Inject
 	private Event<ScanRequestEvent> requestBus;
@@ -62,9 +66,6 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
 	@Inject
 	private IScanRegister scanRegister;
-
-	@Inject
-	private IMovieDAO movieDAO;
 
 	public RemoteController() throws RemoteException {
 		super();
@@ -76,8 +77,8 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 		try {
 			startRegistry();
 
-			// TODO use ModuleConfiguration and not system properties ?
-			Naming.rebind("rmi://localhost:" + getRmiPort() + "/" + MediaManagerRMI.class.getSimpleName(), this);
+			LOGGER.debug("Bind RMI controller to url : {}", configuration.readValue(REMOTECONTROL_URL));
+			Naming.rebind(configuration.readValue(REMOTECONTROL_URL), this);
 		} catch (Exception e) {
 			throw new ConfigurationException("Can't register RMI implementation.", e);
 		}
@@ -145,7 +146,7 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 				for (Field f : m.getAllFields()) {
 					ConfigurationField field = new ConfigurationField();
 					field.setFullname(m.getPackageName() + "." + f.getKey());
-					field.setValue(m.readValue(f.getKey()));
+					field.setValue(m.getValue(f.getKey()));
 					field.setDefaultValue(f.isDefaultValue());
 					field.setDescription(f.getDescription());
 
@@ -162,15 +163,20 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 	}
 
 	/**
-	 * Create dynamic registry, if isn't started...
+	 * Create dynamic registry, if necessary...
 	 *
 	 * @throws RemoteException
 	 */
 	private Registry startRegistry() throws RemoteException {
-		return LocateRegistry.createRegistry(getRmiPort());
+		final Integer port = configuration.readValueAsInt("remotecontrol.port");
+
+		if (configuration.readValueAsBoolean("remotecontrol.createregistry")) {
+			return LocateRegistry.createRegistry(port);
+
+		} else {
+			return LocateRegistry.getRegistry(port);
+		}
+
 	}
 
-	private int getRmiPort() {
-		return Integer.valueOf(System.getProperty("mediamanager.port"));
-	}
 }

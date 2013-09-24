@@ -59,7 +59,7 @@ public class ContextLauncher extends Thread {
 		if (configFile != null) {
 			System.setProperty("mediamanager.propertiesfile", pathToString(configFile));
 		}
-		System.setProperty("mediamanager.port", String.valueOf(port));
+		System.setProperty("remotecontrol.port", String.valueOf(port));
 	}
 
 	/** Get normalized absolute path. */

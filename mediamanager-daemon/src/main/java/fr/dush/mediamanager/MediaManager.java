@@ -23,6 +23,8 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.dto.scan.ScanStatus;
 import fr.dush.mediamanager.dto.tree.MediaType;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
@@ -40,9 +42,13 @@ import fr.dush.mediamanager.remote.impl.StoppedRemoteInterface;
  */
 public class MediaManager {
 
-	private static final int DEFAULT_WIDTH = 800;
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(MediaManager.class);
+
+	private static final String REMOTECONTROL_PORT = "remotecontrol.port";
+
+	private static final String REMOTECONTROL_URL = "remotecontrol.url";
+
+	private static final int DEFAULT_WIDTH = 800;
 
 	/** Command line options (parser) */
 	private static final Options OPTIONS = buildOptions();
@@ -50,7 +56,9 @@ public class MediaManager {
 	/** Configuration if none is defined. */
 	private static final Path DEFAULT_CONFIG_PATH = Paths.get(System.getProperty("user.home"), ".mediamanager", "mediamanager.properties");
 
-	/** Port's default value, it can be override by command args, or in configuration file. */
+	/**
+	 * Port's default value, it can be override by command args, or in configuration file.
+	 */
 	private static final int DEFAULT_REGISTRY_PORT = 1099;
 
 	private final CommandLine args;
@@ -128,17 +136,14 @@ public class MediaManager {
 		// Control daemon
 		options.addOption("s", "start", false, "start daemon, if it isn't started");
 		options.addOption(OptionBuilder.withDescription("stop daemon, if it started").withLongOpt("stop").create());
-		options.addOption(OptionBuilder.withDescription("get daemon status, and scanning progression if any").withLongOpt("status")
-				.create());
+		options.addOption(OptionBuilder.withDescription("get daemon status, and scanning progression if any").withLongOpt("status").create());
 
-		options.addOption(OptionBuilder
-				.withDescription("scan given directory with defined scanner, server must be started. Can be used with --enricher")
+		options.addOption(OptionBuilder.withDescription("scan given directory with defined scanner, server must be started. Can be used with --enricher")
 				.hasArgs(2).withArgName("media type> <directoryPath").withLongOpt("scan").create());
 		options.addOption(OptionBuilder.withDescription("Used with --scan : define default enricher.").hasArgs(1).withArgName("enricher")
 				.withLongOpt("enricher").create());
 		options.addOption(OptionBuilder.withDescription("show current configuration").withLongOpt("show").create());
-		options.addOption(OptionBuilder.withDescription("set variable").hasArgs(3).withArgName("package> <name> <value").withLongOpt("set")
-				.create());
+		options.addOption(OptionBuilder.withDescription("set variable").hasArgs(3).withArgName("package> <name> <value").withLongOpt("set").create());
 
 		return options;
 	}
@@ -213,8 +218,7 @@ public class MediaManager {
 			// Scanning process
 			final String[] arguments = args.getOptionValues("scan");
 			try {
-				getRemoteInterface().scan(MediaType.valueOfMediaType(arguments[0]), toAbsolute(arguments[1]),
-						args.getOptionValue("enricher"));
+				getRemoteInterface().scan(MediaType.valueOfMediaType(arguments[0]), toAbsolute(arguments[1]), args.getOptionValue("enricher"));
 				System.out.println("Scanning in progress...");
 
 			} catch (RemoteException | IllegalArgumentException e) {
@@ -240,7 +244,7 @@ public class MediaManager {
 				if (getRemoteInterface().getStatus() == Status.STOPPED) {
 					System.out.println("Server is stopped.");
 				} else {
-					System.out.println("No copnfiguration loaded...");
+					System.out.println("No configuration loaded...");
 				}
 
 				return;
@@ -248,8 +252,7 @@ public class MediaManager {
 
 			System.out.println("Configuration : ");
 			for (ConfigurationField f : configs) {
-				System.out
-						.println(String.format("\t- %-40s = %s %s", f.getFullname(), f.getValue(), f.isDefaultValue() ? "(default)" : ""));
+				System.out.println(String.format("\t- %-40s = %s %s", f.getFullname(), f.getValue(), f.isDefaultValue() ? "(default)" : ""));
 				if (isNotEmpty(f.getDescription())) {
 					System.out.println("\t\t\t(" + f.getDescription() + ")");
 				}
@@ -358,7 +361,13 @@ public class MediaManager {
 	private MediaManagerRMI getRemoteInterface() {
 		if (remoteInterface == null) {
 			try {
-				remoteInterface = (MediaManagerRMI) Naming.lookup("rmi://localhost/" + MediaManagerRMI.class.getSimpleName());
+				Properties props = new Properties();
+				props.put(REMOTECONTROL_PORT, String.valueOf(port));
+				props.put(REMOTECONTROL_URL, readRmiUrl());
+
+				String url = new ModuleConfiguration(null, new FieldSet("daemon")).readValue(REMOTECONTROL_URL, props);
+				LOGGER.debug("Get RMI controller with url : {}", url);
+				remoteInterface = (MediaManagerRMI) Naming.lookup(url);
 
 			} catch (Exception e) {
 				LOGGER.debug("Can't bind server remote interface : {}", e.getMessage(), e);
@@ -367,6 +376,25 @@ public class MediaManager {
 		}
 
 		return remoteInterface;
+	}
+
+	private String readRmiUrl() {
+		String url = "rmi://localhost:${remotecontrol.port}/MediaManagerRMI";
+
+		if (configFile != null && configFile.toFile().exists()) {
+			try {
+				Properties p = new Properties();
+				p.load(new FileInputStream(configFile.toFile()));
+
+				url = p.getProperty(REMOTECONTROL_URL, url);
+				url = p.getProperty("daemon." + REMOTECONTROL_URL, url);
+
+			} catch (IOException e) {
+				LOGGER.warn("Can't read {} from file {} : {}", REMOTECONTROL_URL, configFile, e.getMessage());
+			}
+		}
+
+		return url;
 	}
 
 	/**
@@ -385,7 +413,8 @@ public class MediaManager {
 			Properties props = new Properties();
 			props.load(new FileInputStream(file));
 
-			return castPort(props.getProperty("mediamanager.port", String.valueOf(DEFAULT_REGISTRY_PORT)));
+			String p = props.getProperty(REMOTECONTROL_PORT, String.valueOf(DEFAULT_REGISTRY_PORT));
+			return castPort(props.getProperty("daemon." + REMOTECONTROL_PORT, p));
 
 		} catch (IOException e) {
 			LOGGER.warn("Can't read configuration file {} : {}", configFile, e.getMessage());
