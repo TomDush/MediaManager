@@ -43,7 +43,7 @@ public class FileConfigurationDAOImpl implements IConfigurationDAO {
 		final String propertyFile = System.getProperty("mediamanager.propertiesfile");
 
 		if (!isEmpty(propertyFile)) {
-			configFile = Paths.get(propertyFile);
+			configFile = Paths.get(propertyFile).normalize();
 
 			if (!configFile.toFile().exists()) {
 				throw new ConfigurationException("Properties file %s does't exist.", configFile);

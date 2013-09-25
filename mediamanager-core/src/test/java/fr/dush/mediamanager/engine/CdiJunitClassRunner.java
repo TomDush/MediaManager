@@ -18,6 +18,8 @@ public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 	static {
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
+
+		System.setProperty("mediamanager.propertiesfile", "src/test/resources/dbconfig-junit.properties");
 	}
 
 	public CdiJunitClassRunner(Class<?> klass) throws InitializationError {

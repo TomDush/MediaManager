@@ -52,7 +52,7 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
 	@Test
 	@Ignore
 	public void startLocal() throws Exception {
-		System.setProperty("mediamanager.propertiesfile", "../mediamanager-core/src/test/resources/mainconfig.properties");
+		System.setProperty("mediamanager.propertiesfile", "../mediamanager-core/src/test/resources/dbconfig-int.properties");
 
 		ContextLauncher launcher = new ContextLauncher(Paths.get("src/test/resources", "test-config.properties"), DEFAULT_JUNIT_PORT);
 		synchronized (launcher) {

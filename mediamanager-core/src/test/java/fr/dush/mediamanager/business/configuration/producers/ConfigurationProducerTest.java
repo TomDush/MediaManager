@@ -16,7 +16,6 @@ import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
 import fr.dush.mediamanager.engine.CdiJunitTest;
 
 @Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")
@@ -36,10 +35,10 @@ public class ConfigurationProducerTest extends CdiJunitTest {
 		assertThat(host).isNotNull().hasKey("host").hasValue("localhost").isDefaultValue();
 
 		assertThat(config.readValue("port")).isEqualTo("8080");
-		assertThat(config.readValue("foo", "bar")).isEqualTo("bar");
-		assertThat(config.readValue("foo", "baz")).isEqualTo("baz"); // Default value isn't saved...
+		assertThat(config.readValue("foobar", "bar")).isEqualTo("bar");
+		assertThat(config.readValue("foobar", "baz")).isEqualTo("baz"); // Default value isn't saved...
 
-		final Field foo = config.getField("foo");
+		final Field foo = config.getField("host");
 		assertThat(foo).isDefaultValue();
 		foo.setValue("baz");
 		assertThat(foo).isNotDefaultValue();
@@ -53,21 +52,5 @@ public class ConfigurationProducerTest extends CdiJunitTest {
 		fields.get(0).setDefaultValue(true);
 
 		mapper.writeValue(System.out, fields);
-	}
-
-	@Test
-	public void testResolveProperties() throws Exception {
-		final ModuleConfiguration generic = new ModuleConfiguration(null, new FieldSet("generic"));
-		ModuleConfiguration config = new ModuleConfiguration(generic, new FieldSet("foobar"));
-
-		final String temp = config.readValue("temp", "temp_dir");
-		assertThat(temp).isEqualTo("temp_dir");
-
-		generic.addField(new Field("mediamanager.root", "${user.home}/.mediamanager"));
-		final String root = System.getProperty("user.home") + "/.mediamanager";
-		assertThat(generic.readValue("mediamanager.root")).isEqualTo(root);
-
-		final String value = config.readValue("foobar", "${mediamanager.root}/${temp}");
-		assertThat(value).isEqualTo(root + "/temp_dir");
 	}
 }

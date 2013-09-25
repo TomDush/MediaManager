@@ -24,9 +24,15 @@ public class Field {
 
 	private boolean defaultValue = false;
 
+	/** Create field with NON-default value */
 	public Field(String key, String value) {
+		this(key, value, false);
+	}
+
+	public Field(String key, String value, boolean defaultValue) {
 		this.key = key;
 		this.value = value;
+		this.defaultValue = defaultValue;
 	}
 
 	/**

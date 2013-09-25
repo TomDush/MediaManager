@@ -19,7 +19,7 @@ public class FileConfigurationDAOImplTest {
 
 	@Test
 	public void testReadPropertiesFile() throws Exception {
-		previousValue = System.setProperty("mediamanager.propertiesfile", "src/test/resources/mainconfig.properties");
+		previousValue = System.setProperty("mediamanager.propertiesfile", "src/test/resources/dbconfig-junit.properties");
 
 		FileConfigurationDAOImpl configurationDAO = new FileConfigurationDAOImpl();
 		configurationDAO.initialize();
