@@ -21,12 +21,14 @@ import com.github.axet.vget.VGet;
 import com.google.common.hash.Hashing;
 
 import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 @ApplicationScoped
+@Startup
 public class ArtDownloaderImpl implements IArtDownloader {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);

@@ -20,6 +20,7 @@ import com.google.common.base.Function;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
 import fr.dush.mediamanager.dto.media.SourceId;
@@ -32,6 +33,7 @@ import fr.dush.mediamanager.dto.media.video.Movie;
  *
  */
 @ApplicationScoped
+@Startup(superclass = IMovieDAO.class)
 public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovieDAO {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);
@@ -160,6 +162,11 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 
 		// Morphia native query
 		return createNativeQuery(sb.toString(), ids, ids).order("title").asList();
+	}
+
+	@Override
+	public List<Movie> findAll() {
+		return createQuery().order("title").asList();
 	}
 
 	private static Function<SourceId, String> sourceId2string = new Function<SourceId, String>() {

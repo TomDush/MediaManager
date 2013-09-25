@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
@@ -46,6 +47,7 @@ import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
  * @author Thomas Duchatelle
  *
  */
+@ApplicationScoped
 @Module(name = "MoviesDB Plugin", id = "enricher-themoviesdb", description = "Find data on movies and shows with http://www.themoviedb.org/")
 public class TheMovieDbEnricher implements IMoviesEnricher {
 

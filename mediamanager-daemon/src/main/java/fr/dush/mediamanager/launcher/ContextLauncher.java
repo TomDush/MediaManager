@@ -12,11 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
-import fr.dush.mediacenters.modules.webui.WebUIModule;
-import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.business.scanner.impl.MoviesScanner;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.remote.MediaManagerRMI;
 import fr.dush.mediamanager.remote.Stopper;
 import fr.dush.mediamanager.tools.CDIUtils;
@@ -70,8 +65,8 @@ public class ContextLauncher extends Thread {
 			Naming.rebind("rmi://localhost/" + MediaManagerRMI.class.getSimpleName(), remoteInterface);
 
 			// Wait application end...
-			fireInitialized();
 			final Stopper stopper = CDIUtils.getBean(Stopper.class);
+			fireInitialized(stopper);
 			LOGGER.info("Server started.");
 			stopper.waitApplicationEnd();
 
@@ -98,13 +93,8 @@ public class ContextLauncher extends Thread {
 		return LocateRegistry.createRegistry(REGISTRY_PORT);
 	}
 
-	private synchronized void fireInitialized() {
-		// TODO force application scoped "Startup" beans to be initialized.
-		CDIUtils.getBean(WebUIModule.class).toString();
-		CDIUtils.getBean(IMovieDAO.class).toString();
-		CDIUtils.getBean(TheMovieDBProvider.class).toString();
-		CDIUtils.getBean(IArtDownloader.class).toString();
-		CDIUtils.getBean(MoviesScanner.class).toString();
+	private synchronized void fireInitialized(Stopper stopper) {
+		stopper.fireApplciationStarted(this);
 
 		notifyAll();
 	}

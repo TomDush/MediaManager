@@ -1,12 +1,16 @@
 package fr.dush.mediamanager.remote;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import fr.dush.mediamanager.events.lifecycle.ApplicationStarted;
 
 /**
  * Class notified when received event to close application.
@@ -24,6 +28,9 @@ public class Stopper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Stopper.class);
 
 	private static StopperSynchronizer instance;
+
+	@Inject
+	private Event<ApplicationStarted> lifecycleBus;
 
 	private synchronized StopperSynchronizer getInstance() {
 		if (instance == null) {
@@ -43,6 +50,10 @@ public class Stopper {
 		LOGGER.debug("--> waitApplicationEnd {}", this);
 
 		getInstance().waitApplicationEnd();
+	}
+
+	public void fireApplciationStarted(Object source) {
+		lifecycleBus.fire(new ApplicationStarted(source));
 	}
 
 	@Getter

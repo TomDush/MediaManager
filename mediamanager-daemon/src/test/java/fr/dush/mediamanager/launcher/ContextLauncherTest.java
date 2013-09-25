@@ -3,6 +3,7 @@ package fr.dush.mediamanager.launcher;
 import static org.fest.assertions.api.Assertions.*;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Ignore;
@@ -24,9 +25,12 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
 
 	private Throwable catchedException = null;
 
+	private Path configFile = Paths.get("../mediamanager-core/src/test/resources/dbconfig-junit.properties");
+
 	@Test
 	public void testCreateContextAndStop() throws Exception {
-		ContextLauncher launcher = new ContextLauncher(Paths.get("../mediamanager-core/src/test/resources/dbconfig-junit.properties"), DEFAULT_JUNIT_PORT);
+
+		ContextLauncher launcher = new ContextLauncher(configFile, DEFAULT_JUNIT_PORT);
 		launcher.setUncaughtExceptionHandler(this);
 		synchronized (launcher) {
 			launcher.start();
@@ -52,9 +56,8 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
 	@Test
 	@Ignore
 	public void startLocal() throws Exception {
-		System.setProperty("mediamanager.propertiesfile", "../mediamanager-core/src/test/resources/dbconfig-int.properties");
 
-		ContextLauncher launcher = new ContextLauncher(Paths.get("src/test/resources", "test-config.properties"), DEFAULT_JUNIT_PORT);
+		ContextLauncher launcher = new ContextLauncher(configFile, DEFAULT_JUNIT_PORT);
 		synchronized (launcher) {
 			launcher.start();
 
