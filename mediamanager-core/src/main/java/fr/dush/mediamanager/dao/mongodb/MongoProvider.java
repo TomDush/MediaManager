@@ -2,6 +2,7 @@ package fr.dush.mediamanager.dao.mongodb;
 
 import java.net.UnknownHostException;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
@@ -33,10 +34,6 @@ public class MongoProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
 
-	private DB db = null;
-
-	private Datastore datastore = null;
-
 	static {
 		MorphiaLoggerFactory.registerLogger(SLF4JLogrImplFactory.class);
 	}
@@ -46,11 +43,26 @@ public class MongoProvider {
 	@Configuration(definition = "configuration/mongo-config.json")
 	private ModuleConfiguration configuration;
 
+	private MongoClient mongoClient;
+
+	private DB db = null;
+
+	private Datastore datastore = null;
+
+	@PreDestroy
+	public void closeConnection() {
+		LOGGER.debug("Close MongoDB connection.");
+		if (mongoClient != null) {
+			mongoClient.close();
+		}
+	}
+
 	@Produces
 	@ApplicationScoped
 	public MongoClient producesMogoClient() throws UnknownHostException {
 		LOGGER.debug("Instanciate new MongoClient");
-		return new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));
+		mongoClient = new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));
+		return mongoClient;
 	}
 
 	@Produces

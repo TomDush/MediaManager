@@ -360,6 +360,13 @@ public class MovieAssert extends AbstractAssert<MovieAssert, Movie> {
 			paths.add(p.getFile().toString());
 		}
 
+//		List<String> list = transform(newArrayList(videoFiles), new Function<String, String>() {
+//			@Override
+//			public String apply(String s) {
+//				return Paths.get(s).toAbsolutePath().toString();
+//			}
+//		});
+//		list.toArray(new String[list.size()])
 		Assertions.assertThat(paths).containsOnly(videoFiles);
 	}
 

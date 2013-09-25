@@ -56,7 +56,6 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
 	@Test
 	@Ignore
 	public void startLocal() throws Exception {
-
 		System.setProperty("webui.resources", Paths.get("../plugins/webui-plugin/src/main/webapp").toAbsolutePath().normalize().toString());
 
 		ContextLauncher launcher = new ContextLauncher(configFile, DEFAULT_JUNIT_PORT);
