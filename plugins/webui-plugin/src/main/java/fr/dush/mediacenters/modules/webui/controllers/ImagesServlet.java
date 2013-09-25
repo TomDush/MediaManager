@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,20 +17,20 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.Files;
 
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.tools.CDIUtils;
 
 @SuppressWarnings("serial")
 public class ImagesServlet extends HttpServlet {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ImagesServlet.class);
 
+	@Inject
+	private IArtDownloader artDownloader;
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		final String path = req.getRequestURI();
 
-		CDIUtils.bootCdiContainer();
-		final IArtDownloader artDownloader = CDIUtils.getBean(IArtDownloader.class);
-		LOGGER.info("Resolving {} with {}", path, artDownloader);
+		LOGGER.debug("Resolving {} with {}", path, artDownloader);
 
 		if (isNotEmpty(path) && path.startsWith("/")) {
 			final Path imagePath = artDownloader.getImagePath(path.substring(1));
