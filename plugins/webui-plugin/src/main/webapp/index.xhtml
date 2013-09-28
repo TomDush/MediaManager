@@ -16,14 +16,20 @@
 	<p>#{movieController.moviesSize}</p>
 
 	<div>
-		<ui:repeat var="m" value="#{movieController.allMovies}" >
-			<div style="float:left; width:30%; margin:0.5%; height:300px; overflow: hidden;">
-				<img style="width: 30%; float:left" src="/#{m.poster}" />
-				<h2 style="text-align:center; font-size: 1.2em; font-weight: bold; color: #185884">#{m.title}</h2>
-				Genres : #{m.genres}<br/>
-				Director(s) : #{m.directors}<br/>
-				Actors : #{m.mainActors}<br/>
-				Trailers : #{m.trailers}
+		<ui:repeat var="m" value="#{movieController.allMovies}">
+			<div style="float: left; width: 30%; margin: 0.5%; height: 300px; overflow: hidden;">
+				<img style="width: 30%; float: left" src="/#{m.poster}" />
+				<h2 style="text-align: center; font-size: 1.2em; font-weight: bold; color: #185884">#{m.title} (#{m.release})</h2>
+				Genres : #{m.genres}<br />
+				Overview(s) : #{m.overview}<br/>
+				
+				Ids : #{m.mediaIds}<br/>
+				<!-- 				Director(s) : #{m.directors}<br/> -->
+				<!-- 				Actors : #{m.mainActors}<br/> -->
+<!-- 					Trailers :  -->
+<!-- 					<ui:repeat var="t" value="#{m.trailers.trailers}"> -->
+<!-- 						<a href="#{t.url}">Trailer '#{t.title}'</a> -->
+<!-- 					</ui:repeat> -->
 			</div>
 		</ui:repeat>
 	</div>
