@@ -12,10 +12,13 @@ var mountFolder = function (connect, dir) {
 // use this if you want to recursively match all subfolders:
 // 'test/spec/**/*.js'
 
+var modRewrite = require('connect-modrewrite');
+
 module.exports = function (grunt) {
   require('load-grunt-tasks')(grunt);
   require('time-grunt')(grunt);
 
+  // configurable paths
   // configurable paths
   var yeomanConfig = {
     app: 'app',
@@ -75,6 +78,11 @@ module.exports = function (grunt) {
           middleware: function (connect) {
             return [
               lrSnippet,
+              modRewrite([
+                  '!^/.*\.(html|css|json|js|png|jpeg|jpg|gif)(\\?.*)*$ /index.html'
+                  //'^/.*$ /index.html'
+              ]),
+              mountFolder(connect, 'restmock'),
               mountFolder(connect, '.tmp'),
               mountFolder(connect, yeomanConfig.app)
             ];

@@ -1,0 +1,35 @@
+
+<form class="media-search .form-horizontal">
+    <fieldset>
+        <legend>Search</legend>
+
+        <div>
+            <label class="checkbox span4">
+                <input type="checkbox" ng-model="request.movies" check-list="request.media" value="movies"/> Movies
+            </label>
+            <label class="checkbox span4">
+                <input type="checkbox" ng-model="request.shows" check-list="request.media" value="shows"> Shows
+            </label>
+        </div>
+
+        <input type="text" class="span10" placeholder="Title" ng-model="request.title"/>
+
+        <div ng-show="genres">
+            <h6>Genres :</h6>
+            <label class="checkbox inline genre" ng-repeat="g in genres | orderBy:'toString()' ">
+                <input type="checkbox" id="genres[]" value="{{g}}" check-list="request.genres"> {{g}}
+            </label>
+
+            <div class="check-control">
+                <i ng-click="selectAllGenres()" class="icon-check" title="Select all" />
+                <i ng-click="clearGenres()" class="icon-remove-circle" title="Deselect all" />
+                <i ng-click="inverseGenres()" class="icon-adjust" title="Inverse selection" />
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button ng-click="submit(request)" class="btn btn-primary"><i class="icon-search icon-white" ></i> Search</button>
+            <button ng-click="reset()" class="btn"><i class="icon-ban-circle" ></i> Reset</button>
+        </div>
+    </fieldset>
+</form>
