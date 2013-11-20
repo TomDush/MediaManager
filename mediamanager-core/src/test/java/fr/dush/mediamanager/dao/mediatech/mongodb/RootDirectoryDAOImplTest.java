@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
-import fr.dush.mediamanager.dto.tree.MediaType;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 

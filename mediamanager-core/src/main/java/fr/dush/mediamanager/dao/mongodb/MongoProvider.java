@@ -79,7 +79,7 @@ public class MongoProvider {
 	public Datastore producesMorphiaConfig(DB mongodb) {
 		if (datastore == null) {
 			Morphia morphia = new Morphia();
-			morphia.mapPackage("fr.dush.mediamanager.dto");
+			morphia.mapPackage("fr.dush.mediamanager.domain");
 			morphia.getMapper().getConverters().addConverter(PathConverter.class);
 
 			datastore = morphia.createDatastore(mongodb.getMongo(), configuration.readValue("mongodb.databaseName"));

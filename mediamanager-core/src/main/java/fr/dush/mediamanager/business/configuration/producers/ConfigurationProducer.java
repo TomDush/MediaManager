@@ -31,8 +31,8 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.configuration.utils.ConfigurationInjectionPoint;
 import fr.dush.mediamanager.business.configuration.utils.IConfigurationArguments;
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 /**

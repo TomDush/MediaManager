@@ -23,8 +23,8 @@ import com.mongodb.DBObject;
 import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
-import fr.dush.mediamanager.dto.media.SourceId;
-import fr.dush.mediamanager.dto.media.video.Movie;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.Movie;
 
 /**
  * Provide access to movies persisted in MongoDB. <br/>

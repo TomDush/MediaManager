@@ -4,7 +4,7 @@ import static java.lang.String.*;
 
 import org.fest.assertions.api.AbstractAssert;
 
-import fr.dush.mediamanager.dto.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.Field;
 
 
 /**

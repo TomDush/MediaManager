@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
-import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
 import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Matchers.*;
@@ -14,8 +13,8 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
-import fr.dush.mediamanager.dto.tree.MediaType;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 import fr.dush.mediamanager.tools.PathsUtils;

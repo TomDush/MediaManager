@@ -5,8 +5,8 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import fr.dush.mediamanager.dao.IDao;
-import fr.dush.mediamanager.dto.media.SourceId;
-import fr.dush.mediamanager.dto.media.video.Movie;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.Movie;
 
 /**
  * Interface to movies saved in database

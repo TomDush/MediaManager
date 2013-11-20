@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class FileConfigurationDAOImplTest {

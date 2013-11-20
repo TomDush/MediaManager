@@ -19,11 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
-import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
-import fr.dush.mediamanager.dto.media.Media;
-import fr.dush.mediamanager.dto.scan.Phase;
-import fr.dush.mediamanager.dto.scan.ScanStatus;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.domain.media.Media;
+import fr.dush.mediamanager.domain.scan.Phase;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.exceptions.ScanException;
 
 /**

@@ -10,7 +10,7 @@ import lombok.Setter;
 
 import com.google.common.base.Joiner;
 
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 
 @Getter
 @Setter

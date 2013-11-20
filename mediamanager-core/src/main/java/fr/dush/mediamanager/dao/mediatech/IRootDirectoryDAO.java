@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 
 /**
  * Provide access to persisted data on mediatech location (root directory), there is no constrains containing on implementations.

@@ -46,9 +46,9 @@ public class PersonParser {
 	 * @param limit Limit result size. 0 to take all...
 	 * @return
 	 */
-	public List<fr.dush.mediamanager.dto.media.video.Person> getCasting(int limit) {
+	public List<fr.dush.mediamanager.domain.media.video.Person> getCasting(int limit) {
 		// Select and transform actors
-		final Collection<fr.dush.mediamanager.dto.media.video.Person> casting = transform(filter(persons, selectPerson(ACTOR_JOB)),
+		final Collection<fr.dush.mediamanager.domain.media.video.Person> casting = transform(filter(persons, selectPerson(ACTOR_JOB)),
 				personConverter);
 
 		// If no limit selected
@@ -63,20 +63,20 @@ public class PersonParser {
 	 *
 	 * @return
 	 */
-	public List<fr.dush.mediamanager.dto.media.video.Person> getDirectors() {
+	public List<fr.dush.mediamanager.domain.media.video.Person> getDirectors() {
 		// Select and transform actors
-		final Collection<fr.dush.mediamanager.dto.media.video.Person> directors = transform(filter(persons, selectPerson(DIRECTOR_JOB)),
+		final Collection<fr.dush.mediamanager.domain.media.video.Person> directors = transform(filter(persons, selectPerson(DIRECTOR_JOB)),
 				personConverter);
 
 		// If no limit selected
 		return newArrayList(directors);
 	}
 
-	private Function<Person, fr.dush.mediamanager.dto.media.video.Person> personConverter = new Function<Person, fr.dush.mediamanager.dto.media.video.Person>() {
+	private Function<Person, fr.dush.mediamanager.domain.media.video.Person> personConverter = new Function<Person, fr.dush.mediamanager.domain.media.video.Person>() {
 
 		@Override
-		public fr.dush.mediamanager.dto.media.video.Person apply(Person info) {
-			fr.dush.mediamanager.dto.media.video.Person person = new fr.dush.mediamanager.dto.media.video.Person();
+		public fr.dush.mediamanager.domain.media.video.Person apply(Person info) {
+			fr.dush.mediamanager.domain.media.video.Person person = new fr.dush.mediamanager.domain.media.video.Person();
 
 			person.getSourceIds().addId(TheMovieDbEnricher.MOVIEDB_ID_TYPE, Integer.toString(info.getId()));
 			person.setName(info.getName());

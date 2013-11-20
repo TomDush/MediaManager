@@ -3,7 +3,7 @@ package fr.dush.mediamanager.business.mediatech;
 import java.nio.file.Path;
 import java.util.List;
 
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 
 /**

@@ -7,7 +7,7 @@ import javax.enterprise.inject.Produces;
 
 import com.google.common.base.Splitter;
 
-import fr.dush.mediamanager.dto.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.domain.configuration.ScannerConfiguration;
 
 /**
  * Create/read {@link ScannerConfiguration}.

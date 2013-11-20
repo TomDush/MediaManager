@@ -8,7 +8,7 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.domain.media.Media;
 
 /**
  * While scanning, if no or more than one media found for one file, this event is fire.

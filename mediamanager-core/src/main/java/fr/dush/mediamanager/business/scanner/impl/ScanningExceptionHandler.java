@@ -11,7 +11,7 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
 import fr.dush.mediamanager.events.lifecycle.ExceptionEvent;
 
 public class ScanningExceptionHandler implements UncaughtExceptionHandler {

@@ -5,8 +5,8 @@ import lombok.Setter;
 
 import com.google.common.io.Files;
 
-import fr.dush.mediamanager.dto.tree.MediaType;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.AbstractEvent;
 
 /**

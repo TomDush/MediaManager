@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.business.scanner.impl;
 
-import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -40,12 +39,12 @@ import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dto.media.SourceId;
-import fr.dush.mediamanager.dto.media.video.Movie;
-import fr.dush.mediamanager.dto.media.video.VideoFile;
-import fr.dush.mediamanager.dto.scan.MoviesParsedName;
-import fr.dush.mediamanager.dto.scan.ScanStatus;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.media.video.VideoFile;
+import fr.dush.mediamanager.domain.scan.MoviesParsedName;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.exceptions.ScanException;

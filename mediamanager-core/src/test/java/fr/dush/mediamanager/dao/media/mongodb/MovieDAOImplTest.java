@@ -15,12 +15,12 @@ import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dto.media.SourceId;
-import fr.dush.mediamanager.dto.media.video.Movie;
-import fr.dush.mediamanager.dto.media.video.Person;
-import fr.dush.mediamanager.dto.media.video.Trailer;
-import fr.dush.mediamanager.dto.media.video.Trailers;
-import fr.dush.mediamanager.dto.media.video.VideoFile;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.media.video.Person;
+import fr.dush.mediamanager.domain.media.video.Trailer;
+import fr.dush.mediamanager.domain.media.video.Trailers;
+import fr.dush.mediamanager.domain.media.video.VideoFile;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 import fr.dush.mediamanager.tools.PathsUtils;

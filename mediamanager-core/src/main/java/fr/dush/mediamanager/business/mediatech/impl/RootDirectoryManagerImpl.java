@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
-import static com.google.common.collect.Collections2.*;
 import static com.google.common.collect.Lists.*;
 import static com.google.common.collect.Sets.*;
 
@@ -17,7 +16,7 @@ import com.google.common.base.Function;
 
 import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;
 
 @ApplicationScoped

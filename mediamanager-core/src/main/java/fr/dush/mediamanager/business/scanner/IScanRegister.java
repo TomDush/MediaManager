@@ -2,7 +2,7 @@ package fr.dush.mediamanager.business.scanner;
 
 import java.util.List;
 
-import fr.dush.mediamanager.dto.scan.ScanStatus;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 
 /**

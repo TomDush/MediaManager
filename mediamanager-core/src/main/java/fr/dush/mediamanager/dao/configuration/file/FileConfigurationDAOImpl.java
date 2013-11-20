@@ -23,8 +23,8 @@ import com.google.common.io.CharStreams;
 
 import fr.dush.mediamanager.annotations.FileConfigurationDAO;
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 
 /**

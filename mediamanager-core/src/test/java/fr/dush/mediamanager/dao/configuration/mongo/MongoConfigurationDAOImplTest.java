@@ -12,8 +12,8 @@ import org.junit.Test;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 

@@ -14,8 +14,8 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 
 @ApplicationScoped
 public class MongoConfigurationDAOImpl implements IConfigurationDAO {

@@ -29,14 +29,14 @@ import com.omertron.themoviedbapi.model.Trailer;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.business.mediatech.ImageType;
-import fr.dush.mediamanager.dto.media.Media;
-import fr.dush.mediamanager.dto.media.SourceId;
-import fr.dush.mediamanager.dto.media.Sources;
-import fr.dush.mediamanager.dto.media.video.BelongToCollection;
-import fr.dush.mediamanager.dto.media.video.Movie;
-import fr.dush.mediamanager.dto.media.video.MoviesCollection;
-import fr.dush.mediamanager.dto.media.video.Trailers;
-import fr.dush.mediamanager.dto.scan.MoviesParsedName;
+import fr.dush.mediamanager.domain.media.Media;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.Sources;
+import fr.dush.mediamanager.domain.media.video.BelongToCollection;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.media.video.MoviesCollection;
+import fr.dush.mediamanager.domain.media.video.Trailers;
+import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
@@ -103,7 +103,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 	}
 
 	@Override
-	public List<fr.dush.mediamanager.dto.media.video.Trailer> findTrailers(Media media, String lang) throws EnrichException {
+	public List<fr.dush.mediamanager.domain.media.video.Trailer> findTrailers(Media media, String lang) throws EnrichException {
 		try {
 			final int id = getId(media.getMediaIds(), media.getTitle());
 			return Lists.transform(api.getMovieTrailers(id, isBlank(lang) ? "en" : lang), trailerConverter);
@@ -124,14 +124,14 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 			// If it's movie and MoviesDB's id is known, research available trailers.
 			if (event.getMedia() instanceof Movie) {
 				Movie movie = (Movie) event.getMedia();
-				final List<fr.dush.mediamanager.dto.media.video.Trailer> trailers = findTrailers(movie, event.getLang());
+				final List<fr.dush.mediamanager.domain.media.video.Trailer> trailers = findTrailers(movie, event.getLang());
 
 				if (movie.getTrailers() == null) {
 					movie.setTrailers(new Trailers());
 				}
 				movie.getTrailers().getSources().add(MOVIEDB_ID_TYPE);
 				movie.getTrailers().setRefreshed(new Date());
-				for (fr.dush.mediamanager.dto.media.video.Trailer t : trailers) {
+				for (fr.dush.mediamanager.domain.media.video.Trailer t : trailers) {
 					movie.getTrailers().addTrailer(t);
 				}
 			}
@@ -306,11 +306,11 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 		return new SourceId(MOVIEDB_ID_TYPE, Integer.toString(id));
 	}
 
-	private Function<Trailer, fr.dush.mediamanager.dto.media.video.Trailer> trailerConverter = new Function<Trailer, fr.dush.mediamanager.dto.media.video.Trailer>() {
+	private Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer> trailerConverter = new Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer>() {
 
 		@Override
-		public fr.dush.mediamanager.dto.media.video.Trailer apply(Trailer movieDb) {
-			final fr.dush.mediamanager.dto.media.video.Trailer link = new fr.dush.mediamanager.dto.media.video.Trailer();
+		public fr.dush.mediamanager.domain.media.video.Trailer apply(Trailer movieDb) {
+			final fr.dush.mediamanager.domain.media.video.Trailer link = new fr.dush.mediamanager.domain.media.video.Trailer();
 			link.setTitle(movieDb.getName());
 			link.setQuality(movieDb.getSize());
 			link.setSource(movieDb.getWebsite());

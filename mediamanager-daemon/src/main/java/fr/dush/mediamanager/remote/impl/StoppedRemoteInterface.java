@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.enterprise.inject.Alternative;
 
-import fr.dush.mediamanager.dto.scan.ScanStatus;
-import fr.dush.mediamanager.dto.tree.MediaType;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
+import fr.dush.mediamanager.domain.tree.MediaType;
 import fr.dush.mediamanager.launcher.Status;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.MediaManagerRMI;

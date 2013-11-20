@@ -2,8 +2,8 @@ package fr.dush.mediamanager.dao.configuration;
 
 import java.util.List;
 
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 
 public interface IConfigurationDAO {
 

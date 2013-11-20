@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.enterprise.inject.Alternative;
 
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
-import fr.dush.mediamanager.dto.configuration.Field;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 
 @Alternative
 public class ConfigurationDAOMock implements IConfigurationDAO {

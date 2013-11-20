@@ -19,7 +19,7 @@ import com.google.code.morphia.query.WhereCriteria;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
-import fr.dush.mediamanager.dto.tree.RootDirectory;
+import fr.dush.mediamanager.domain.tree.RootDirectory;
 
 /**
  * Using MongoDB database, and implementing low level rules as describe in {@link IRootDirectoryDAO}.

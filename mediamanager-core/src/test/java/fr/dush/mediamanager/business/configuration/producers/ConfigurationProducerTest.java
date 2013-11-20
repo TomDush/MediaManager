@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.business.configuration.producers;
 
-import static com.google.common.collect.Lists.*;
 import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
 import static org.fest.assertions.api.Assertions.*;
 
@@ -15,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.dto.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.engine.CdiJunitTest;
 
 @Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")

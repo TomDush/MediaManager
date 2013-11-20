@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import fr.dush.mediamanager.dto.media.Media;
+import fr.dush.mediamanager.domain.media.Media;
 
 /**
  * Event to find all trailers available for an media. This media is directly completed...

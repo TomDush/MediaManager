@@ -27,9 +27,9 @@ import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.business.mediatech.ImageType;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
-import fr.dush.mediamanager.dto.media.video.Movie;
-import fr.dush.mediamanager.dto.scan.MoviesParsedName;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 
 @RunWith(BlockJUnit4ClassRunner.class)
