@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -217,7 +218,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 				LOGGER.debug("{} in {} volumes : {}", entry.getValue().iterator().next().getName(), entry.getValue().size(), entry.getValue());
 
 				// Sort multi-file
-				final ArrayList<FileStacking> volumeList = newArrayList(entry.getValue());
+				final ArrayList<FileStacking> volumeList = Lists.newArrayList(entry.getValue());
 				Collections.sort(volumeList);
 
 				// Correct parsed file name : remove volume information if necessary

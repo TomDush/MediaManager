@@ -5,6 +5,7 @@ import static org.fest.assertions.api.Assertions.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -46,7 +47,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 	@Test
 	public void testSave_KO() throws Exception {
 		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(
-				newArrayList(new RootDirectory(), new RootDirectory()));
+                Lists.newArrayList(new RootDirectory(), new RootDirectory()));
 
 		// Root path of existing RootDirectory
 		try {
@@ -66,7 +67,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 
 		final RootDirectory existing = new RootDirectory("Existing Directory", MediaType.MOVIE, "/home/medias/movies/vf",
 				"/home/medias/collections");
-		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
+		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(Lists.newArrayList(existing));
 		when(rootDirectoryDAO.findById("My Directory")).thenReturn(existing);
 
 		try {
@@ -95,7 +96,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 	@Test
 	public void testUpdateWithSameId() throws Exception {
 		final RootDirectory existing = new RootDirectory("My Directory", MediaType.MOVIE, "/home/medias/movies", "/home/medias/collections");
-		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
+		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(Lists.newArrayList(existing));
 		when(rootDirectoryDAO.findById(anyString())).thenReturn(existing);
 
 		final RootDirectory returned = rootDirectoryManager.createOrUpdateRootDirectory(new RootDirectory("My Directory", MediaType.MOVIE,
@@ -112,7 +113,7 @@ public class RootDirectoryManagerImplTest extends SimpleJunitTest {
 				"/home/medias/movies/collections", "/home/medias/shows");
 		existing.setEnricher("oldEnricher");
 
-		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(newArrayList(existing));
+		when(rootDirectoryDAO.findUsingPath(anyCollectionOf(String.class))).thenReturn(Lists.newArrayList(existing));
 
 		final RootDirectory update = new RootDirectory("My Directory", MediaType.MOVIE, "/home/medias/movies", "/home/media",
 				"/home/medias/shows/pilots", "/mnt/remote/movies");

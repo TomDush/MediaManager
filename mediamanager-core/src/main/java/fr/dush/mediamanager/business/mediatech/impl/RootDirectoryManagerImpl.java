@@ -14,6 +14,7 @@ import javax.inject.Inject;
 
 import com.google.common.base.Function;
 
+import com.google.common.collect.Collections2;
 import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
@@ -113,12 +114,12 @@ public class RootDirectoryManagerImpl implements IRootDirectoryManager {
 	private List<String> getConflictPaths(RootDirectory rootDirectory, List<RootDirectory> roots) {
 		List<String> conflicts = newArrayList();
 		for (final RootDirectory r : roots) {
-			conflicts.addAll(transform(intersection(r.getPaths(), rootDirectory.getPaths()), new Function<String, String>() {
-				@Override
-				public String apply(String s) {
-					return s + " shared with " + r.getName();
-				}
-			}));
+			conflicts.addAll(Collections2.transform(intersection(r.getPaths(), rootDirectory.getPaths()), new Function<String, String>() {
+                @Override
+                public String apply(String s) {
+                    return s + " shared with " + r.getName();
+                }
+            }));
 		}
 
 		return conflicts;

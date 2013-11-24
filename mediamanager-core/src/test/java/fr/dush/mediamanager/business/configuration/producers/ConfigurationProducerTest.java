@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +46,7 @@ public class ConfigurationProducerTest extends CdiJunitTest {
 
 	@Test
 	public void testGenerateObjectMapper() throws Exception {
-		List<Field> fields = newArrayList(new Field("host", "localhost"), new Field("port", "8080"));
+		List<Field> fields = Lists.newArrayList(new Field("host", "localhost"), new Field("port", "8080"));
 		fields.get(0).setName("Target host");
 		fields.get(0).setDescription("Host on which is installed players.");
 		fields.get(0).setDefaultValue(true);

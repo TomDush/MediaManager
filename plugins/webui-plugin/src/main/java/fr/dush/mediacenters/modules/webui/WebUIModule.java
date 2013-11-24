@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.io.Resources;
 
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.dto.configuration.FieldSet;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
 

@@ -1,82 +1,84 @@
 <web-app>
-	<display-name>MediaManager</display-name>
+    <display-name>MediaManager</display-name>
 
-	<init-param>
-		<param-name>development</param-name>
-		<param-value>true</param-value>
-	</init-param>
-	<context-param>
-		<param-name>javax.faces.PROJECT_STAGE</param-name>
-		<param-value>Development</param-value>
-	</context-param>
+    <init-param>
+        <param-name>development</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <context-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/api</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.scan</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>resteasy.injector.factory</param-name>
+        <param-value>org.jboss.resteasy.cdi.CdiInjectorFactory</param-value>
+    </context-param>
 
-	<listener>
-		<listener-class>org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>com.sun.faces.config.ConfigureListener</listener-class>
-	</listener>
+    <listener>
+        <listener-class>org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
+    </listener>
 
-	<!-- Welcome page -->
-	<welcome-file-list>
-		<welcome-file>index.xhtml</welcome-file>
-	</welcome-file-list>
+    <!-- Welcome page -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index_static.html</welcome-file>
+    </welcome-file-list>
 
-	<!-- JSF mapping -->
-	<servlet>
-		<servlet-name>Faces Servlet</servlet-name>
-		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
-	<context-param>
-		<param-name>javax.faces.CONFIG_FILES</param-name>
-		<param-value>/WEB-INF/faces-config.xml</param-value>
-	</context-param>
-	
-	<!-- Test -->
-	<servlet>
-		<servlet-name>TestServlet</servlet-name>
-		<servlet-class>fr.dush.mediacenters.modules.webui.servlets.TestServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <!-- Static resources servlet -->
+    <servlet>
+        <servlet-name>StaticServlet</servlet-name>
+        <jsp-file>/singlePage.jsp</jsp-file>
+    </servlet>
 
-	<!-- Images Servlet -->
-	<servlet>
-		<servlet-name>ImagesServlet</servlet-name>
-		<servlet-class>fr.dush.mediacenters.modules.webui.controllers.ImagesServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <servlet-mapping>
+        <servlet-name>StaticServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
-	<!-- Map these files with JSF -->
-	<servlet-mapping>
-		<servlet-name>TestServlet</servlet-name>
-		<url-pattern>/test/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ImagesServlet</servlet-name>
-		<url-pattern>/posters/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ImagesServlet</servlet-name>
-		<url-pattern>/backdrops/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>/faces/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.jsf</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.faces</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Faces Servlet</servlet-name>
-		<url-pattern>*.xhtml</url-pattern>
-	</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.js</url-pattern>
+        <url-pattern>*.css</url-pattern>
+        <url-pattern>*.ico</url-pattern>
+        <url-pattern>*.png</url-pattern>
+        <url-pattern>*.jpg</url-pattern>
+        <url-pattern>*.htc</url-pattern>
+        <url-pattern>*.gif</url-pattern>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
+
+    <!-- Images Servlet -->
+    <servlet>
+        <servlet-name>ImagesServlet</servlet-name>
+        <servlet-class>fr.dush.mediacenters.modules.webui.controllers.ImagesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ImagesServlet</servlet-name>
+        <url-pattern>/posters/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImagesServlet</servlet-name>
+        <url-pattern>/backdrops/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Service REST servlet (Resteasy) -->
+    <servlet>
+        <servlet-name>Resteasy</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Resteasy</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+
 </web-app>

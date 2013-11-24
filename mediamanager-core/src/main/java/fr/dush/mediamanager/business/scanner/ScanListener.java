@@ -1,18 +1,5 @@
 package fr.dush.mediamanager.business.scanner;
 
-import static com.google.common.collect.Sets.*;
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.util.Set;
-
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.business.scanner.impl.AbstractScanner;
 import fr.dush.mediamanager.business.scanner.impl.MoviesScanner;
@@ -22,6 +9,17 @@ import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.events.scan.ScanResponseEvent;
 import fr.dush.mediamanager.exceptions.ScanException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import java.util.Set;
+
+import static com.google.common.collect.Sets.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Listen {@link RootDirectory}'s events to create and scan directory's contents and find valuable medias.
