@@ -16,7 +16,7 @@
     </div>
     <div class="row-fluid">
         <div style="width: 10%;" class="pull-left" ng-repeat="m in random.elements | filter:{poster:'!!'} |limitTo:10">
-            <a ui-sref="sheet.movie({movieId : m._id})" title="{{m.title}} ({{m.release |date:'yyyy'}})">
+            <a ui-sref="sheet.movie({movieId : m.id})" title="{{m.title}} ({{m.release |date:'yyyy'}})">
                 <img alt="{{m.title}}" ng-src="{{m.poster}}"/>
             </a>
         </div>
@@ -38,7 +38,7 @@
             <h2>{{lastMovies.elements.length}} last unseen movies</h2>
             <ul>
                 <li ng-repeat="m in lastMovies.elements">
-                    <a ui-sref="sheet.movie({movieId : m._id})" title="{{m.title}}">{{m.title}} ({{m.release
+                    <a ui-sref="sheet.movie({movieId : m.id})" title="{{m.title}}">{{m.title}} ({{m.release
                         |date:'yyyy'}})</a>
                     <!-- TODO Display more information on "title" (small popup) -->
                 </li>

@@ -23,8 +23,8 @@
 
 angular.module('mediaServices', [ 'ngResource' ]).factory('Movie',
     function ($resource) {
-        return $resource(':destination/:ctrl:id.json', {destination: "movies"}, {
-            last: { method: 'GET', params: { ctrl: 'last', order: 'last', size: '@size || 10' } },
+        return $resource('api/:destination/:ctrl:id.json', {destination: "movies"}, {
+            last: { method: 'GET', params: { ctrl: 'last',size: '@size || 10' } },
             random: { method: 'GET', params: { ctrl: 'random', size: '@size || 10' } },
             list: { method: 'GET', params: { ctrl: 'list', size: '@size || 10' } },
             find: {method: 'GET', params: {destination: "movie"}}

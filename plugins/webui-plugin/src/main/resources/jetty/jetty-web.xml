@@ -2,4 +2,11 @@
 <Configure id="webAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
 	<Set name="contextPath">${webui.subcontext}</Set>
 	<Set name="resourceBase">${webui.resources}</Set>
+    <Set name="serverClasses">
+        <Array type="java.lang.String">
+            <Item>
+                -org.eclipse.jetty.servlet.ServletContextHandler.Decorator
+            </Item>
+        </Array>
+    </Set>
 </Configure>

@@ -29,7 +29,7 @@ describe('MediaServices -', function () {
                 { title: '2012' },
                 { title: 'Ironman' }
             ]};
-            $httpBackend.expectGET('movies/last.json?order=last&size=5').respond(response);
+            $httpBackend.expectGET('api/movies/last.json?size=5').respond(response);
 
             // Run
             var movies = Movie.last({ size: 5 });
@@ -44,7 +44,7 @@ describe('MediaServices -', function () {
                 { title: '2012' },
                 { title: 'Ironman' }
             ]};
-            $httpBackend.expectGET('movies/random.json?size=10').respond(response);
+            $httpBackend.expectGET('api/movies/random.json?size=10').respond(response);
 
             // Exec
             var movies = Movie.random();
@@ -58,7 +58,7 @@ describe('MediaServices -', function () {
                 { title: '2012' },
                 { title: 'Ironman' }
             ]};
-            $httpBackend.expectGET('movies/last.json?order=last&seen=false&size=7').respond(response);
+            $httpBackend.expectGET('api/movies/last.json?seen=false&size=7').respond(response);
 
             var movies = Movie.last({ size: 7, seen: false });
 
@@ -68,7 +68,7 @@ describe('MediaServices -', function () {
 
         it("should get movie details", function () {
             var response = { title: 'Ironman' };
-            $httpBackend.expectGET('movie/MOVIE_ID.json').respond(response);
+            $httpBackend.expectGET('api/movie/MOVIE_ID.json').respond(response);
 
             var movie = Movie.find({ id: "MOVIE_ID"});
 

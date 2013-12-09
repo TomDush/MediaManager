@@ -5,7 +5,7 @@ angular.module('mediamanager').controller('SearchCtrl', function ($scope, $state
     // Load data ...
     $scope.master = {media: ['movies', 'shows'], genres: []};
     $scope.genres = [];
-    $http.get('/medias/genres.json').success(function (data) {
+    $http.get('/api/medias/genres.json').success(function (data) {
         $scope.genres = data;
         $scope.master.genres = angular.copy(data);
         if (!$stateParams.genres) {
@@ -27,13 +27,10 @@ angular.module('mediamanager').controller('SearchCtrl', function ($scope, $state
         if (query.media.length == $scope.master.media.length) {
             delete query.media;
         }
-        if (!query.title) {
-            delete query.title;
-        }
 
         // Fire search event...
         if (!isEmpty(query)) {
-            $state.go("medias.list", query, {inherit: false});
+            $state.go("medias.list", compactObject(query), {inherit: false});
         }
     }
 
@@ -78,7 +75,7 @@ angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $
     $scope.$watch("request", function (newRequest) {
         if (newRequest != null) {
             console.log("Refresh list with request : " + JSON.stringify(newRequest));
-            $scope.movies = Movie.list(newRequest);
+            $scope.movies = Movie.list(compactObject(newRequest));
         }
     }, true);
 
@@ -164,9 +161,18 @@ function isEmpty(obj) {
 }
 
 function convertToArray(value) {
-    if (value && value != null && !Object.prototype.toString.call(value) === '[object Array]') {
+    if (value && value != null && Object.prototype.toString.call(value) !== '[object Array]') {
         return value.split(",");
     }
 
     return value;
+}
+
+function compactObject(o) {
+    Object.keys(o).forEach(function (k) {
+        if (!o[k]) {
+            delete o[k];
+        }
+    });
+    return o;
 }

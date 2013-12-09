@@ -30,7 +30,7 @@ describe('Controller -', function () {
             scope.onSearch("MovieTitle");
 
             // Check
-            expect(state.go).toHaveBeenCalledWith("medias.list", {title: "MovieTitle"});
+            expect(state.go).toHaveBeenCalledWith("medias.list", {title: "MovieTitle"}, jasmine.objectContaining({ inherit: false }));
         });
     });
 
@@ -46,7 +46,7 @@ describe('Controller -', function () {
         }));
 
         it('should call correctly Movie object.', function () {
-            expect(Movie.last).toHaveBeenCalledWith(jasmine.objectContaining({seen: false}));
+            expect(Movie.last).toHaveBeenCalledWith(jasmine.objectContaining({seen: 'UNSEEN'}));
             expect(Movie.random).toHaveBeenCalled();
         });
 

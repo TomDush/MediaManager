@@ -1,42 +1,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.dush</groupId>
-		<artifactId>builtin-mediamanager-plugins</artifactId>
-		<version>0.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>fr.dush</groupId>
+        <artifactId>builtin-mediamanager-plugins</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>webui-mediamanager-plugin</artifactId>
-	<name>MediaManager - Web UI</name>
-	<packaging>war</packaging>
+    <artifactId>webui-mediamanager-plugin</artifactId>
+    <name>MediaManager - Web UI</name>
+    <packaging>war</packaging>
 
-	<properties>
-		<jetty-version>9.0.5.v20130815</jetty-version>
-	</properties>
+    <properties>
+        <jetty-version>9.0.5.v20130815</jetty-version>
+    </properties>
 
-	<dependencies>
-		<!-- Media Manager API -->
-		<dependency>
-			<groupId>fr.dush</groupId>
-			<artifactId>mediamanager-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <!-- Media Manager API -->
+        <dependency>
+            <groupId>fr.dush</groupId>
+            <artifactId>mediamanager-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- CDI Provider servlet -->
-		<dependency>
-			<groupId>org.jboss.weld.servlet</groupId>
-			<artifactId>weld-servlet-core</artifactId>
-			<version>${weld-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.weld</groupId>
-			<artifactId>weld-core-jsf</artifactId>
-			<version>${weld-version}</version>
-		</dependency>
+        <!-- CDI Provider servlet -->
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet-core</artifactId>
+            <version>${weld-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core-jsf</artifactId>
+            <version>${weld-version}</version>
+        </dependency>
 
         <!-- WS REST : RestEasy -->
         <dependency>
@@ -54,48 +54,48 @@
             <artifactId>resteasy-jackson2-provider</artifactId>
             <version>3.0.5.Final</version>
         </dependency>
-	</dependencies>
+    </dependencies>
 
-	<profiles>
-		<profile>
-			<id>standalone-dependencies</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+    <profiles>
+        <profile>
+            <id>standalone-dependencies</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
 
-			<dependencies>
-				<!-- Web server (Jetty) -->
-				<dependency>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-server</artifactId>
-					<version>${jetty-version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-xml</artifactId>
-					<version>${jetty-version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-jsp</artifactId>
-					<version>${jetty-version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-webapp</artifactId>
-					<version>${jetty-version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-plus</artifactId>
-					<version>${jetty-version}</version>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
+            <dependencies>
+                <!-- Web server (Jetty) -->
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-server</artifactId>
+                    <version>${jetty-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-xml</artifactId>
+                    <version>${jetty-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-jsp</artifactId>
+                    <version>${jetty-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-webapp</artifactId>
+                    <version>${jetty-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>jetty-plus</artifactId>
+                    <version>${jetty-version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
-	<build>
-		<plugins>
+    <build>
+        <plugins>
             <!-- Clean client temporary dirs -->
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -156,99 +156,99 @@
             </plugin>
 
             <!-- Compile and get client web app -->
-            <!--<plugin>-->
-                <!--<groupId>com.github.trecloux</groupId>-->
-                <!--<artifactId>yeoman-maven-plugin</artifactId>-->
-                <!--<version>0.1</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>build</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<configuration>-->
-                    <!--<yeomanProjectDirectory>client</yeomanProjectDirectory>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<artifactId>maven-war-plugin</artifactId>-->
-                <!--<version>2.4</version>-->
-                <!--<configuration>-->
-                    <!--<webResources>-->
-                        <!--<resource>-->
-                            <!--<directory>client/dist</directory>-->
-                        <!--</resource>-->
-                    <!--</webResources>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
+            <plugin>
+                <groupId>com.github.trecloux</groupId>
+                <artifactId>yeoman-maven-plugin</artifactId>
+                <version>0.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <yeomanProjectDirectory>client</yeomanProjectDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>client/dist</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
 
             <!-- Jetty plugin, use 'mvn jetty:run -P !standalone-dependencies' to start it. -->
             <plugin>
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty-version}</version>
-				<configuration>
-					<scanIntervalSeconds>10</scanIntervalSeconds>
-					<webApp>
-						<descriptor>src/main/webapp/WEB-INF/web.xml</descriptor>
-						<tempDirectory>target/jettytemp</tempDirectory>
-					</webApp>
-					<useTestScope>true</useTestScope>
-					<contextXml>src/test/resources/configuration/jetty-context.xml</contextXml>
-				</configuration>
-			</plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty-version}</version>
+                <configuration>
+                    <scanIntervalSeconds>10</scanIntervalSeconds>
+                    <webApp>
+                        <descriptor>src/main/webapp/WEB-INF/web.xml</descriptor>
+                        <tempDirectory>target/jettytemp</tempDirectory>
+                    </webApp>
+                    <useTestScope>true</useTestScope>
+                    <contextXml>src/test/resources/configuration/jetty-context.xml</contextXml>
+                </configuration>
+            </plugin>
 
-			<!-- Configure system properties -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>set-system-properties</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<property>
-									<name>mediamanager.propertiesfile</name>
-									<value>../../mediamanager-core/src/test/resources/dbconfig-int.properties</value>
-								</property>
-							</properties>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+            <!-- Configure system properties -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>set-system-properties</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>
+                                    <name>mediamanager.propertiesfile</name>
+                                    <value>../../mediamanager-core/src/test/resources/dbconfig-int.properties</value>
+                                </property>
+                            </properties>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>properties-maven-plugin</artifactId>
-										<versionRange>[1.0-alpha-2,)</versionRange>
-										<goals>
-											<goal>set-system-properties</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>properties-maven-plugin</artifactId>
+                                        <versionRange>[1.0-alpha-2,)</versionRange>
+                                        <goals>
+                                            <goal>set-system-properties</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

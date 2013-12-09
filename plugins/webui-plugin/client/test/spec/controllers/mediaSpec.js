@@ -26,7 +26,7 @@ describe('Controller -', function () {
 
             state = jasmine.createSpyObj('state', ['go']);
 
-            _$httpBackend_.expectGET('/medias/genres.json').respond(genres);
+            _$httpBackend_.expectGET('/api/medias/genres.json').respond(genres);
 
             SearchCtrl = $controller('SearchCtrl', { $scope: scope, $stateParams: stateParams, $state: state });
         }));

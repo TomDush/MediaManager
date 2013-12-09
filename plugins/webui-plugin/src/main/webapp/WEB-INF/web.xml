@@ -11,7 +11,11 @@
     </context-param>
     <context-param>
         <param-name>resteasy.scan</param-name>
-        <param-value>true</param-value>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>javax.ws.rs.Application</param-name>
+        <param-value>fr.dush.mediacenters.modules.webui.rest.WebUiApplication</param-value>
     </context-param>
     <context-param>
         <param-name>resteasy.injector.factory</param-name>
@@ -57,7 +61,7 @@
     <!-- Images Servlet -->
     <servlet>
         <servlet-name>ImagesServlet</servlet-name>
-        <servlet-class>fr.dush.mediacenters.modules.webui.controllers.ImagesServlet</servlet-class>
+        <servlet-class>fr.dush.mediacenters.modules.webui.servlets.ImagesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
@@ -69,11 +73,17 @@
         <servlet-name>ImagesServlet</servlet-name>
         <url-pattern>/backdrops/*</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImagesServlet</servlet-name>
+        <url-pattern>/actors/*</url-pattern>
+    </servlet-mapping>
+
 
     <!-- Service REST servlet (Resteasy) -->
     <servlet>
         <servlet-name>Resteasy</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>

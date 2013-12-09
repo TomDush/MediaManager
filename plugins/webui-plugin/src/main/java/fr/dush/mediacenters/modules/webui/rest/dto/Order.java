@@ -5,6 +5,9 @@ import java.io.Serializable;
 /** @author Thomas Duchatelle */
 public enum Order implements Serializable {
 
+    /** No specific order, or alphabetical */
+    LIST,
+
     /** Alphabetic order */
     ALPHA,
 

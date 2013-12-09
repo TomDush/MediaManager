@@ -32,7 +32,7 @@ public class MovieController {
 
     @GET
     @Path("movies")
-    public String size() {
+    public String home() {
         LOGGER.info("Object mapper is : {}", objectMapper);
         return String.format("<h1>Welcome in REST Service</h1><p>There are <b>%d</b> movies in database.</p>",
                              movieDAO.findAll().size());
@@ -43,7 +43,6 @@ public class MovieController {
     @Produces(MediaType.APPLICATION_JSON)
     public MediaPage findMovies(@Form RequestFilter filter) {
         LOGGER.debug("Search movies with filter : {}", filter);
-        // http://localhost:8080/api/movies/LAST?title=Hello%20World&genres=Action,Fantasy,Action&pagination.index=42&pagination.pageSize=12
 
         List<Movie> movies = movieDAO.findAll();
 
@@ -63,7 +62,4 @@ public class MovieController {
         throw new WebApplicationException(id + " not found...", HttpURLConnection.HTTP_NOT_FOUND);
     }
 
-    public Date getDate() {
-        return new Date();
-    }
 }
