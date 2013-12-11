@@ -1,64 +1,69 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.dush</groupId>
-		<artifactId>mediamanager</artifactId>
-		<version>0.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>fr.dush</groupId>
+        <artifactId>mediamanager</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>mediamanager-core</artifactId>
-	<name>MediaManager - CORE</name>
-	<packaging>jar</packaging>
+    <artifactId>mediamanager-core</artifactId>
+    <name>MediaManager - CORE</name>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<!-- Downloader Youtube and Vimeo -->
-		<dependency>
-			<groupId>com.github.axet</groupId>
-			<artifactId>vget</artifactId>
-			<version>1.1.0</version>
-		</dependency>
+    <dependencies>
+        <!-- Downloader Youtube and Vimeo -->
+        <dependency>
+            <groupId>com.github.axet</groupId>
+            <artifactId>vget</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 
-		<!-- Parser JSON -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.2.1</version>
-		</dependency>
+        <!-- Parser JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.2.1</version>
+        </dependency>
 
-		<!-- Re root logger to SLF4J (for Openwebbeans) -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-			<version>${slf4j-version}</version>
-		</dependency>
+        <!-- Re root logger to SLF4J (for Openwebbeans) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j-version}</version>
+        </dependency>
 
-		<!-- PERSISTENCE : MongoDB -->
-		<dependency>
-			<groupId>org.mongodb</groupId>
-			<artifactId>mongo-java-driver</artifactId>
-			<version>2.10.1</version>
-		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>de.flapdoodle.embed</groupId> -->
-		<!-- <artifactId>de.flapdoodle.embed.mongo</artifactId> -->
-		<!-- <version>1.28</version> -->
-		<!-- </dependency> -->
+        <!-- PERSISTENCE : MongoDB -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>de.flapdoodle.embed</groupId> -->
+        <!-- <artifactId>de.flapdoodle.embed.mongo</artifactId> -->
+        <!-- <version>1.28</version> -->
+        <!-- </dependency> -->
 
-		<!-- MongoDB DAO utils -->
-		<dependency>
-			<groupId>com.google.code.morphia</groupId>
-			<artifactId>morphia</artifactId>
-			<version>0.103</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.morphia</groupId>
-			<artifactId>morphia-logging-slf4j</artifactId>
-			<version>0.103</version>
-		</dependency>
-	</dependencies>
+        <!-- MongoDB DAO utils -->
+        <dependency>
+            <groupId>com.google.code.morphia</groupId>
+            <artifactId>morphia</artifactId>
+            <version>0.103</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.morphia</groupId>
+            <artifactId>morphia-logging-slf4j</artifactId>
+            <version>0.103</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jongo</groupId>
+            <artifactId>jongo</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -22,99 +22,87 @@ import fr.dush.mediamanager.dao.IDao;
 
 public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 
-	@Inject
-	private Datastore ds;
+    @Inject
+    private Datastore ds;
 
-	private final Class<T> clazz;
+    private final Class<T> clazz;
 
-	public AbstractDAO(Class<T> clazz) {
-		this.clazz = clazz;
-	}
+    public AbstractDAO(Class<T> clazz) {
+        this.clazz = clazz;
+    }
 
-	@Override
-	public T findById(K id) {
-		return ds.get(clazz, id);
-	}
+    @Override
+    public T findById(K id) {
+        return ds.get(clazz, id);
+    }
 
-	@Override
-	public void save(T dto) {
-		ds.save(dto);
-	}
+    @Override
+    public void save(T dto) {
+        ds.save(dto);
+    }
 
-	@Override
-	public List<T> findAll() {
-		return ds.createQuery(clazz).asList();
-	}
+    @Override
+    public List<T> findAll() {
+        return ds.createQuery(clazz).asList();
+    }
 
-	@Override
-	public long count() {
-		return ds.getCount(clazz);
-	}
+    @Override
+    public long count() {
+        return ds.getCount(clazz);
+    }
 
-	@Override
-	public void delete(T dto) {
-		ds.delete(dto);
-	}
+    @Override
+    public void delete(T dto) {
+        ds.delete(dto);
+    }
 
-	protected Datastore getDs() {
-		return ds;
-	}
+    protected Datastore getDs() {
+        return ds;
+    }
 
-	/**
-	 * Execute query written in native form : JSON.
-	 *
-	 * @param query JSON query
-	 * @param args parameters to set into query (using String.format)
-	 * @return Result list
-	 */
-	protected Query<T> createNativeQuery(String jsonQuery, Object... args) {
-		QueryImpl<T> query = ((QueryImpl<T>) ds.createQuery(clazz));
-		query.setQueryObject((DBObject) JSON.parse(String.format(jsonQuery, args)));
+    /**
+     * Execute query written in native form : JSON.
+     *
+     * @param jsonQuery JSON query
+     * @param args parameters to set into query (using String.format)
+     * @return Result list
+     */
+    protected Query<T> createNativeQuery(String jsonQuery, Object... args) {
+        QueryImpl<T> query = ((QueryImpl<T>) ds.createQuery(clazz));
+        query.setQueryObject((DBObject) JSON.parse(String.format(jsonQuery, args)));
 
-		return query;
-	}
+        return query;
+    }
 
-	/**
-	 * Create update operation...
-	 *
-	 * @return
-	 */
-	protected UpdateOperations<T> createUpdateOperations() {
-		return ds.createUpdateOperations(clazz);
-	}
+    /**
+     * Create update operation...
+     */
+    protected UpdateOperations<T> createUpdateOperations() {
+        return ds.createUpdateOperations(clazz);
+    }
 
-	/**
-	 * Create basic Morphia query, for this class.
-	 *
-	 * @return
-	 */
-	protected Query<T> createQuery() {
-		return ds.createQuery(clazz);
-	}
+    /**
+     * Create basic Morphia query, for this class.
+     */
+    protected Query<T> createQuery() {
+        return ds.createQuery(clazz);
+    }
 
-	protected Mapper getMapper() {
-		return ((DatastoreImpl) ds).getMapper();
-	}
+    protected Mapper getMapper() {
+        return ((DatastoreImpl) ds).getMapper();
+    }
 
-	/**
-	 * Format string array to JSON list.
-	 *
-	 * @param args
-	 * @return
-	 */
-	protected static String asJsonList(String... args) {
-		return "[ '" + Joiner.on("', '").skipNulls().join(args) + "' ]";
-	}
+    /**
+     * Format string array to JSON list.
+     */
+    protected static String asJsonList(String... args) {
+        return "[ '" + Joiner.on("', '").skipNulls().join(args) + "' ]";
+    }
 
-	/**
-	 * Format object array to JSON list.
-	 *
-	 * @param args
-	 * @param function
-	 * @return
-	 */
-	protected static <T> String asJsonList(T[] args, Function<T, String> function) {
-		return "[ " + Joiner.on(", ").skipNulls().join(transform(Arrays.asList(args), function)) + " ]";
-	}
-
+    /**
+     * Format object array to JSON list.
+     */
+    protected static <T> String asJsonList(T[] args, Function<T, String> function) {
+        return "[ " + Joiner.on(", ").skipNulls().join(transform(Arrays.asList(args), function)) + " ]";
+    }
 }

@@ -4,61 +4,62 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import fr.dush.mediamanager.tools.CDIUtils;
 
 /**
- * Initialize CDI context (with OpenWebBeans) to use injection in unit test.
+ * Initialize CDI context to use injection in unit test.
+ * <p> Never stop CDI container... It's not a good idea to close it because it could be stopped while another worker work use it ! </p>
  *
  * @author Thomas Duchatelle
  */
 public class CdiJunitClassRunner extends BlockJUnit4ClassRunner {
 
-	static {
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.install();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CdiJunitClassRunner.class);
 
-		System.setProperty("mediamanager.propertiesfile", "src/test/resources/dbconfig-junit.properties");
-	}
+    static {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
 
-	public CdiJunitClassRunner(Class<?> klass) throws InitializationError {
-		super(klass);
+        System.setProperty("mediamanager.propertiesfile", "src/test/resources/dbconfig-junit.properties");
+    }
 
-		CDIUtils.bootCdiContainer();
-	}
+    public CdiJunitClassRunner(Class<?> klass) throws InitializationError {
+        super(klass);
 
-	@Override
-	protected void finalize() throws Throwable {
-		CDIUtils.stopCdiContainer();
-	}
+        LOGGER.debug("Booting CDI container for '{}'", this.hashCode());
+        CDIUtils.bootCdiContainer();
+    }
 
-	@Override
-	protected Object createTest() throws Exception {
-		return CDIUtils.getBean(getTestClass().getJavaClass());
-	}
 
-	@Override
-	protected Statement methodInvoker(FrameworkMethod method, Object test) {
-		final Statement st = super.methodInvoker(method, test);
+    @Override
+    protected Object createTest() throws Exception {
+        return CDIUtils.getBean(getTestClass().getJavaClass());
+    }
 
-		// Recast InvocatonTargetException
-		return new Statement() {
+    @Override
+    protected Statement methodInvoker(FrameworkMethod method, Object test) {
+        final Statement st = super.methodInvoker(method, test);
 
-			@Override
-			public void evaluate() throws Throwable {
-				try {
-					st.evaluate();
-				} catch (Exception e) {
-					if (e.getCause() instanceof Error) {
-						throw e.getCause();
-					}
+        // Recast InvocatonTargetException
+        return new Statement() {
 
-					throw e;
-				}
+            @Override
+            public void evaluate() throws Throwable {
+                try {
+                    st.evaluate();
+                } catch (Exception e) {
+                    LOGGER.debug("Statement fail with error ", e);
+                    if (e.getCause() instanceof Error) {
+                        throw e.getCause();
+                    }
 
-			}
-		};
-	}
-
+                    throw e;
+                }
+            }
+        };
+    }
 }
