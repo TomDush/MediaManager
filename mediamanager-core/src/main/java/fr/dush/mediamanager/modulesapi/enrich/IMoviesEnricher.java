@@ -20,7 +20,7 @@ public interface IMoviesEnricher {
 	/**
 	 * Search movie from parsed file name.
 	 *
-	 * @param media
+	 * @param filename
 	 * @return
 	 * @throws EnrichException If an error occurred, this exception is thrown.
 	 */

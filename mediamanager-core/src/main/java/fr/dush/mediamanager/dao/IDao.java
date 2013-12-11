@@ -1,5 +1,8 @@
 package fr.dush.mediamanager.dao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.bson.types.ObjectId;
+
 import java.util.List;
 
 /**
@@ -14,8 +17,10 @@ public interface IDao<T, K> {
 	/**
 	 * Find entity by internal ID
 	 *
-	 * @param id
-	 * @return
+	 *
+     *
+     * @param id
+     * @return
 	 */
 	public T findById(K id);
 
@@ -30,6 +35,6 @@ public interface IDao<T, K> {
 
 	public long count();
 
-	public void delete(T dto);
+	public void delete(K key);
 
 }

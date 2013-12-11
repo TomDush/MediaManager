@@ -1,17 +1,15 @@
 package fr.dush.mediamanager.domain.tree;
 
-import static com.google.common.collect.Sets.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.jongo.marshall.jackson.oid.Id;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
+import static com.google.common.collect.Sets.*;
 
 /**
  * Media root directory.
@@ -20,7 +18,6 @@ import com.google.code.morphia.annotations.Id;
  *
  */
 @SuppressWarnings("serial")
-@Entity(noClassnameStored = true)
 @Data
 @EqualsAndHashCode(of = "name")
 @NoArgsConstructor

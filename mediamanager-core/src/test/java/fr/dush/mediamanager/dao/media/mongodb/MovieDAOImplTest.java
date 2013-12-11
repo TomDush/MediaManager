@@ -2,7 +2,6 @@ package fr.dush.mediamanager.dao.media.mongodb;
 
 import static com.google.common.collect.Sets.*;
 import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
-import static org.fest.assertions.api.Assertions.*;
 
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -11,6 +10,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import fr.dush.mediamanager.dao.media.queries.SearchForm;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
@@ -28,10 +28,10 @@ import fr.dush.mediamanager.tools.PathsUtils;
 @DatabaseScript(clazz = Movie.class, locations = "dataset/movies.json")
 public class MovieDAOImplTest extends MongoJunitTest {
 
+    private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+
 	@Inject
 	private IMovieDAO movieDAO;
-
-	private static final DateFormat FORMATER = new SimpleDateFormat("yyyy-MM-dd");
 
 	@DatabaseScript(clazz = Movie.class, inherits = false)
 	@Test
@@ -44,17 +44,17 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
 		m.setGenres(newHashSet("action"));
 		m.setSeen(2);
-		m.setCreation(FORMATER.parse("2013-08-05"));
+		m.setCreation(FORMATTER.parse("2013-08-05"));
 		m.setOtherMetaData("No other data on this films...");
 		m.setOverview("Heroes aren't born. They're built.");
 		m.setPoster("/some/poster.jpg");
-		m.setRelease(FORMATER.parse("2008-05-01"));
+		m.setRelease(FORMATTER.parse("2008-05-01"));
 
 		final Trailers ts = new Trailers();
-		ts.setRefreshed(FORMATER.parse("2013-08-05"));
+		ts.setRefreshed(FORMATTER.parse("2013-08-05"));
 		ts.getSources().add("MOVIES_DB");
 		final Trailer t = new Trailer();
-		t.setPublishDate(FORMATER.parse("2008-05-01"));
+		t.setPublishDate(FORMATTER.parse("2008-05-01"));
 		t.setQuality("HD1080");
 		t.setSource("youtube");
 		t.setTitle("Iron Man (trailer)");
@@ -131,7 +131,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		assertThat(movie).as("DataTest invalid").isNotNull();
 
 		// Exec
-		movieDAO.incrementViewCount(movie, 2);
+		movieDAO.incrementViewCount(movie.getId(), 2);
 
 		// Test
 		final Movie reloaded = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70a"));
@@ -142,7 +142,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		assertThat(movie2).as("DataTest invalid").isNotNull();
 
 		// Exec
-		movieDAO.incrementViewCount(movie2, 1);
+		movieDAO.incrementViewCount(movie2.getId(), 1);
 
 		// Test
 		final Movie reloaded2 = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70b"));
@@ -218,4 +218,12 @@ public class MovieDAOImplTest extends MongoJunitTest {
 		assertThat(movies).hasSize(1);
 		assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 	}
+
+    @Test
+    public void test_fullSearch() {
+        List<Movie> movies = movieDAO.search(new SearchForm("Star Trek"), null);
+
+        assertThat(movies).hasSize(1);
+        assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
+    }
 }

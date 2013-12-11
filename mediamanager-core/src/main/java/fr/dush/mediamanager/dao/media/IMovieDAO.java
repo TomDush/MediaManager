@@ -2,6 +2,10 @@ package fr.dush.mediamanager.dao.media;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.dush.mediamanager.dao.media.queries.Order;
+import fr.dush.mediamanager.dao.media.queries.SearchForm;
+import fr.dush.mediamanager.dao.media.queries.SearchLimit;
 import org.bson.types.ObjectId;
 
 import fr.dush.mediamanager.dao.IDao;
@@ -17,18 +21,19 @@ import fr.dush.mediamanager.domain.media.video.Movie;
 public interface IMovieDAO extends IDao<Movie, ObjectId> {
 
 	/**
-	 * Save or update movie, based on {@link Movie#getMediaIds()}.
+     * Save or update movie, based on {@link Movie#getMediaIds()}.
 	 *
-	 * @param movie
-	 */
+     * @param movie
+     */
 	void saveOrUpdateMovie(Movie movie);
 
 	/**
 	 * Increment {@link Movie#getSeen()} by inc.
 	 *
-	 * @param inc Number of view to add
-	 */
-	void incrementViewCount(Movie movie, int inc);
+     * @param id
+     * @param inc Number of view to add
+     */
+	void incrementViewCount(ObjectId id, int inc);
 
 	/**
 	 * Find movies by IDs provided by sources (imdb, movieDb, ...)
@@ -38,6 +43,9 @@ public interface IMovieDAO extends IDao<Movie, ObjectId> {
 	 */
 	List<Movie> findBySourceId(SourceId... sourceIds);
 
+    /** Search movies by multiple criteria */
+    List<Movie> search(SearchForm form, SearchLimit limit, Order... order);
+
 	/**
 	 * Movies never seen yet.
 	 *
@@ -46,7 +54,7 @@ public interface IMovieDAO extends IDao<Movie, ObjectId> {
 	List<Movie> findUnseen();
 
 	/**
-	 * Find by approximative name
+	 * Find by approximate name
 	 *
 	 * @param name
 	 * @return Movies matching name

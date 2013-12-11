@@ -175,7 +175,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 	/**
 	 * Get and cast MovieDB ID.
 	 *
-	 * @param media Media which must have MovieDB id.
+	 * @param sourceIds Movie identifiers.
 	 * @return MovieDB id.
 	 * @throws EnrichException
 	 */
@@ -186,8 +186,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 					MOVIEDB_ID_TYPE, title));
 		}
 
-		final int id = Integer.parseInt(ids.iterator().next());
-		return id;
+        return Integer.parseInt(ids.iterator().next());
 	}
 
 	private void enrichMovie(final int id, Movie movie) throws EnrichException {

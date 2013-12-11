@@ -1,101 +1,93 @@
 package fr.dush.mediamanager.dao.mongodb;
 
-import static com.google.common.collect.Lists.*;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import fr.dush.mediamanager.dao.IDao;
+import lombok.AccessLevel;
+import lombok.Getter;
+import org.bson.types.ObjectId;
+import org.jongo.Jongo;
+import org.jongo.MongoCollection;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
+import static com.google.common.collect.Lists.*;
 
-import com.google.code.morphia.Datastore;
-import com.google.code.morphia.DatastoreImpl;
-import com.google.code.morphia.mapping.Mapper;
-import com.google.code.morphia.query.Query;
-import com.google.code.morphia.query.QueryImpl;
-import com.google.code.morphia.query.UpdateOperations;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
-
-import fr.dush.mediamanager.dao.IDao;
-
+/**
+ * Provide basic CRUD operation on database.
+ *
+ * @param <T>
+ * @param <K>
+ */
 public abstract class AbstractDAO<T, K> implements IDao<T, K> {
 
     @Inject
-    private Datastore ds;
+    @Getter(AccessLevel.PROTECTED)
+    private Jongo jongo;
 
     private final Class<T> clazz;
 
-    public AbstractDAO(Class<T> clazz) {
+    @Getter(AccessLevel.PROTECTED)
+    private MongoCollection collection;
+
+    protected AbstractDAO(Class<T> clazz) {
         this.clazz = clazz;
+    }
+
+    @PostConstruct
+    public void initCollection() {
+        collection = jongo.getCollection(getCollectionName());
+    }
+
+    /** Get collection name of this class */
+    protected String getCollectionName() {
+        return EntityUtils.getCollectionName(clazz);
     }
 
     @Override
     public T findById(K id) {
-        return ds.get(clazz, id);
+        if (id instanceof ObjectId) {
+            return collection.findOne((ObjectId) id).as(clazz);
+        } else {
+            return collection.findOne("{_id : #}", id).as(clazz);
+        }
     }
 
     @Override
     public void save(T dto) {
-        ds.save(dto);
+        collection.save(dto);
     }
 
     @Override
     public List<T> findAll() {
-        return ds.createQuery(clazz).asList();
+        return newArrayList(collection.find().as(clazz));
     }
 
     @Override
     public long count() {
-        return ds.getCount(clazz);
+        return collection.count();
     }
 
     @Override
-    public void delete(T dto) {
-        ds.delete(dto);
-    }
-
-    protected Datastore getDs() {
-        return ds;
-    }
-
-    /**
-     * Execute query written in native form : JSON.
-     *
-     * @param jsonQuery JSON query
-     * @param args parameters to set into query (using String.format)
-     * @return Result list
-     */
-    protected Query<T> createNativeQuery(String jsonQuery, Object... args) {
-        QueryImpl<T> query = ((QueryImpl<T>) ds.createQuery(clazz));
-        query.setQueryObject((DBObject) JSON.parse(String.format(jsonQuery, args)));
-
-        return query;
-    }
-
-    /**
-     * Create update operation...
-     */
-    protected UpdateOperations<T> createUpdateOperations() {
-        return ds.createUpdateOperations(clazz);
-    }
-
-    /**
-     * Create basic Morphia query, for this class.
-     */
-    protected Query<T> createQuery() {
-        return ds.createQuery(clazz);
-    }
-
-    protected Mapper getMapper() {
-        return ((DatastoreImpl) ds).getMapper();
+    public void delete(K key) {
+        if(key instanceof ObjectId) {
+            collection.remove((ObjectId) key);
+        } else {
+            collection.remove("{ _id : # }", key);
+        }
     }
 
     /**
      * Format string array to JSON list.
      */
     protected static String asJsonList(String... args) {
+        return "[ '" + Joiner.on("', '").skipNulls().join(args) + "' ]";
+    }
+
+    protected static String asJsonList(Iterable<String> args) {
         return "[ '" + Joiner.on("', '").skipNulls().join(args) + "' ]";
     }
 

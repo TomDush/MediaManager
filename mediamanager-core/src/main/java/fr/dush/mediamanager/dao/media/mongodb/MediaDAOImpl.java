@@ -1,13 +1,7 @@
 package fr.dush.mediamanager.dao.media.mongodb;
 
-import com.google.code.morphia.Datastore;
-import com.google.code.morphia.query.Query;
-import com.google.code.morphia.query.QueryImpl;
-import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 import fr.dush.mediamanager.dao.media.IMediaDAO;
-import fr.dush.mediamanager.domain.media.video.Movie;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.ResultHandler;

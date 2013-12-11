@@ -1,183 +1,271 @@
 package fr.dush.mediamanager.dao.media.mongodb;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
+import fr.dush.mediamanager.annotations.Startup;
+import fr.dush.mediamanager.dao.media.IMovieDAO;
+import fr.dush.mediamanager.dao.media.queries.Order;
+import fr.dush.mediamanager.dao.media.queries.SearchForm;
+import fr.dush.mediamanager.dao.media.queries.SearchLimit;
+import fr.dush.mediamanager.dao.media.queries.Seen;
+import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import org.bson.types.ObjectId;
+import org.jongo.Find;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-
-import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.code.morphia.query.Query;
-import com.google.code.morphia.query.QueryImpl;
-import com.google.code.morphia.query.UpdateOperations;
-import com.google.common.base.Function;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-
-import fr.dush.mediamanager.annotations.Startup;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
-import fr.dush.mediamanager.domain.media.SourceId;
-import fr.dush.mediamanager.domain.media.video.Movie;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Provide access to movies persisted in MongoDB. <br/>
  *
  * @author Thomas Duchatelle
- *
  */
 @ApplicationScoped
 @Startup(superclass = IMovieDAO.class)
 public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovieDAO {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);
 
-	public MovieDAOImpl() {
-		super(Movie.class);
-	}
+    @Inject
+    private ObjectMapper objectMapper;
 
-	@Override
-	public void save(Movie dto) {
-		saveOrUpdateMovie(dto);
-	}
+    public MovieDAOImpl() {
+        super(Movie.class);
+    }
 
-	@Override
-	public void saveOrUpdateMovie(Movie movie) {
-		// Force creation date
-		if (null == movie.getCreation()) {
-			movie.setCreation(new Date());
-		}
+    @Override
+    public List<Movie> findAll() {
+        return Lists.newArrayList(getCollection().find().sort("{title : 1}").as(Movie.class));
+    }
 
-		// Convert to DBObject, without 'id', if present.
-		final DBObject dbMovie = getMapper().toDBObject(movie);
-		dbMovie.removeField("_id");
+    @Override
+    public void save(Movie dto) {
+        saveOrUpdateMovie(dto);
+    }
 
-		// Create update query
-		final BasicDBObject updateQuery = new BasicDBObject("$set", dbMovie);
+    @Override
+    public void saveOrUpdateMovie(Movie movie) { // FIXME Change exception name...
+        if (movie.getMediaIds() == null || movie.getMediaIds().isEmpty()) {
+            throw new IllegalArgumentException("Movie must be identified by MediaId.");
+        }
 
-		// Complete fields
-		final BasicDBObject push = new BasicDBObject();
-		updateQuery.put("$addToSet", push);
+        // Force creation date
+        if (movie.getCreation() == null) {
+            movie.setCreation(new Date());
+        }
 
-		pushEach(dbMovie, push, "mediaIds", null);
-		pushEach(dbMovie, push, "backdrops", null);
-		pushEach(dbMovie, push, "genres", null);
-		pushEach(dbMovie, push, "videoFiles", null);
+        // Convert to DBObject, without 'id', if present.
+        DBObject dbMovie = null;
+        try {
+            dbMovie = (DBObject) JSON.parse(objectMapper.writeValueAsString(movie));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Can't convert movie " + movie + " to JSON.", e);
+        }
 
-		final Object trailers = dbMovie.removeField("trailers");
-		if (trailers instanceof DBObject) {
-			pushEach((DBObject) trailers, push, "sources", "trailers.");
-			pushEach((DBObject) trailers, push, "trailers", "trailers.");
+        dbMovie.removeField("_id");
 
-			dbMovie.put("trailers.refreshed", ((DBObject) trailers).get("refreshed"));
-		}
+        // Create update query
+        final BasicDBObject updateQuery = new BasicDBObject("$set", dbMovie);
 
-		// Fields created once
-		final BasicDBObject setOnInsert = new BasicDBObject();
-		updateQuery.put("$setOnInsert", setOnInsert);
+        // Complete fields
+        final BasicDBObject push = new BasicDBObject();
+        updateQuery.put("$addToSet", push);
 
-		setOnInsert.put("creation", dbMovie.removeField("creation"));
-		if (movie.getSeen() > 0) setOnInsert.put("seen", dbMovie.removeField("seen"));
+        pushEach(dbMovie, push, "mediaIds", null);
+        pushEach(dbMovie, push, "backdrops", null);
+        pushEach(dbMovie, push, "genres", null);
+        pushEach(dbMovie, push, "videoFiles", null);
 
-		// ** Update query
-		final QueryImpl<Movie> query = (QueryImpl<Movie>) createQueryOnIds(movie.getMediaIds());
+        final Object trailers = dbMovie.removeField("trailers");
+        if (trailers instanceof DBObject) {
+            pushEach((DBObject) trailers, push, "sources", "trailers.");
+            pushEach((DBObject) trailers, push, "trailers", "trailers.");
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Update movies matching query : {}", query);
-			LOGGER.debug("Update query is : {}", updateQuery);
-		}
+            dbMovie.put("trailers.refreshed", ((DBObject) trailers).get("refreshed"));
+        }
 
-		getDs().getCollection(Movie.class).update(query.getQueryObject(), updateQuery, true, true);
+        // Fields created once
+        final BasicDBObject setOnInsert = new BasicDBObject();
+        updateQuery.put("$setOnInsert", setOnInsert);
 
-	}
+        setOnInsert.put("creation", dbMovie.removeField("creation"));
+        if (movie.getSeen() > 0) {
+            setOnInsert.put("seen", dbMovie.removeField("seen"));
+        }
 
-	private void pushEach(DBObject dbMovie, DBObject push, String key, String keyPrefix) {
-		if (isBlank(keyPrefix)) keyPrefix = "";
+        // ** Update query
+        getCollection().update(" {mediaIds : {$in : #}}", movie.getMediaIds()).multi().upsert().with(updateQuery.toString());
+    }
 
-		final Object value = dbMovie.removeField(key);
-		if (null != value) push.put(keyPrefix + key, new BasicDBObject("$each", value));
-	}
+    private void pushEach(DBObject dbMovie, DBObject push, String key, String keyPrefix) {
+        if (isBlank(keyPrefix)) {
+            keyPrefix = "";
+        }
 
-	@Override
-	public void incrementViewCount(Movie movie, int inc) {
-		final UpdateOperations<Movie> updateOp = createUpdateOperations().inc("seen", inc);
+        final Object value = dbMovie.removeField(key);
+        if (null != value) {
+            push.put(keyPrefix + key, new BasicDBObject("$each", value));
+        }
+    }
 
-		if (null != movie.getId()) {
-			// Classic update (by ID)
-			getDs().update(movie, updateOp);
+    @Override
+    public void incrementViewCount(ObjectId id, int inc) {
+        getCollection().update("{_id : #}", id).with("{$inc : {seen : # } }", inc);
+    }
 
-		} else {
-			final Query<Movie> query = createQueryOnIds(movie.getMediaIds());
+    @Override
+    public List<Movie> search(SearchForm form, SearchLimit limit, Order... orders) {
+        if (form == null) {
+            LOGGER.warn("Search movie request without form... Redirect to find all.");
+            return findAll();
+        }
 
-			getDs().update(query, updateOp);
-		}
-	}
+        // Create query
+        List<String> subQueries = new ArrayList<>();
+        List<Object> args = new ArrayList<>();
 
-	@Override
-	public List<Movie> findBySourceId(SourceId... sourceIds) {
-		if (null == sourceIds || sourceIds.length <= 0) {
-			throw new IllegalArgumentException("sourceIds must be defined");
-		}
+        if (isNotBlank(form.getTitle())) {
+            subQueries.add(" title : { $regex : # , $options : 'i' } ");
+            args.add(form.getTitle());
+        }
+        if (form.getGenres() != null && !form.getGenres().isEmpty()) {
+            subQueries.add("genres : { $all : # }");
+            args.add(form.getGenres());
+        }
+        if (form.getSeen() != null && form.getSeen() != Seen.ALL) {
+            switch (form.getSeen()) {
+                case SEEN:
+                    subQueries.add(" seen : { $gt : 0 } ");
+                    break;
 
-		final Query<Movie> query = createQueryOnIds(Arrays.asList(sourceIds));
+                case UNSEEN:
+                    subQueries.add(" $or : [{seen : { $exists: false}}, {seen : 0}] ");
+                    break;
 
-		return query.order("title").asList();
-	}
+                case ALL:
+                default:
+                    break;
+            }
+        }
+        if (form.getMediaIds() != null && !form.getMediaIds().isEmpty()) {
+            subQueries.add(" mediaIds : {$in : #} ");
+            args.add(form.getMediaIds());
+        }
+        if (form.getCrewIds() != null && !form.getCrewIds().isEmpty()) {
+            subQueries.add(" $or : [ {mainActors.sourceIds : {$in : #}}, {directors.sourceIds : {$in : #}} ] ");
+            args.add(form.getCrewIds());
+            args.add(form.getCrewIds());
+        }
 
-	private Query<Movie> createQueryOnIds(Collection<SourceId> mediaIds) {
-		final Query<Movie> query = createQuery();
-		query.criteria("mediaIds").in(mediaIds);
-		return query;
-	}
+        // Execute it
+        String queryString = "{ " + Joiner.on(", ").join(subQueries) + " }";
+        LOGGER.debug("Search query : {} ; args = {}", queryString, args);
+        Find query = getCollection().find(queryString, args.toArray(new Object[args.size()]));
 
-	@Override
-	public List<Movie> findUnseen() {
-		final Query<Movie> query = createQuery();
-		query.or(query.criteria("seen").equal(0), query.criteria("seen").doesNotExist());
+        if (limit != null && limit.isMaxSizeDefined()) {
+            query.limit(limit.getMaxSize());
+        }
 
-		return query.order("-creation").asList();
-	}
+        if (orders.length > 0) {
+            query.sort(getSort(Arrays.asList(orders)));
+        }
 
-	@Override
-	public List<Movie> findByTitle(String name) {
-		return createNativeQuery("{ title : { $regex : '%s' , $options : 'i' } }", name).order("title").asList();
-	}
+        return Lists.newArrayList(query.as(Movie.class));
+    }
 
-	@Override
-	public List<Movie> findByGenres(String... genres) {
-		final Query<Movie> query = createNativeQuery("{ genres : { $all : %s } }", asJsonList(genres));
+    private static String getSort(List<Order> orders) {
+        Collection<String> orderClause = Collections2.transform(orders, new Function<Order, String>() {
 
-		return query.order("title").asList();
-	}
+            @Override
+            public String apply(Order input) {
+                switch (input) {
+                    case ALPHA:
+                    case LIST:
+                        return " title : 1  ";
+                    case ALPHA_DESC:
+                        return " title : -1 ";
+                    case DATE:
+                        return " release : 1 ";
+                    case DATE_DESC:
+                        return " release : -1";
+                    case FIRST:
+                        return " creation : 1  ";
+                    case LAST:
+                        return " creation : -1 ";
+                    default:
+                        return "";
+                }
+            }
+        });
 
-	@Override
-	public List<Movie> findByCrew(SourceId... crew) {
-		StringBuilder sb = new StringBuilder("{ $or : [ ");
-		sb.append(" { 'mainActors.sourceIds' : { $in : %s } },");
-		sb.append(" { 'directors.sourceIds' : { $in : %s } }");
-		sb.append("] }");
+        return "{ " + Joiner.on(", ").join(orderClause) + " }";
+    }
 
-		final String ids = asJsonList(crew, sourceId2string);
+    @Override
+    public List<Movie> findUnseen() {
+        //        query.or(query.criteria("seen").equal(0), query.criteria("seen").doesNotExist());
+        // FIXME Check if movies without 'seen' attribute match.
+        return search(new SearchForm(Seen.UNSEEN), null, Order.LAST);
+    }
 
-		// Morphia native query
-		return createNativeQuery(sb.toString(), ids, ids).order("title").asList();
-	}
+    @Override
+    public List<Movie> findByTitle(String name) {
+        return search(new SearchForm(name), null, Order.ALPHA);
+    }
 
-	@Override
-	public List<Movie> findAll() {
-		return createQuery().order("title").asList();
-	}
+    @Override
+    public List<Movie> findByGenres(String... genres) {
+        return search(new SearchForm(genres), null, Order.ALPHA);
+    }
 
-	private static Function<SourceId, String> sourceId2string = new Function<SourceId, String>() {
-		@Override
-		public String apply(SourceId id) {
-			return String.format(" { type : '%s', value : '%s' } ", id.getType(), id.getValue());
-		}
-	};
+    @Override
+    public List<Movie> findBySourceId(SourceId... sourceIds) {
+        if (sourceIds == null || sourceIds.length <= 0) {
+            throw new IllegalArgumentException("sourceIds must be defined");
+        }
+
+        SearchForm form = new SearchForm();
+        form.setMediaIds(Sets.newHashSet(sourceIds));
+
+        return search(form, null, Order.ALPHA);
+    }
+
+    @Override
+    public List<Movie> findByCrew(SourceId... crew) {
+        if (crew == null || crew.length <= 0) {
+            throw new IllegalArgumentException("crew sourceIds must be defined");
+        }
+
+        SearchForm form = new SearchForm();
+        form.setCrewIds(Sets.newHashSet(crew));
+
+        return search(form, null, Order.ALPHA);
+    }
+
+
+    private static Function<SourceId, String> sourceId2string = new Function<SourceId, String>() {
+        @Override
+        public String apply(SourceId id) {
+            return String.format(" { type : '%s', value : '%s' } ", id.getType(), id.getValue());
+        }
+    };
 }
