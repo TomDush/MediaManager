@@ -1,5 +1,6 @@
 package fr.dush.mediamanager.domain.media;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.dush.mediamanager.annotations.mapping.AddToSet;
 import fr.dush.mediamanager.annotations.mapping.SetOnInsert;
 import lombok.Data;
@@ -51,4 +52,13 @@ public abstract class Media implements Serializable {
 
 	/** Vote average between 1 (fantastic) and 0 (poor) */
 	private double voteAverage;
+
+    /** Property added to REST services */
+    @JsonProperty("id")
+    public ObjectId getAliasId() {
+        return id;
+    }
+
+    public void setAliasId(ObjectId id) {
+    }
 }

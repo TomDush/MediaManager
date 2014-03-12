@@ -5,17 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dao.media.queries.Order;
-import fr.dush.mediamanager.dao.media.queries.SearchForm;
-import fr.dush.mediamanager.dao.media.queries.SearchLimit;
-import fr.dush.mediamanager.dao.media.queries.Seen;
+import fr.dush.mediamanager.dao.media.queries.*;
 import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
 import fr.dush.mediamanager.domain.media.SourceId;
 import fr.dush.mediamanager.domain.media.video.Movie;
@@ -26,12 +22,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import static com.google.common.collect.Lists.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 /**
@@ -54,7 +47,7 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
 
     @Override
     public List<Movie> findAll() {
-        return Lists.newArrayList(getCollection().find().sort("{title : 1}").as(Movie.class));
+        return newArrayList(getCollection().find().sort("{title : 1}").as(Movie.class));
     }
 
     @Override
@@ -113,7 +106,10 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
         }
 
         // ** Update query
-        getCollection().update(" {mediaIds : {$in : #}}", movie.getMediaIds()).multi().upsert().with(updateQuery.toString());
+        getCollection().update(" {mediaIds : {$in : #}}", movie.getMediaIds())
+                       .multi()
+                       .upsert()
+                       .with(updateQuery.toString());
     }
 
     private void pushEach(DBObject dbMovie, DBObject push, String key, String keyPrefix) {
@@ -133,16 +129,52 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
     }
 
     @Override
-    public List<Movie> search(SearchForm form, SearchLimit limit, Order... orders) {
-        if (form == null) {
-            LOGGER.warn("Search movie request without form... Redirect to find all.");
-            return findAll();
+    public PaginatedList<Movie> search(SearchForm form, SearchLimit limit, Order... orders) {
+        // Create query
+        List<Object> args = new ArrayList<>();
+        String queryString = generateQuery(form, args);
+
+        // Execute it
+        LOGGER.debug("Search query : {} ; args = {}", queryString, args);
+        Find query = getCollection().find(queryString, args.toArray(new Object[args.size()]));
+
+        PaginatedList<Movie> result = new PaginatedList<>();
+        if (limit != null) {
+            if (limit.isPaginationActive()) {
+                result.setSkipped(limit.getPageSize() * limit.getIndex());
+                result.setMaxSize(limit.getPageSize());
+
+                query.skip(result.getSkipped()).limit(result.getMaxSize());
+            } else if (limit.isMaxSizeDefined()) {
+                result.setMaxSize(limit.getMaxSize());
+                query.limit(result.getMaxSize());
+            }
         }
 
-        // Create query
-        List<String> subQueries = new ArrayList<>();
-        List<Object> args = new ArrayList<>();
+        if (orders.length > 0) {
+            query.sort(getSort(Arrays.asList(orders)));
+        } else {
+            query.sort(getSort(newArrayList(Order.LIST)));
+        }
 
+        result.setList(newArrayList(query.as(Movie.class)));
+
+        // If element has been limited, get original size
+        if (limit != null &&
+            (limit.isMaxSizeDefined() && result.getList().size() >= limit.getMaxSize() || limit.isPaginationActive())) {
+
+            result.setFullSize(getCollection().count(queryString));
+        }
+
+        return result;
+    }
+
+    private String generateQuery(SearchForm form, List<Object> args) {
+        if(form == null){
+            return "{}";
+        }
+
+        List<String> subQueries = new ArrayList<>();
         if (isNotBlank(form.getTitle())) {
             subQueries.add(" title : { $regex : # , $options : 'i' } ");
             args.add(form.getTitle());
@@ -176,20 +208,7 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
             args.add(form.getCrewIds());
         }
 
-        // Execute it
-        String queryString = "{ " + Joiner.on(", ").join(subQueries) + " }";
-        LOGGER.debug("Search query : {} ; args = {}", queryString, args);
-        Find query = getCollection().find(queryString, args.toArray(new Object[args.size()]));
-
-        if (limit != null && limit.isMaxSizeDefined()) {
-            query.limit(limit.getMaxSize());
-        }
-
-        if (orders.length > 0) {
-            query.sort(getSort(Arrays.asList(orders)));
-        }
-
-        return Lists.newArrayList(query.as(Movie.class));
+        return "{ " + Joiner.on(", ").join(subQueries) + " }";
     }
 
     private static String getSort(List<Order> orders) {
@@ -224,17 +243,17 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
     public List<Movie> findUnseen() {
         //        query.or(query.criteria("seen").equal(0), query.criteria("seen").doesNotExist());
         // FIXME Check if movies without 'seen' attribute match.
-        return search(new SearchForm(Seen.UNSEEN), null, Order.LAST);
+        return search(new SearchForm(Seen.UNSEEN), null, Order.LAST).getList();
     }
 
     @Override
     public List<Movie> findByTitle(String name) {
-        return search(new SearchForm(name), null, Order.ALPHA);
+        return search(new SearchForm(name), null, Order.ALPHA).getList();
     }
 
     @Override
     public List<Movie> findByGenres(String... genres) {
-        return search(new SearchForm(genres), null, Order.ALPHA);
+        return search(new SearchForm(genres), null, Order.ALPHA).getList();
     }
 
     @Override
@@ -246,7 +265,7 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
         SearchForm form = new SearchForm();
         form.setMediaIds(Sets.newHashSet(sourceIds));
 
-        return search(form, null, Order.ALPHA);
+        return search(form, null, Order.ALPHA).getList();
     }
 
     @Override
@@ -258,9 +277,8 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
         SearchForm form = new SearchForm();
         form.setCrewIds(Sets.newHashSet(crew));
 
-        return search(form, null, Order.ALPHA);
+        return search(form, null, Order.ALPHA).getList();
     }
-
 
     private static Function<SourceId, String> sourceId2string = new Function<SourceId, String>() {
         @Override

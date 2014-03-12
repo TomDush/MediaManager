@@ -18,14 +18,14 @@ public class SearchLimit implements Serializable {
     /** Page size, default is 10 */
     private int pageSize;
 
-    /** Max element number */
-    private int maxSize;
+    /** Max element number, 0 is default value to enable pagination... */
+    private int maxSize = 0;
 
     public boolean isPaginationActive() {
-        return index > 0;
+        return isMaxSizeDefined() && index > 0;
     }
 
     public boolean isMaxSizeDefined() {
-        return !isPaginationActive() && maxSize > 0;
+        return maxSize > 0;
     }
 }

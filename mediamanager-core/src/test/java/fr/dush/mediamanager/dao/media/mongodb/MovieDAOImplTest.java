@@ -221,7 +221,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
     @Test
     public void test_fullSearch() {
-        List<Movie> movies = movieDAO.search(new SearchForm("Star Trek"), null);
+        List<Movie> movies = movieDAO.search(new SearchForm("Star Trek"), null).getList();
 
         assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");

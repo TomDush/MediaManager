@@ -18,6 +18,7 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.engine.CdiJunitTest;
 
+// FIXME This class stop unit test with intelliJ...
 @Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")
 public class ConfigurationProducerTest extends CdiJunitTest {
 

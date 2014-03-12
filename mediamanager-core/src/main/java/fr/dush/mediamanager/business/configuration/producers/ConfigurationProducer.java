@@ -179,13 +179,6 @@ public class ConfigurationProducer {
 
 	/**
 	 * Read and parse to {@link Field}s file in class path.
-	 *
-	 * @param config
-	 * @param file
-	 * @return
-	 * @throws IOException
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
 	 */
 	protected List<Field> readClasspathFile(String file) throws IOException, JsonParseException, JsonMappingException {
 		// Read file

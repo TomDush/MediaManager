@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.dush.mediamanager.dao.media.queries.Order;
+import fr.dush.mediamanager.dao.media.queries.PaginatedList;
 import fr.dush.mediamanager.dao.media.queries.SearchForm;
 import fr.dush.mediamanager.dao.media.queries.SearchLimit;
 import org.bson.types.ObjectId;
@@ -44,7 +45,7 @@ public interface IMovieDAO extends IDao<Movie, ObjectId> {
 	List<Movie> findBySourceId(SourceId... sourceIds);
 
     /** Search movies by multiple criteria */
-    List<Movie> search(SearchForm form, SearchLimit limit, Order... order);
+    PaginatedList<Movie> search(SearchForm form, SearchLimit limit, Order... order);
 
 	/**
 	 * Movies never seen yet.
