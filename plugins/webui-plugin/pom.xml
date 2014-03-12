@@ -54,6 +54,13 @@
             <artifactId>resteasy-jackson2-provider</artifactId>
             <version>3.0.5.Final</version>
         </dependency>
+
+        <!-- Bean mapping -->
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>5.4.0</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -220,6 +227,39 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Generate assertions -->
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+                <version>1.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-assertions</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--<packages>-->
+                        <!--<param>fr.dush.mediamanager.dao.media.queries</param>-->
+                    <!--</packages>-->
+                    <classes>
+                        <param>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</param>
+                        <param>fr.dush.mediacenters.modules.webui.rest.dto.Pagination</param>
+                        <param>fr.dush.mediamanager.dao.media.queries.SearchForm</param>
+                        <param>fr.dush.mediamanager.dao.media.queries.SearchLimit</param>
+                    </classes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>fr.dush</groupId>
+                        <artifactId>mediamanager-core</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
         </plugins>
 
         <pluginManagement>

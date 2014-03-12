@@ -27,7 +27,7 @@ public class MediaPage<T extends Media> implements Serializable {
     private int number = 0;
 
     /** Number of available elements */
-    private int size = 0;
+    private long size = 0;
 
     /** Elements */
     private List<T> elements = new ArrayList<>();

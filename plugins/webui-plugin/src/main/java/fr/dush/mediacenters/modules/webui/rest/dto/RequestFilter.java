@@ -2,6 +2,8 @@ package fr.dush.mediacenters.modules.webui.rest.dto;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
+import fr.dush.mediamanager.dao.media.queries.Order;
+import fr.dush.mediamanager.dao.media.queries.Seen;
 import lombok.Data;
 import org.jboss.resteasy.annotations.Form;
 

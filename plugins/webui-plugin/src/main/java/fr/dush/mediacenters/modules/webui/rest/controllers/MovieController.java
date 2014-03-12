@@ -1,11 +1,14 @@
 package fr.dush.mediacenters.modules.webui.rest.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.dush.mediacenters.modules.webui.rest.dto.MediaPage;
 import fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
+import fr.dush.mediamanager.dao.media.queries.PaginatedList;
+import fr.dush.mediamanager.dao.media.queries.SearchForm;
+import fr.dush.mediamanager.dao.media.queries.SearchLimit;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import org.bson.types.ObjectId;
+import org.dozer.Mapper;
 import org.jboss.resteasy.annotations.Form;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +18,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.net.HttpURLConnection;
-import java.util.Date;
-import java.util.List;
 
 @RequestScoped
 @Path("/")
@@ -27,13 +28,13 @@ public class MovieController {
     @Inject
     private IMovieDAO movieDAO;
 
+    /** Mapper bean to bean */
     @Inject
-    private ObjectMapper objectMapper;
+    private Mapper dozerMapper;
 
     @GET
     @Path("movies")
     public String home() {
-        LOGGER.info("Object mapper is : {}", objectMapper);
         return String.format("<h1>Welcome in REST Service</h1><p>There are <b>%d</b> movies in database.</p>",
                              movieDAO.findAll().size());
     }
@@ -44,10 +45,25 @@ public class MovieController {
     public MediaPage findMovies(@Form RequestFilter filter) {
         LOGGER.debug("Search movies with filter : {}", filter);
 
-        List<Movie> movies = movieDAO.findAll();
+        // Exec request
+        PaginatedList<Movie> movies = movieDAO.search(dozerMapper.map(filter, SearchForm.class),
+                                                      dozerMapper.map(filter, SearchLimit.class),
+                                                      filter.getOrder());
 
-        // FIXME : page number is false...
-        return new MediaPage(1, 20, movies.size() / 20 + 1, movies.size(), movies);
+        // Create request result
+        MediaPage mediaPage = new MediaPage(movies.getList());
+
+        if (filter.getPagination() != null) {
+            mediaPage.setPageSize(filter.getPagination().getPageSize());
+            mediaPage.setPage(filter.getPagination().getIndex());
+
+            int fix = movies.getMaxSize() % filter.getPagination().getPageSize() == 0 ? 0 : 1;
+            mediaPage.setNumber(fix + movies.getMaxSize() / filter.getPagination().getPageSize());
+        }
+
+        mediaPage.setSize(movies.getFullSize());
+
+        return mediaPage;
     }
 
     @GET
@@ -61,5 +77,4 @@ public class MovieController {
 
         throw new WebApplicationException(id + " not found...", HttpURLConnection.HTTP_NOT_FOUND);
     }
-
 }

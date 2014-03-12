@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <mapping>
+        <class-a>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</class-a>
+        <class-b>fr.dush.mediamanager.dao.media.queries.SearchForm</class-b>
+    </mapping>
+
+    <mapping>
+        <class-a>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</class-a>
+        <class-b>fr.dush.mediamanager.dao.media.queries.SearchLimit</class-b>
+        <field>
+            <a>pagination.index</a>
+            <b>index</b>
+        </field>
+        <field>
+            <a>pagination.pageSize</a>
+            <b>pageSize</b>
+        </field>
+        <field>
+            <a>size</a>
+            <b>maxSize</b>
+        </field>
+    </mapping>
+
+</mappings>
