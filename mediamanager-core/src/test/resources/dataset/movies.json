@@ -102,7 +102,8 @@
 			}
 			
 		],
-		"mainActors":[
+        "overview": "Unleash the power behind the armor.",
+        "mainActors":[
 			{
 				"sourceIds":[
 					{
@@ -171,6 +172,6 @@
 			{
 				"file":"/media/movies/star_trek.mp4"
 			}
-		],
-	}
+        ]
+    }
 ]

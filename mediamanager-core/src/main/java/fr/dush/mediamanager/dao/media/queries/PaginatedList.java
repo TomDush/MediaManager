@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +25,5 @@ public class PaginatedList<T> {
     private int maxSize = 0;
 
     /** Requested list */
-    private List<T> list;
-
+    private List<T> list = new ArrayList<>();
 }

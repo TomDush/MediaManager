@@ -33,6 +33,9 @@ public class SearchForm implements Serializable {
     /** Crew identifier from other site */
     private Set<SourceId> crewIds;
 
+    /** Expected not null or empty fields */
+    private Set<MediaField> notNullFields = new HashSet<>();
+
     public SearchForm(String title) {
         this.title = title;
     }

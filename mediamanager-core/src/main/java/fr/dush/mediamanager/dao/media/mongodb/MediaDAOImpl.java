@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * @author Thomas Duchatelle
  */
@@ -28,18 +27,19 @@ public class MediaDAOImpl implements IMediaDAO {
     public Set<String> findAllGenres() {
         MongoCollection movies = jongo.getCollection("Movies");
 
-        // "{ $unwind : '$genres' }").and(
-        //        "{ $group : {_id : 1, genres : {$addToSet : {$each : '$genres'}} } }"
-        List<List<String>> genres = movies.aggregate("{ $unwind : '$genres' }").and("{ $group : {_id : '1', " +
-                "genres : {$addToSet : '$genres'}} }").map(new ResultHandler<List<String>>() {
-            @Override
-            public List<String> map(DBObject dbObject) {
-                LOGGER.info("Map object : {} [class = {} )", dbObject, dbObject.get("genres").getClass());
-                return (List<String>) dbObject.get("genres");
-            }
-        });
+        List<List<String>> genres = movies.aggregate("{ $unwind : '$genres' }")
+                                          .and("{ $group : {_id : '1', " + "genres : {$addToSet : '$genres'}} }")
+                                          .map(new ResultHandler<List<String>>() {
+                                              @Override
+                                              public List<String> map(DBObject dbObject) {
+                                                  LOGGER.debug("Map object : {} [class = {} )",
+                                                               dbObject,
+                                                               dbObject.get("genres").getClass());
+                                                  return (List<String>) dbObject.get("genres");
+                                              }
+                                          });
 
-        LOGGER.info("Found genres : {}", genres);
+        LOGGER.debug("Found genres : {}", genres);
 
         if (genres == null || genres.isEmpty()) {
             LOGGER.error("Couldn't get genres list...");
