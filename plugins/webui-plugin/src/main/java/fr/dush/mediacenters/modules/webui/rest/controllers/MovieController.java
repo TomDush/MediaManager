@@ -43,7 +43,7 @@ public class MovieController {
     @Path("/movies/{order:\\w+}.json")
     @Produces(MediaType.APPLICATION_JSON)
     public MediaPage findMovies(@Form RequestFilter filter) {
-        LOGGER.debug("Search movies with filter : {}", filter);
+        LOGGER.info("Search movies with filter : {}", filter);
 
         // Exec request
         PaginatedList<Movie> movies = movieDAO.search(dozerMapper.map(filter, SearchForm.class),
@@ -53,16 +53,14 @@ public class MovieController {
         // Create request result
         MediaPage mediaPage = new MediaPage(movies.getList());
 
-        if (filter.getPagination() != null) {
+        if (filter.getPagination() != null && filter.getPagination().getIndex() > 0) {
             mediaPage.setPageSize(filter.getPagination().getPageSize());
             mediaPage.setPage(filter.getPagination().getIndex());
-
-            int fix = movies.getMaxSize() % filter.getPagination().getPageSize() == 0 ? 0 : 1;
-            mediaPage.setNumber(fix + movies.getMaxSize() / filter.getPagination().getPageSize());
         }
 
         mediaPage.setSize(movies.getFullSize());
 
+        LOGGER.debug("Return {} movies for request {}", mediaPage.getElements().size(), filter);
         return mediaPage;
     }
 

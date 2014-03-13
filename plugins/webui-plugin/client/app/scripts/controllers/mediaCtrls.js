@@ -69,22 +69,18 @@ angular.module('mediamanager').controller('ParentCtrl', function ($scope, $state
 
 });
 
-angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $stateParams) {
+angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $stateParams, $state) {
     // Ctrl request arguments
     $scope.request = null;
-    $scope.$watch("request", function (newRequest) {
-        if (newRequest != null) {
-            console.log("Refresh list with request : " + JSON.stringify(newRequest));
-            $scope.movies = Movie.list(compactObject(newRequest));
-        }
-    }, true);
+//    $scope.$watch("request", function (newRequest) {
+//       Event when request is changed...
+//    }, true);
 
     $scope.selectPage = function (page) {
-        if (!$scope.request.pagination) {
-            $scope.request.pagination = {page: page};
-        } else {
-            $scope.request.pagination.page = page;
-        }
+        $scope.request.index = page;
+
+//        console.log("Refresh list with request : " + JSON.stringify($scope.request));
+        $state.go("medias.list", {index: page});
     }
 
     // Initialize request params
@@ -92,8 +88,16 @@ angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $
         if (!$stateParams.media || convertToArray($stateParams.media).indexOf("movies") >= 0) {
             var request = angular.copy($stateParams);
             request.genres = convertToArray($stateParams.genres);
+            // Enable pagination
+            if (!request.index) {
+                request.index = 1;
+            }
 
             $scope.request = request;
+
+            console.log("Requesting : " + JSON.stringify(request));
+            $scope.movies = Movie.list(compactObject(request));
+
         } else {
             console.log("Must search something, but can't handle it... (must be shows)");
         }

@@ -11,5 +11,5 @@ angular.module('mediamanager').controller('MainCtrl', function ($scope, $state) 
 
 angular.module('mediamanager').controller('HomeCtrl', function ($scope, Movie) {
     $scope.lastMovies = Movie.last({ seen: 'UNSEEN', size: 15});
-    $scope.random = Movie.random({size: 10});
+    $scope.random = Movie.random({size: 10, notNullFields: "POSTER"});
 });

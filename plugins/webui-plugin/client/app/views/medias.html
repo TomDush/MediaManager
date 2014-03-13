@@ -1,26 +1,32 @@
 <h2 ng-show="movies && movies.elements.length > 0">Movies</h2>
 
+<!-- TODO Sort... -->
 
 <div ng-repeat="movie in movies.elements" class="media">
     <a ui-sref="medias.list({movieId : movie.id})" class="media-icon pull-left">
-        <img ng-src="{{movie.poster}}" ng-show="movie.poster" />
-        <div ng-hide="movie.poster" class="span1"> </div>
+        <img ng-src="{{movie.poster}}" ng-show="movie.poster"/>
+
+        <div ng-hide="movie.poster" class="span1"></div>
     </a>
+
     <div class="media-body">
         <span class="pull-right" ng-show="movie.voteAverage && movie.voteAverage > 0">{{movie.voteAverage |rate}}</span>
-        <h4 class="media-heading" ui-sref="medias.list({movieId : movie.id})" >
+        <h4 class="media-heading" ui-sref="medias.list({movieId : movie.id})">
             {{movie.title}} <span ng-show="movie.release">({{movie.release |date:'yyyy'}})</span>
         </h4>
         <ul class="unstyled">
-            <li><genres genres="movie.genres" /></li>
+            <li>
+                <genres genres="movie.genres"/>
+            </li>
         </ul>
     </div>
 </div>
 
 <div ng-show="movies.page > 0">
-    <pagination total-items="movies.size" page="movies.page" on-select-page="selectPage(page)" />
+    <pagination total-items="movies.size" page="movies.page" items-per-page="movies.pageSize"
+                on-select-page="selectPage(page)"/>
 </div>
-<div ng-show="movies.page == 0 && movies.size > 0 && ! movies.pageSize" style="margin: 20px 0px;">
+<div ng-show="movies.page == 0 && movies.size > 0" style="margin: 20px 0px;">
     There are <a ui-sref="medias.list({media: ['movies'], genres: null, title:null})">{{movies.size}} other movies</a>...
 </div>
 
