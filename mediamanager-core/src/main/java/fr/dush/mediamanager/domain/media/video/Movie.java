@@ -3,8 +3,8 @@ package fr.dush.mediamanager.domain.media.video;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import fr.dush.mediamanager.annotations.mapping.DBCollection;
 import fr.dush.mediamanager.annotations.mapping.AddToSet;
+import fr.dush.mediamanager.annotations.mapping.DBCollection;
 import fr.dush.mediamanager.domain.media.Media;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +35,9 @@ public class Movie extends Media {
 
     /** Release date */
     private Date release;
+
+    /** Brief overview */
+    private String tagline;
 
     /** Movie overview */
     private String overview;
@@ -93,8 +96,13 @@ public class Movie extends Media {
         sb.append("\n");
 
         if (null != collection) {
-            sb.append("Belong to collection : ").append(collection.getTitle()).append(", part ").append(collection.getPart()).append(" of ").append
-                    (collection.getTotalPart()).append("\n");
+            sb.append("Belong to collection : ")
+              .append(collection.getTitle())
+              .append(", part ")
+              .append(collection.getPart())
+              .append(" of ")
+              .append(collection.getTotalPart())
+              .append("\n");
         }
         sb.append("Genres : ").append(Joiner.on(", ").join(genres)).append("\n");
         if (null != overview) {
@@ -108,7 +116,9 @@ public class Movie extends Media {
         }
         if (null != trailers) {
             if (trailers.getTrailers().isEmpty()) {
-                sb.append("No trailers, refreshed on ").append(formatter.format(trailers.getRefreshed())).append(") : \n");
+                sb.append("No trailers, refreshed on ")
+                  .append(formatter.format(trailers.getRefreshed()))
+                  .append(") : \n");
             } else {
                 sb.append("Trailers (refreshed on ").append(trailers.getRefreshed()).append(") : \n");
                 for (Trailer t : trailers.getTrailers()) {
