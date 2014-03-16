@@ -83,6 +83,13 @@ angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $
         $state.go("medias.list", {index: page});
     }
 
+    $scope.noPoster = "/img/no-poster-w92.jpg";
+    $scope.resolvePoster = function (img) {
+        if (img /*&& img != ''*/) return img;
+
+        return $scope.noPoster;
+    }
+
     // Initialize request params
     if ($stateParams.genres || $stateParams.title || $stateParams.media) {
         if (!$stateParams.media || convertToArray($stateParams.media).indexOf("movies") >= 0) {
@@ -124,6 +131,13 @@ angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, 
     $scope.loading = function () {
         return $scope.movieId != null && $scope.movie == undefined;
     };
+
+    $scope.noProfile = "/img/no-profile-w45.jpg";
+    $scope.resolveProfile = function (img) {
+        if (img && img != '') return img;
+
+        return $scope.noProfile;
+    }
 
     $scope.$watch('movieId', function (oldValue, newValue) {
         if (newValue) {

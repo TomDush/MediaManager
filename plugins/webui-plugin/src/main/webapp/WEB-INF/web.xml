@@ -67,15 +67,19 @@
 
     <servlet-mapping>
         <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/posters/*</url-pattern>
+        <url-pattern>/poster/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/backdrops/*</url-pattern>
+        <url-pattern>/backdrop/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/actors/*</url-pattern>
+        <url-pattern>/actor/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ImagesServlet</servlet-name>
+        <url-pattern>/other/*</url-pattern>
     </servlet-mapping>
 
 

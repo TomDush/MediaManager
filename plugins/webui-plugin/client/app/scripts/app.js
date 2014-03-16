@@ -79,4 +79,13 @@ angular.module('mediamanager', ['ui.router', 'ui.bootstrap', 'mediaServices' ]).
                 scope.$watch('list', setupHandler, true);
             }
         };
+    })
+    .directive('errSrc', function () {
+        return {
+            link: function (scope, element, attrs) {
+                element.bind('error', function () {
+                    element.attr('src', attrs.errSrc);
+                });
+            }
+        }
     });

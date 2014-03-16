@@ -3,8 +3,7 @@ package fr.dush.mediacenters.modules.enrich.moviesdb;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import fr.dush.mediamanager.tools.RetryApi;
 
 import javax.enterprise.inject.Alternative;
 import java.util.List;
@@ -15,10 +14,6 @@ import java.util.List;
  */
 @Alternative
 public class TheMovieDBRetryDecorator extends TheMovieDbApi {
-
-    public static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBRetryDecorator.class);
-
-    public static final int MAX_TRY = 5;
 
     private TheMovieDbApi theMovieDbApi;
 
@@ -34,7 +29,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public MovieDb getMovieInfo(final int movieId, final String language) throws MovieDbException {
 
-        return retry(new MethodWithReturn<MovieDb>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
             @Override
             public MovieDb doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieInfo(movieId, language);
@@ -44,7 +39,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public MovieDb getMovieInfoImdb(final String imdbId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<MovieDb>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
             @Override
             public MovieDb doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieInfoImdb(imdbId, language);
@@ -55,7 +50,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public List<AlternativeTitle> getMovieAlternativeTitles(final int movieId,
                                                             final String country) throws MovieDbException {
-        return retry(new MethodWithReturn<List<AlternativeTitle>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<AlternativeTitle>>() {
             @Override
             public List<AlternativeTitle> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieAlternativeTitles(movieId, country);
@@ -65,7 +60,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Person> getMovieCasts(final int movieId) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Person>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Person>>() {
             @Override
             public List<Person> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieCasts(movieId);
@@ -75,7 +70,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Artwork> getMovieImages(final int movieId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Artwork>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
             @Override
             public List<Artwork> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieImages(movieId, language);
@@ -85,7 +80,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Keyword> getMovieKeywords(final int movieId) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Keyword>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Keyword>>() {
             @Override
             public List<Keyword> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieKeywords(movieId);
@@ -95,7 +90,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<ReleaseInfo> getMovieReleaseInfo(final int movieId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<List<ReleaseInfo>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<ReleaseInfo>>() {
             @Override
             public List<ReleaseInfo> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieReleaseInfo(movieId, language);
@@ -105,7 +100,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Trailer> getMovieTrailers(final int movieId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Trailer>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Trailer>>() {
             @Override
             public List<Trailer> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieTrailers(movieId, language);
@@ -115,7 +110,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Translation> getMovieTranslations(final int movieId) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Translation>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Translation>>() {
             @Override
             public List<Translation> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieTranslations(movieId);
@@ -126,7 +121,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public List<MovieDb> getSimilarMovies(final int movieId, final String language,
                                           final int page) throws MovieDbException {
-        return retry(new MethodWithReturn<List<MovieDb>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieDb>>() {
             @Override
             public List<MovieDb> doIt() throws MovieDbException {
                 return theMovieDbApi.getSimilarMovies(movieId, language, page);
@@ -137,7 +132,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public List<MovieList> getMovieLists(final int movieId, final String language,
                                          final int page) throws MovieDbException {
-        return retry(new MethodWithReturn<List<MovieList>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieList>>() {
             @Override
             public List<MovieList> doIt() throws MovieDbException {
                 return theMovieDbApi.getMovieLists(movieId, language, page);
@@ -147,7 +142,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public MovieDb getLatestMovie() throws MovieDbException {
-        return retry(new MethodWithReturn<MovieDb>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
             @Override
             public MovieDb doIt() throws MovieDbException {
                 return theMovieDbApi.getLatestMovie();
@@ -157,7 +152,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public CollectionInfo getCollectionInfo(final int collectionId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<CollectionInfo>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<CollectionInfo>() {
             @Override
             public CollectionInfo doIt() throws MovieDbException {
                 return theMovieDbApi.getCollectionInfo(collectionId, language);
@@ -167,7 +162,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Artwork> getCollectionImages(final int collectionId, final String language) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Artwork>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
             @Override
             public List<Artwork> doIt() throws MovieDbException {
                 return theMovieDbApi.getCollectionImages(collectionId, language);
@@ -177,7 +172,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public Person getPersonInfo(final int personId) throws MovieDbException {
-        return retry(new MethodWithReturn<Person>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<Person>() {
             @Override
             public Person doIt() throws MovieDbException {
                 return theMovieDbApi.getPersonInfo(personId);
@@ -187,7 +182,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     @Override
     public List<Artwork> getPersonImages(final int personId) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Artwork>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
             @Override
             public List<Artwork> doIt() throws MovieDbException {
                 return theMovieDbApi.getPersonImages(personId);
@@ -198,7 +193,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public List<MovieDb> searchMovie(final String movieName, final int searchYear, final String language,
                                      final boolean includeAdult, final int page) throws MovieDbException {
-        return retry(new MethodWithReturn<List<MovieDb>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieDb>>() {
             @Override
             public List<MovieDb> doIt() throws MovieDbException {
                 return theMovieDbApi.searchMovie(movieName, searchYear, language, includeAdult, page);
@@ -209,7 +204,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     @Override
     public List<Collection> searchCollection(final String query, final String language,
                                              final int page) throws MovieDbException {
-        return retry(new MethodWithReturn<List<Collection>>() {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Collection>>() {
             @Override
             public List<Collection> doIt() throws MovieDbException {
                 return theMovieDbApi.searchCollection(query, language, page);
@@ -217,32 +212,4 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
         });
     }
 
-    public <T> T retry(MethodWithReturn<T> methodWithReturn) throws MovieDbException {
-        int n = 0;
-        Exception exception = null;
-
-        try {
-
-            while (n++ < MAX_TRY) {
-                try {
-                    // Try to do it and accept 5 fails
-                    return methodWithReturn.doIt();
-                } catch (Exception e) {
-                    LOGGER.warn("Error occurred: {}... Will retrying", e.getMessage());
-                    exception = e;
-
-                    Thread.sleep(5000);
-                }
-            }
-        } catch (InterruptedException e1) {
-            LOGGER.debug("Do not retry any more...", e1.getMessage());
-        }
-
-        throw new RuntimeException("Could not get information even after retrying {} times.", exception);
-    }
-
-    public interface MethodWithReturn<T> {
-
-        T doIt() throws MovieDbException;
-    }
 }

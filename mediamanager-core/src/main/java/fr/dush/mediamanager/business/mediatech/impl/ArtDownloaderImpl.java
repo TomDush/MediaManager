@@ -1,202 +1,193 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
-import static com.google.common.io.Files.*;
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.google.common.hash.Hashing;
+import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Startup;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.business.mediatech.ArtRepository;
+import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import fr.dush.mediamanager.domain.media.art.Art;
+import fr.dush.mediamanager.domain.media.art.ArtQuality;
+import fr.dush.mediamanager.domain.media.art.ArtType;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.axet.vget.VGet;
-import com.google.common.hash.Hashing;
-
-import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.Startup;
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.business.mediatech.ImageType;
-import fr.dush.mediamanager.exceptions.ConfigurationException;
+import static com.google.common.io.Files.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 @ApplicationScoped
 @Startup
 public class ArtDownloaderImpl implements IArtDownloader {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
 
-	@Inject
-	@Configuration(name = "Mediatech", definition = "configuration/mediatech.json")
-	private ModuleConfiguration configuration;
+    @Inject
+    @Configuration(name = "Mediatech", definition = "configuration/mediatech.json")
+    private ModuleConfiguration configuration;
 
-	private Path temp;
+    private Path temp;
 
-	private Path imageRootPath;
+    private Path imageRootPath;
 
-	private Path trailersRootPath;
+    /**
+     * Read the configuration once.
+     */
+    @PostConstruct
+    public void readConfiguration() {
+        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
 
-	/**
-	 * Read the configuration once.
-	 *
-	 * @throws IOException
-	 */
-	@PostConstruct
-	public void readConfiguration() {
-		imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
-		trailersRootPath = Paths.get(configuration.readValue("downloader.trailerpath"));
+        try {
+            temp = Files.createTempDirectory("MM_Downloader");
+        } catch (IOException e) {
+            throw new ConfigurationException("Can't create new temporary directory.", e);
+        }
 
-		try {
-			temp = Files.createTempDirectory("MM_Downloader");
-		} catch (IOException e) {
-			throw new ConfigurationException("Can't create new temporary directory.", e);
-		}
+        LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; temp = {}", imageRootPath, temp);
 
-		LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; trailerpath = {} ; temp = {}", imageRootPath, trailersRootPath, temp);
+        imageRootPath.toFile().mkdirs();
+        for (ArtType t : ArtType.values()) {
+            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
+        }
+        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
+    }
 
-		imageRootPath.toFile().mkdirs();
-		for (ImageType t : ImageType.values()) {
-			imageRootPath.resolve(getPath(t)).toFile().mkdirs();
-		}
-		imageRootPath.resolve(getPath(null)).toFile().mkdirs();
-		trailersRootPath.toFile().mkdirs();
-	}
+    @Override
+    public boolean readImage(Art art, ArtQuality artQuality, OutputStream outputStream) throws IOException {
+        Path artPath = resolveLocalPath(art, artQuality);
 
-	@Override
-	public String storeImage(ImageType imageType, URL url, String basename) {
-		try {
-			// Download to temporary directory
-			final Path tempFile = createNewTempPath();
-			Files.copy(url.openStream(), tempFile);
-			LOGGER.debug("{} donwloaded into {}", url, tempFile);
+        if (artPath != null) {
+            // If it found, copy file to output stream
+            Files.copy(artPath, outputStream);
+            return true;
+        }
 
-			// Move to real directory if not already existing, rename it with hash
-			final Path downloadedFile = imageRootPath.resolve(getPath(imageType)).resolve(
-					newFinalName(tempFile.toFile(), escape(basename), getFileExtension(url.getFile())));
+        return false;
+    }
 
-			if (!downloadedFile.toFile().exists()) {
-				LOGGER.debug("{} moved into {}", url, downloadedFile);
-				Files.move(tempFile, downloadedFile);
-			}
+    @Override
+    public void downloadArt(ArtRepository artRepository, Art art, ArtQuality... qualities) throws IOException {
+        // Check if file doesn't already exist for this quality...
+        for (ArtQuality quality : qualities) {
+            Path path = resolveLocalPath(art, quality);
+            if (path == null) {
 
-			// Return relative and normalized file path to be use in web url
-			return getWebRelativeUrl(downloadedFile);
+                // Download file to temporary file
+                final Path tempFile = createNewTempPath();
+                if (artRepository.readImage(art.getRef(), quality, new FileOutputStream(tempFile.toFile()))) {
 
-		} catch (IOException e) {
-			LOGGER.error("Error while downloading file {}.", url, e);
-			return null;
-		}
+                    // Move to real directory if not already existing, rename it with hash
+                    final Path downloadedFile = imageRootPath.resolve(getPath(art.getType()))
+                                                             .resolve(newFinalName(tempFile.toFile(),
+                                                                                   escape(art.getShortDescription()),
+                                                                                   getFileExtension(art.getRef())));
 
-	}
+                    if (!downloadedFile.toFile().exists()) {
+                        LOGGER.debug("{} moved into {}", art.getRef(), downloadedFile);
+                        Files.move(tempFile, downloadedFile);
 
-	/**
-	 * Remove all non authorized chars.
-	 *
-	 * @param basename
-	 * @return
-	 */
-	private String escape(String basename) {
-		return basename.replaceAll("\\W", "_").replaceAll("_+", "_");
-	}
+                    } else {
+                        LOGGER.warn("The file {} has been downloaded 2 times! [art: {}]", downloadedFile, art);
+                    }
 
-	private String getWebRelativeUrl(final Path downloadedFile) {
-		return imageRootPath.relativize(downloadedFile).toString().replace("\\", "/");
-	}
+                    // Fill art
+                    art.getDownloadedFiles().put(quality, getWebRelativeUrl(downloadedFile));
+                }
+            }
+        }
 
-	private String getPath(ImageType imageType) {
-		if (imageType == null) {
-			return getPath(ImageType.OTHER);
-		}
+    }
 
-		return imageType.toString().toLowerCase() + "s";
-	}
+    private Path resolveLocalPath(Art art, ArtQuality artQuality) {
+        String fileName = art.getDownloadedFiles().get(artQuality);
 
-	/**
-	 * Generate unique temporary file path.
-	 *
-	 * @return
-	 */
-	protected Path createNewTempPath() {
-		return temp.resolve(Long.toString(System.currentTimeMillis()));
-	}
+        if (isNotEmpty(fileName)) {
+            Path path = imageRootPath.resolve(fileName);
+            if (path.toFile().isFile()) {
+                return path;
+            }
+        }
 
-	@Override
-	public Path getImagePath(String relativePath) {
-		return imageRootPath.resolve(relativePath);
-	}
+        return null;
+    }
 
-	@Override
-	public String storeTrailer(URL trailer, String basename) {
-		try {
-			// Download trailer into temporary directory, use default filename
-			VGet vget = new VGet(trailer, temp.toFile());
-			vget.download();
-			final File originalName = vget.getTarget();
-			LOGGER.info("{} downloaded into : {}", trailer, originalName);
+    private String getWebRelativeUrl(final Path downloadedFile) {
+        return imageRootPath.relativize(downloadedFile).toString().replace("\\", "/");
+    }
 
-			// Move trailer to real directory
-			final Path finalPath = trailersRootPath.resolve(newFinalName(originalName, basename, null));
-			if (!finalPath.toFile().exists()) {
-				Files.move(originalName.toPath(), finalPath);
-			}
+    /**
+     * Generate unique temporary file path.
+     */
+    private Path createNewTempPath() {
+        return temp.resolve(Long.toString(System.currentTimeMillis()));
+    }
 
-			return trailersRootPath.relativize(finalPath).toString();
+    /**
+     * Remove all non authorized chars.
+     */
+    private static String escape(String basename) {
+        if (isEmpty(basename)) {
+            return "";
+        }
 
-		} catch (IOException e) {
-			LOGGER.error("Can't donwload trailer {}.", trailer, e);
-			return null;
-		}
-	}
+        return basename.replaceAll("\\W", "_").replaceAll("_+", "_");
+    }
 
-	/**
-	 * Generate file name with file hash
-	 *
-	 * @param file File to hash
-	 * @param basename Base name to use (if it's blank, use simplified file's basename)
-	 * @param extension Extension to use, if it's blank, use file's extension.
-	 * @return File name with hash to avoid overwrite on existing files with same name but not same content.
-	 * @throws IOException
-	 */
-	private static String newFinalName(final File file, String basename, String extension) throws IOException {
-		final StringBuffer sb = new StringBuffer();
+    private static String getPath(ArtType artType) {
+        if (artType == null) {
+            return getPath(ArtType.OTHER);
+        }
 
-		if (isNotBlank(basename)) {
-			sb.append(getSimpleFileName(basename));
-		} else {
-			sb.append(getSimpleFileName(file.toString()));
-		}
-		sb.append("_").append(hash(file, Hashing.sha1())).append(".");
-		if (isNotBlank(extension)) {
-			sb.append(extension);
-		} else {
-			sb.append(getFileExtension(file.toString()));
-		}
+        return artType.toString().toLowerCase() + "s";
+    }
 
-		return sb.toString();
-	}
+    /**
+     * Generate file name with file hash
+     *
+     * @param file      File to hash
+     * @param basename  Base name to use (if it's blank, use simplified file's basename)
+     * @param extension Extension to use, if it's blank, use file's extension.
+     * @return File name with hash to avoid overwrite on existing files with same name but not same content.
+     */
+    private static String newFinalName(final File file, String basename, String extension) throws IOException {
+        final StringBuffer sb = new StringBuffer();
 
-	/**
-	 * Get file name without extension, brackets, dash and point.
-	 *
-	 * @param filePath
-	 * @return
-	 */
-	public static String getSimpleFileName(final String filePath) {
-		final String filename = getNameWithoutExtension(filePath);
+        if (isNotBlank(basename)) {
+            sb.append(getSimpleFileName(basename));
+        } else {
+            sb.append(getSimpleFileName(file.toString()));
+        }
+        sb.append("_").append(hash(file, Hashing.sha1())).append(".");
+        if (isNotBlank(extension)) {
+            sb.append(extension);
+        } else {
+            sb.append(getFileExtension(file.toString()));
+        }
 
-		return filename.replaceAll("\\(.*\\)", "").replaceAll("[ -.]", "_").replaceAll("_+", "_").replaceAll("^_|_$", "");
-	}
+        return sb.toString();
+    }
 
-	@Override
-	public Path getTrailerPath(String relativePath) {
-		return trailersRootPath.resolve(relativePath);
-	}
+    /**
+     * Get file name without extension, brackets, dash and point.
+     */
+    public static String getSimpleFileName(final String filePath) {
+        final String filename = getNameWithoutExtension(filePath);
+
+        return filename.replaceAll("\\(.*\\)", "")
+                       .replaceAll("[ -.]", "_")
+                       .replaceAll("_+", "_")
+                       .replaceAll("^_|_$", "");
+    }
 
 }

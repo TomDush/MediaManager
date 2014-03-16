@@ -10,7 +10,9 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.art.ArtQuality;
 import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.media.video.Person;
 import fr.dush.mediamanager.domain.media.video.VideoFile;
 import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
@@ -104,7 +106,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
     @Override
     protected Collection<? extends MoviesParsedName> scanDirectory(Path root) {
-        final HashSet<MoviesParsedName> movies = new HashSet<MoviesParsedName>();
+        final HashSet<MoviesParsedName> movies = new HashSet<>();
         appendScanningFile(root.toFile(), movies);
 
         return movies;
@@ -130,22 +132,39 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
                 chosenMovie = newEmptyMovie(file);
             } else {
                 chosenMovie = movies.get(0);
+
+                // Finish to get meta data (if
+                enricher.enrichMedia(chosenMovie);
+
+                // Download elements
+                if (isNotEmpty(chosenMovie.getPoster())) {
+                    addToDownloadList(chosenMovie.getPoster(),
+                                      new ArtQuality[]{ArtQuality.MINI, ArtQuality.THUMBS, ArtQuality.DISPLAY});
+                    for (Person p : chosenMovie.getMainActors()) {
+                        addToDownloadList(p.getPicture(), ArtQuality.MINI);
+                    }
+                    for (Person p : chosenMovie.getDirectors()) {
+                        addToDownloadList(p.getPicture(), ArtQuality.MINI);
+                    }
+                }
             }
 
             // Add video information
             chosenMovie.getVideoFiles().add(file.getVideoFile());
 
-            // Finish to get meta data
-            if (!movies.isEmpty()) {
-                enricher.enrichMedia(chosenMovie);
-            }
-
             return chosenMovie;
+
         } catch (EnrichException e) {
             LOGGER.error("Enrichement fail on file {} (movie : {}).", file, file.getMovieName(), e);
         }
 
         return null;
+    }
+
+    private void addToDownloadList(String artRef, ArtQuality... artQualities) {
+        if (isNotEmpty(artRef)) {
+            getDownloader().append(artRef, artQualities);
+        }
     }
 
     @Override

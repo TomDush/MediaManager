@@ -60,6 +60,7 @@ public class MovieController {
 
         mediaPage.setSize(movies.getFullSize());
 
+        // TODO Disable pagination if all movies has been found.
         LOGGER.debug("Return {} movies for request {}", mediaPage.getElements().size(), filter);
         return mediaPage;
     }

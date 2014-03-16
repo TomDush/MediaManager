@@ -1,82 +1,73 @@
 package fr.dush.mediacenters.modules.enrich;
 
-import static org.fest.assertions.api.Assertions.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.net.URL;
-import java.util.List;
-
+import com.omertron.themoviedbapi.MovieDbException;
+import com.omertron.themoviedbapi.TheMovieDbApi;
+import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.scan.MoviesParsedName;
+import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.omertron.themoviedbapi.MovieDbException;
-import com.omertron.themoviedbapi.TheMovieDbApi;
+import java.util.List;
 
-import fr.dush.mediacenters.modules.enrich.moviesdb.TheMovieDBProvider;
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.business.mediatech.ImageType;
-import fr.dush.mediamanager.domain.configuration.FieldSet;
-import fr.dush.mediamanager.domain.media.video.Movie;
-import fr.dush.mediamanager.domain.scan.MoviesParsedName;
-import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
+import static org.fest.assertions.api.Assertions.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TheMovieDbEnricherTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricherTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricherTest.class);
 
-	@InjectMocks
-	private TheMovieDbEnricher enrichMedia;
+    @InjectMocks
+    private TheMovieDbEnricher enrichMedia;
 
-	@Spy
-	private TheMovieDbApi api;
+    @Spy
+    private TheMovieDbApi api;
 
-	@Mock
-	private IArtDownloader metaMediaManager;
+    @Before
+    public void initTest() throws MovieDbException {
+        final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
+        theMovieDBProvider.setConfiguration(new ModuleConfiguration(null, new FieldSet()));
+        api = theMovieDBProvider.provideTheMovieDbApi();
 
-	@Before
-	public void initTest() throws MovieDbException {
-		final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
-		theMovieDBProvider.setConfiguration(new ModuleConfiguration(null, new FieldSet()));
-		api = theMovieDBProvider.provideTheMovieDbApi();
+        MockitoAnnotations.initMocks(this);
 
-		MockitoAnnotations.initMocks(this);
+    }
 
-		when(metaMediaManager.storeImage(any(ImageType.class), any(URL.class), anyString())).thenAnswer(new Answer<String>() {
+    @Test
+    public void testFindFilmData() throws Exception {
+        final List<Movie> list = enrichMedia.findMediaData(new MoviesParsedName(null, "Transformers", 2007));
+        assertThat(list).isNotEmpty();
 
-			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
-				return invocation.getArguments()[1].toString();
-			}
-		});
-	}
+        for (Movie f : list) {
+            enrichMedia.enrichMedia(f);
+            enrichMedia.completeTrailers(new FindTrailersEvent(this, f, "en"));
 
-	@Test
-	public void testFindFilmData() throws Exception {
-		final List<Movie> list = enrichMedia.findMediaData(new MoviesParsedName(null, "Transformers", 2007));
-		assertThat(list).isNotEmpty();
+            LOGGER.info("\n{}", f.prettyPrint(null));
+            //			LOGGER.info("Trailers : {}", enrichMedia.findTrailers(f, "en"));
+        }
 
-		for (Movie f : list) {
-			enrichMedia.enrichMedia(f);
-			enrichMedia.completeTrailers(new FindTrailersEvent(this, f, "en"));
+        // Now, try to download arts...
+        Movie transformer = list.get(0);
+        TheMovieDBArtUrl url = new TheMovieDBArtUrl(transformer.getPoster());
+        LOGGER.info("Art key = [{}]", url.getPath());
+        printUrl(url, "original");
+        printUrl(url, "w92");
+        printUrl(url, "w185");
 
+    }
 
-			LOGGER.info("\n{}", f.prettyPrint(null));
-//			LOGGER.info("Trailers : {}", enrichMedia.findTrailers(f, "en"));
-		}
-
-	}
+    private void printUrl(TheMovieDBArtUrl url, String size) throws MovieDbException {
+        LOGGER.info("\t- {}: {}", size, api.createImageUrl(url.getPath(), size));
+    }
 
 }

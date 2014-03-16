@@ -6,48 +6,66 @@
 </div>
 <div class="container-fluid sheet" ng-show="movie.title">
 
-	<div class="row-fluid">
-		<div class="span4 poster" ng-show="movie.poster">
-            <img alt="{{movie.title}}" ng-src="/{{movie.poster}}" />
-		</div>
+    <div class="row-fluid">
+        <div class="span4 poster" ng-show="movie.poster">
+            <img alt="{{movie.title}}?size=THUMBS" ng-src="/{{movie.poster}}" />
+        </div>
         <div class="" ng-class="{span12 : !movie.poster, span8: movie.poster}">
             <h1><span class="pull-right title-date">{{movie.release |date:'yyyy'}}</span>{{movie.title}}</h1>
+
             <div class="tagline">{{movie.tagline}}</div>
 
             <ul class="unstyled">
-                <li class="parent-hover">Genres : <genres genres="movie.genres"></genres></li> <!--{{movie.genres}}-->
+                <li class="parent-hover">Genres :
+                    <genres genres="movie.genres"></genres>
+                </li>
+                <!--{{movie.genres}}-->
                 <li>Note : {{movie.voteAverage |rate:movie.voteNumber}}</li>
-                <li>Director(s) : <span ng-repeat="d in movie.directors"><a href="/search/crew/{{d.name}}">{{d.name}}</a> </span></li>
+                <li>Director(s) : <span ng-repeat="d in movie.directors"><a
+                        href="/search/crew/{{d.name}}">{{d.name}}</a> </span></li>
             </ul>
 
             <!-- Action buttons -->
             <div class="actionsButton">
-                <a ng-click="resume()" class="btn btn-primary"><i class="icon-film icon-white" ></i> Resume</a>
-                <a ng-click="play()" class="btn btn-primary"><i class="icon-play icon-white" ></i> Play</a>
+                <a ng-click="resume()" class="btn btn-primary"><i class="icon-film icon-white"></i> Resume</a> <a
+                    ng-click="play()" class="btn btn-primary"><i class="icon-play icon-white"></i> Play</a>
 
             </div>
         </div>
-	</div>
-	<div class="row-fluid">
+    </div>
+    <div class="row-fluid">
         <h2>Overview</h2>
+
         <p>{{movie.overview}}</p>
     </div>
 
     <h2>Cast</h2>
-    <ul class="crew-list unstyled">
-        <li ng-repeat="c in movie.mainActors">
-            <img ng-src="/{{c.picture}}" alt="{{c.name}}" class="pull-left"/>
-            <span>{{c.name}}</span>
-        </li>
-    </ul>
+
+    <div class="row-fluid">
+        <div class="span2" ng-repeat="c in movie.mainActors">
+            <div class="thumbnail">
+                <img ng-src="/{{resolveProfile(c.picture)}}?size=MINI" err-src="{{noProfile}}" alt="{{c.name}}" />
+
+                <div class="caption">
+                    {{c.name}}
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div style="clear:both" />
 
-    <h2>Trailers</h2>
-    <p>TODO</p>
+    <h2 ng-show="movie.trailers.trailers">Trailers</h2>
+
+    <ul>
+        <li ng-repeat="t in movie.trailers.trailers"><a href="{{t.url}}">{{t.title}} [{{t.quality}}]</a></li>
+    </ul>
 
     <h2>Backdrops</h2>
-    <img ng-src="/{{backdrop}}" ng-repeat="backdrop in movie.backdrops" />
+
+    <div class="row-fluid">
+        <img ng-src="/{{backdrop}}?size=MINI" ng-repeat="backdrop in movie.backdrops" style="text-align: center;" />
+    </div>
 
 </div>
 
