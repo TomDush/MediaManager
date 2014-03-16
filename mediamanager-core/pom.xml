@@ -56,4 +56,34 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+
+            <!-- Generate assertions -->
+            <plugin>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+                <version>1.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate-assertions</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packages>
+                        <param>fr.dush.mediamanager.domain.media.art</param>
+                    </packages>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>fr.dush</groupId>
+                        <artifactId>mediamanager-core</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>

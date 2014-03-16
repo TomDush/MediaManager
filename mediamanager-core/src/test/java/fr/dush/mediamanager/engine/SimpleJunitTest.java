@@ -8,9 +8,9 @@ import org.mockito.MockitoAnnotations;
 @RunWith(BlockJUnit4ClassRunner.class)
 public abstract class SimpleJunitTest {
 
-	@Before
-	public void initMock() {
-		MockitoAnnotations.initMocks(this);
-	}
+    @Before
+    public void initMockito() {
+        MockitoAnnotations.initMocks(this);
+    }
 
 }

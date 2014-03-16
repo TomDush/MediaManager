@@ -9,11 +9,10 @@ import com.omertron.themoviedbapi.model.Genre;
 import com.omertron.themoviedbapi.model.MovieDb;
 import com.omertron.themoviedbapi.model.Trailer;
 import fr.dush.mediamanager.annotations.Module;
-import fr.dush.mediamanager.business.mediatech.IArtDownloader;
-import fr.dush.mediamanager.business.mediatech.ImageType;
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.SourceId;
 import fr.dush.mediamanager.domain.media.Sources;
+import fr.dush.mediamanager.domain.media.art.ArtType;
 import fr.dush.mediamanager.domain.media.video.BelongToCollection;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.media.video.MoviesCollection;
@@ -49,7 +48,7 @@ import static org.apache.commons.lang3.StringUtils.*;
         description = "Find data on movies and shows with http://www.themoviedb.org/")
 public class TheMovieDbEnricher implements IMoviesEnricher {
 
-    public static final String MOVIEDB_ID_TYPE = "moviedb";
+    public static final String MOVIEDB_ID_TYPE = "themoviedb";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricher.class);
 
@@ -57,9 +56,6 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
     @Inject
     private TheMovieDbApi api;
-
-    @Inject
-    private IArtDownloader downloader;
 
     @Override
     public List<Movie> findMediaData(MoviesParsedName filename) throws EnrichException {
@@ -145,12 +141,12 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             MoviesCollection collection = new MoviesCollection();
             collection.getMediaIds().addId(createId(info.getId()));
             collection.setCreation(new Date());
-            collection.setPoster(downloadImage(ImageType.POSTER,
-                                               info.getPosterPath(),
-                                               collection.getTitle() + "_poster"));
-            collection.setBackdrop(downloadImage(ImageType.BACKDROP,
-                                                 info.getBackdropPath(),
-                                                 collection.getTitle() + "_backdrop"));
+            collection.setPoster(generateArtUrl(ArtType.POSTER,
+                                                info.getPosterPath(),
+                                                collection.getTitle() + "_poster"));
+            collection.setBackdrop(generateArtUrl(ArtType.BACKDROP,
+                                                  info.getBackdropPath(),
+                                                  collection.getTitle() + "_backdrop"));
 
             // List of movies
             collection.setMovies(Lists.transform(info.getParts(), movieCollectionConverter));
@@ -163,12 +159,11 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
         }
     }
 
-    public String downloadImage(ImageType imageType, String imagePath, String baseName) throws MovieDbException {
-        if (isNotEmpty(imagePath)) {
-            return downloader.storeImage(imageType, api.createImageUrl(imagePath, "original"), baseName);
-        }
-
-        return null;
+    /**
+     * Generate an URL for a given art type and path.
+     */
+    public String generateArtUrl(ArtType type, String path, String description) {
+        return new TheMovieDBArtUrl(type, path, description).getRef();
     }
 
     /**
@@ -205,7 +200,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             }
             movie.setTagline(movieDb.getTagline());
             movie.setOverview(movieDb.getOverview());
-            movie.getBackdrops().add(downloadImage(ImageType.BACKDROP, movieDb.getBackdropPath(), movieDb.getTitle()));
+            movie.getBackdrops().add(generateArtUrl(ArtType.BACKDROP, movieDb.getBackdropPath(), movieDb.getTitle()));
             movie.setVoteAverage(movieDb.getVoteAverage() / 10);
 
             // Find main actors...
@@ -256,11 +251,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             }
 
             // Posters, ....
-            try {
-                movie.setPoster(downloadImage(ImageType.POSTER, movieDb.getPosterPath(), movieDb.getTitle()));
-            } catch (MovieDbException e) {
-                LOGGER.warn("Can't download file {} : {}", movieDb.getPosterPath(), e.getMessage(), e);
-            }
+            movie.setPoster(generateArtUrl(ArtType.POSTER, movieDb.getPosterPath(), movieDb.getTitle()));
 
             return movie;
         }
@@ -289,13 +280,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
                     }
 
                     // Posters, ....
-                    try {
-                        movie.setPoster(downloadImage(ImageType.POSTER,
-                                                      collection.getPosterPath(),
-                                                      collection.getTitle()));
-                    } catch (MovieDbException e) {
-                        LOGGER.warn("Can't download file {} : {}", collection.getPosterPath(), e.getMessage(), e);
-                    }
+                    movie.setPoster(generateArtUrl(ArtType.POSTER, collection.getPosterPath(), collection.getTitle()));
 
                     return movie;
                 }

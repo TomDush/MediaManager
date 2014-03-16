@@ -19,32 +19,38 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 public class TheMovieDBProvider {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBProvider.class);
 
-	@Inject
-	@Configuration(entryPoint = TheMovieDbEnricher.class)
-	@Setter
-	private ModuleConfiguration configuration;
+    @Inject
+    @Configuration(entryPoint = TheMovieDbEnricher.class)
+    @Setter
+    private ModuleConfiguration configuration;
 
-	@Produces
-	public TheMovieDbApi provideTheMovieDbApi() throws MovieDbException {
-		LOGGER.debug("Create TheMovieDbApi instance with proxy args : {}.",
-				configuration.resolveProperties("http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}", new Properties()));
+    @Produces
+    public TheMovieDbApi provideTheMovieDbApi() throws MovieDbException {
+        LOGGER.debug("Create TheMovieDbApi instance with proxy args : {}.",
+                     configuration.resolveProperties(
+                             "http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}",
+                             new Properties()));
 
-		String host = configuration.readDeepValue("proxy.host", null);
-		if (isNotEmpty(host)) {
-			WebBrowser.setProxyHost(host);
-			WebBrowser.setProxyPort(configuration.readDeepValue("proxy.port", null));
-			WebBrowser.setProxyUsername(configuration.readDeepValue("proxy.username", null));
-			WebBrowser.setProxyPassword(configuration.readDeepValue("proxy.password", null));
-		}
+        String host = configuration.readDeepValue("proxy.host", null);
+        if (isNotEmpty(host)) {
+            WebBrowser.setProxyHost(host);
+            WebBrowser.setProxyPort(configuration.readDeepValue("proxy.port", null));
+            WebBrowser.setProxyUsername(configuration.readDeepValue("proxy.username", null));
+            WebBrowser.setProxyPassword(configuration.readDeepValue("proxy.password", null));
+        }
 
-		try {
-			// TODO MoviesDB : how to protect this private key ?
+        try {
+            // TODO MoviesDB : how to protect this private key ?
             return new TheMovieDBRetryDecorator(configuration.readValue("moviesdb.key",
                                                                         "21fa5e6aa76429cedfa1d628ecc7abeb"));
         } catch (Exception e) {
-			throw new ConfigurationException("Can't initialize TheMovieDbApi, check your internet connection and proxy parameters.", e);
-		}
-	}
+            throw new ConfigurationException(
+                    "Can't initialize TheMovieDbApi, check your internet connection and proxy parameters.",
+                    e);
+        }
+    }
+
+    // TODO ART: Produce an art downloader based on file downloader. Send event to ArtManager to register it.
 }

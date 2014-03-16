@@ -9,9 +9,9 @@ import java.io.OutputStream;
 /**
  * @author Thomas Duchatelle
  */
-public interface IArtDownloader {
+public interface ArtRepository {
 
-    boolean readImage(Art art, ArtQuality artQuality, OutputStream outputStream) throws IOException;
+    boolean readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException;
 
-    void downloadArt(ArtRepository artRepository, Art art, ArtQuality... qualities) throws IOException;
+    Art getMetaData(String artRef);
 }

@@ -1,54 +1,59 @@
 package fr.dush.mediacenters.modules.webui.servlets;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.io.IOException;
-import java.nio.file.Path;
+import fr.dush.mediamanager.business.mediatech.IArtManager;
+import fr.dush.mediamanager.domain.media.art.ArtQuality;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
-
-import fr.dush.mediamanager.business.mediatech.IArtDownloader;
+import static org.apache.commons.lang3.StringUtils.*;
 
 @SuppressWarnings("serial")
 public class ImagesServlet extends HttpServlet {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ImagesServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImagesServlet.class);
 
-	@Inject
-	private IArtDownloader artDownloader;
+    public static final String SIZE_PARAM = "size";
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		final String path = req.getRequestURI();
+    @Inject
+    private IArtManager artDownloader;
 
-		LOGGER.debug("Resolving {} with {}", path, artDownloader);
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final String path = req.getRequestURI();
 
-		if (isNotEmpty(path) && path.startsWith("/")) {
-			final Path imagePath = artDownloader.getImagePath(path.substring(1));
+        LOGGER.debug("Resolving image: {}", path);
 
-			LOGGER.debug("Provide {} art, if exists ({})", imagePath, imagePath.toFile().exists());
+        if (isNotEmpty(path) && path.startsWith("/")) {
+            try {
+                artDownloader.readImage(req.getRequestURI(),
+                                        convertQuality(req.getParameter(SIZE_PARAM)),
+                                        resp.getOutputStream());
+            } catch (IOException e) {
+                LOGGER.error("Couldn't find image with path: {}. Error is: {}", e.getMessage(), e);
 
-			if (imagePath.toFile().exists()) {
-				resp.setContentType("image/" + Files.getFileExtension(imagePath.toString()));
-				Files.copy(imagePath.toFile(), resp.getOutputStream());
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } else {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
 
-			} else {
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-			}
-
-		} else {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-		}
-
-	}
-
+    private ArtQuality convertQuality(String quality) {
+        if (isEmpty(quality)) {
+            return ArtQuality.THUMBS;
+        }
+        try {
+            return ArtQuality.valueOf(quality.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("ArtQuality [{}] isn't know.", quality);
+            return ArtQuality.THUMBS;
+        }
+    }
 }

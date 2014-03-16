@@ -10,6 +10,7 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.art.ArtQuality;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.media.video.VideoFile;
 import fr.dush.mediamanager.domain.scan.MoviesParsedName;
@@ -104,7 +105,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
     @Override
     protected Collection<? extends MoviesParsedName> scanDirectory(Path root) {
-        final HashSet<MoviesParsedName> movies = new HashSet<MoviesParsedName>();
+        final HashSet<MoviesParsedName> movies = new HashSet<>();
         appendScanningFile(root.toFile(), movies);
 
         return movies;
@@ -138,6 +139,10 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
             // Finish to get meta data
             if (!movies.isEmpty()) {
                 enricher.enrichMedia(chosenMovie);
+
+                if (isNotEmpty(chosenMovie.getPoster())) {
+                    getDownloader().append(chosenMovie.getPoster(), ArtQuality.MINI, ArtQuality.THUMBS);
+                }
             }
 
             return chosenMovie;
