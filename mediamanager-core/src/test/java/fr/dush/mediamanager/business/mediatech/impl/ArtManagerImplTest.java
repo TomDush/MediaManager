@@ -32,7 +32,7 @@ public class ArtManagerImplTest extends SimpleJunitTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtManagerImplTest.class);
     public static final byte[] ART_CONTENT = "Hello World!".getBytes();
-    public static final String ART_REF = "junitart/myImage.jpg";
+    public static final String ART_REF = "poster/junitart/myImage.jpg";
 
     @InjectMocks
     private ArtManagerImpl artManager;

@@ -56,6 +56,18 @@ public class TheMovieDbEnricherTest {
             //			LOGGER.info("Trailers : {}", enrichMedia.findTrailers(f, "en"));
         }
 
+        // Now, try to download arts...
+        Movie transformer = list.get(0);
+        TheMovieDBArtUrl url = new TheMovieDBArtUrl(transformer.getPoster());
+        LOGGER.info("Art key = [{}]", url.getPath());
+        printUrl(url, "original");
+        printUrl(url, "w92");
+        printUrl(url, "w185");
+
+    }
+
+    private void printUrl(TheMovieDBArtUrl url, String size) throws MovieDbException {
+        LOGGER.info("\t- {}: {}", size, api.createImageUrl(url.getPath(), size));
     }
 
 }

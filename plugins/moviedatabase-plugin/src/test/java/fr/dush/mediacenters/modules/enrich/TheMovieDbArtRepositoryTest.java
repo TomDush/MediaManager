@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TheMovieDbArtRepositoryTest {
 
-    public static final String REF = "themoviedb/poster/ironman-movie/somewhere/here/ironman.jpg";
+    public static final String REF = "poster/themoviedb/ironman-movie/somewhere/here/ironman.jpg";
 
     @InjectMocks
     private TheMovieDbArtRepository repository;
@@ -56,7 +56,7 @@ public class TheMovieDbArtRepositoryTest {
         repository.readImage(REF, ArtQuality.THUMBS, outputStream);
 
         // Checks...
-        verify(api).createImageUrl("somewhere/here/ironman.jpg", "w185");
+        verify(api).createImageUrl("/somewhere/here/ironman.jpg", "w185");
         assertThat(file).hasContentEqualTo(filePath.toFile());
     }
 }

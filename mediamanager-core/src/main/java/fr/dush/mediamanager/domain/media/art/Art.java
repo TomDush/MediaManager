@@ -12,7 +12,6 @@ import java.util.Map;
 /**
  * @author Thomas Duchatelle
  */
-// TODO ART: Create corresponding DAO
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"ref"})

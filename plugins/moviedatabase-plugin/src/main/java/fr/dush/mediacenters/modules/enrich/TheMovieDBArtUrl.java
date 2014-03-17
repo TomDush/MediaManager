@@ -1,6 +1,7 @@
 package fr.dush.mediacenters.modules.enrich;
 
 import com.google.common.base.Splitter;
+import fr.dush.mediamanager.business.utils.ArtUrlBuilder;
 import fr.dush.mediamanager.domain.media.art.Art;
 import fr.dush.mediamanager.domain.media.art.ArtType;
 import lombok.Getter;
@@ -9,24 +10,28 @@ import lombok.ToString;
 import java.util.ArrayList;
 
 import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Facilities to construct and de-serialise art ref.
  */
 @Getter
 @ToString
-public class TheMovieDBArtUrl {
+public class TheMovieDBArtUrl extends ArtUrlBuilder {
 
-    private ArtType type;
-
+    /** Path must start by / for MovieDB API, it's removed when generate URL add added when retrieve path. */
     private String path;
 
     private String description;
 
     public TheMovieDBArtUrl(ArtType type, String path, String description) {
-        this.type = type;
+        super(type);
+
+        if (isEmpty(path)) {
+            throw new IllegalArgumentException("path must not be empty.");
+        }
         this.path = path;
-        this.description = description;
+        this.description = isEmpty(description) ? "" : description;
     }
 
     /**
@@ -35,32 +40,30 @@ public class TheMovieDBArtUrl {
      * @param artRef Ex: themoviedb/poster/ironman/img/qwerty789.jpg'
      */
     public TheMovieDBArtUrl(String artRef) {
+        super(artRef);
+
         ArrayList<String> list = newArrayList(Splitter.on("/").limit(4).split(artRef));
         if (list.size() < 4) {
             throw new IllegalArgumentException("'" + artRef + "' is invalid ref: need at least 4 part (/ separated).");
         }
 
-        this.type = ArtType.valueOf(list.get(1).toUpperCase());
-        this.path = list.get(3);
+        this.path = list.get(3).startsWith("/") ? list.get(3) : "/" + list.get(3);
         this.description = list.get(2);
     }
 
+    @Override
     public String getRef() {
-        StringBuilder sb = new StringBuilder(TheMovieDbEnricher.MOVIEDB_ID_TYPE).append("/");
-        sb.append(type.toString().toLowerCase()).append("/");
-        sb.append(cleanUrl(description)).append("/");
-        sb.append(path.startsWith("/") ? path.substring(1) : path);
-
-        return sb.toString();
+        return buildRef(cleanUrl(description), path.startsWith("/") ? path.substring(1) : path);
     }
 
-    private String cleanUrl(String description) {
-        return description.replaceAll("\\W", "-").replace("[_-]{2,}", "_").toLowerCase();
+    @Override
+    protected String getRepositoryId() {
+        return TheMovieDbEnricher.MOVIEDB_ID_TYPE;
     }
 
+    @Override
     public Art getArt() {
-        Art art = new Art(getRef());
-        art.setType(type);
+        Art art = super.getArt();
         art.setShortDescription(description);
 
         return art;

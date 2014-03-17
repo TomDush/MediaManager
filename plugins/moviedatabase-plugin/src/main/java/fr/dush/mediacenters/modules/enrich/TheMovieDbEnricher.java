@@ -52,6 +52,8 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricher.class);
 
+    public static final int CASTING_SIZE = 6;
+
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Inject
@@ -163,6 +165,10 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
      * Generate an URL for a given art type and path.
      */
     public String generateArtUrl(ArtType type, String path, String description) {
+        if (isEmpty(path)) {
+            return null;
+        }
+
         return new TheMovieDBArtUrl(type, path, description).getRef();
     }
 
@@ -205,7 +211,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
             // Find main actors...
             PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
-            movie.setMainActors(parser.getCasting(5));
+            movie.setMainActors(parser.getCasting(CASTING_SIZE));
             movie.setDirectors(parser.getDirectors());
 
             // Treat collection data

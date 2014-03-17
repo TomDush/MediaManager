@@ -5,6 +5,7 @@ import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.ArtRepositoryRegisterEvent;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.business.mediatech.IArtManager;
+import fr.dush.mediamanager.business.utils.ArtUrlBuilder;
 import fr.dush.mediamanager.dao.mediatech.IArtDAO;
 import fr.dush.mediamanager.domain.media.art.Art;
 import fr.dush.mediamanager.domain.media.art.ArtQuality;
@@ -47,7 +48,7 @@ public class ArtManagerImpl implements IArtManager {
     }
 
     @Override
-    public void readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException {
+    public boolean readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException {
         LOGGER.info("Read art {} [quality={}]", artRef, artQuality);
 
         Art art = artDAO.findById(artRef);
@@ -56,8 +57,10 @@ public class ArtManagerImpl implements IArtManager {
         if (art == null || !artDownloader.readImage(art, artQuality, outputStream)) {
 
             // If not found, read it directly from the source...
-            resolveArtRepository(artRef).readImage(artRef, artQuality, outputStream);
+            return resolveArtRepository(artRef).readImage(artRef, artQuality, outputStream);
         }
+
+        return true;
     }
 
     @Override
@@ -88,7 +91,8 @@ public class ArtManagerImpl implements IArtManager {
     }
 
     private ArtRepository resolveArtRepository(String artRef) {
-        String protocol = artRef.substring(0, artRef.indexOf("/"));
+        String protocol = ArtUrlBuilder.getArtRepositoryId(artRef);
+
         ArtRepository repo = repositories.get(protocol);
         if (repo == null) {
             throw new IllegalArgumentException(String.format("Repository [%s] isn't know. Could not resolve artRef: %s",

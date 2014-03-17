@@ -16,7 +16,7 @@ public interface IArtManager {
     /**
      * Read art where it is and write it into an output stream.
      */
-    void readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException;
+    boolean readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException;
 
     /**
      * Download art and store it in local.

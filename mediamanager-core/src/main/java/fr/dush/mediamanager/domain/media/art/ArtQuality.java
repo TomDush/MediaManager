@@ -10,6 +10,9 @@ public enum ArtQuality {
     /** Must be readable */
     THUMBS,
 
+    /** main image on the page */
+    DISPLAY,
+
     /** Full size image */
     ORIGINAL;
 }

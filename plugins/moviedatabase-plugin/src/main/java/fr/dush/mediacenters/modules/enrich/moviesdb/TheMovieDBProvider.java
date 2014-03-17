@@ -7,6 +7,7 @@ import fr.dush.mediacenters.modules.enrich.TheMovieDbEnricher;
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
+import fr.dush.mediamanager.tools.RetryApi;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,17 @@ public class TheMovieDBProvider {
 
         try {
             // TODO MoviesDB : how to protect this private key ?
-            return new TheMovieDBRetryDecorator(configuration.readValue("moviesdb.key",
-                                                                        "21fa5e6aa76429cedfa1d628ecc7abeb"));
+            return RetryApi.retry(new RetryApi.MethodWithReturn<TheMovieDbApi>() {
+                @Override
+                public TheMovieDbApi doIt() throws Exception {
+                    return new TheMovieDBRetryDecorator(configuration.readValue("moviesdb.key",
+                                                                                "21fa5e6aa76429cedfa1d628ecc7abeb"));
+                }
+            });
         } catch (Exception e) {
             throw new ConfigurationException(
                     "Can't initialize TheMovieDbApi, check your internet connection and proxy parameters.",
                     e);
         }
     }
-
-    // TODO ART: Produce an art downloader based on file downloader. Send event to ArtManager to register it.
 }

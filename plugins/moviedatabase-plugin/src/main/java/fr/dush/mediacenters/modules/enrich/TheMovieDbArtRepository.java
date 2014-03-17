@@ -41,12 +41,15 @@ public class TheMovieDbArtRepository implements ArtRepository {
     static {
         qualities.put(getKey(ArtType.ACTOR, ArtQuality.MINI), "w45");
         qualities.put(getKey(ArtType.ACTOR, ArtQuality.THUMBS), "w185");
+        qualities.put(getKey(ArtType.ACTOR, ArtQuality.DISPLAY), "h632");
 
         qualities.put(getKey(ArtType.POSTER, ArtQuality.MINI), "w92");
         qualities.put(getKey(ArtType.POSTER, ArtQuality.THUMBS), "w185");
+        qualities.put(getKey(ArtType.POSTER, ArtQuality.DISPLAY), "w342");
 
         qualities.put(getKey(ArtType.BACKDROP, ArtQuality.MINI), "w300");
         qualities.put(getKey(ArtType.BACKDROP, ArtQuality.THUMBS), "w300");
+        qualities.put(getKey(ArtType.BACKDROP, ArtQuality.DISPLAY), "w780");
     }
 
     private static String getKey(ArtType type, ArtQuality quality) {
@@ -61,6 +64,7 @@ public class TheMovieDbArtRepository implements ArtRepository {
 
     @Override
     public boolean readImage(String artRef, ArtQuality artQuality, OutputStream outputStream) throws IOException {
+        LOGGER.info("Read image {} [quality={}]", artRef, artQuality);
         TheMovieDBArtUrl ref = new TheMovieDBArtUrl(artRef);
 
         try {
@@ -82,7 +86,12 @@ public class TheMovieDbArtRepository implements ArtRepository {
 
         String size = qualities.get(getKey(type, artQuality));
 
-        return isEmpty(size) ? "original" : size;
+        if (isEmpty(size)) {
+            LOGGER.warn("Art quality {} is not supported for {} type. Using ORIGINAL.", artQuality, type);
+            return "original";
+        }
+
+        return size;
     }
 
     @Override
