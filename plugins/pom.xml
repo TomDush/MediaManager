@@ -17,6 +17,7 @@
 	<modules>
 		<module>moviedatabase-plugin</module>
 		<module>webui-plugin</module>
+		<module>mplayer-plugin</module>
 	</modules>
 
 </project>
