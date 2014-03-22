@@ -146,6 +146,10 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
                     for (Person p : chosenMovie.getDirectors()) {
                         addToDownloadList(p.getPicture(), ArtQuality.MINI);
                     }
+
+                    if (!chosenMovie.getBackdrops().isEmpty()) {
+                        addToDownloadList(chosenMovie.getBackdrops().get(0), ArtQuality.MINI);
+                    }
                 }
             }
 
@@ -155,7 +159,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
             return chosenMovie;
 
         } catch (EnrichException e) {
-            LOGGER.error("Enrichement fail on file {} (movie : {}).", file, file.getMovieName(), e);
+            LOGGER.error("Enrichment fail on file {} (movie : {}).", file, file.getMovieName(), e);
         }
 
         return null;

@@ -8,7 +8,8 @@
 
     <div class="row-fluid">
         <div class="span4 poster" ng-show="movie.poster">
-            <img alt="{{movie.title}}?size=THUMBS" ng-src="/{{movie.poster}}" />
+            <a href="/{{movie.poster}}?size=ORIGINAL" ng-repeat="backdrop in movie.backdrops" target="_blank"> <img
+                    alt="{{movie.title}}" ng-src="/{{movie.poster}}?size=THUMBS" /> </a>
         </div>
         <div class="" ng-class="{span12 : !movie.poster, span8: movie.poster}">
             <h1><span class="pull-right title-date">{{movie.release |date:'yyyy'}}</span>{{movie.title}}</h1>
@@ -19,7 +20,6 @@
                 <li class="parent-hover">Genres :
                     <genres genres="movie.genres"></genres>
                 </li>
-                <!--{{movie.genres}}-->
                 <li>Note : {{movie.voteAverage |rate:movie.voteNumber}}</li>
                 <li>Director(s) : <span ng-repeat="d in movie.directors"><a
                         href="/search/crew/{{d.name}}">{{d.name}}</a> </span></li>
@@ -64,7 +64,8 @@
     <h2>Backdrops</h2>
 
     <div class="row-fluid">
-        <img ng-src="/{{backdrop}}?size=MINI" ng-repeat="backdrop in movie.backdrops" style="text-align: center;" />
+        <a href="/{{backdrop}}?size=ORIGINAL" ng-repeat="backdrop in movie.backdrops" target="_blank"> <img
+                ng-src="/{{backdrop}}?size=MINI" style="text-align: center;" /> </a>
     </div>
 
 </div>
