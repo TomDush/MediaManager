@@ -249,6 +249,8 @@
                         <param>fr.dush.mediacenters.modules.webui.rest.dto.Pagination</param>
                         <param>fr.dush.mediamanager.dao.media.queries.SearchForm</param>
                         <param>fr.dush.mediamanager.dao.media.queries.SearchLimit</param>
+                        <param>fr.dush.mediacenters.modules.webui.rest.dto.MovieInfo</param>
+                        <param>fr.dush.mediacenters.modules.webui.rest.dto.PlayerInfo</param>
                     </classes>
                 </configuration>
                 <dependencies>

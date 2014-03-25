@@ -53,7 +53,7 @@ public class TheMovieDBProvider {
             });
         } catch (Exception e) {
             throw new ConfigurationException(
-                    "Can't initialize TheMovieDbApi, check your internet connection and proxy parameters.",
+                    "Can't initialise TheMovieDbApi, check your internet connection and proxy parameters.",
                     e);
         }
     }

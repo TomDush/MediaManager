@@ -1,44 +1,46 @@
 body {
-	background: #fafafa;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	color: #333;
+    background: #fafafa;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
 }
 
 .content {
     margin-top: 60px;
+    margin-bottom: 100px;
 }
 
 /* HEADER */
 .brand {
-	font-variant: small-caps;
+    font-variant: small-caps;
 }
 
 .brand .first {
-	color: red;
-	font-variant: normal;
-	font-weight: bold;
+    color: red;
+    font-variant: normal;
+    font-weight: bold;
 }
 
 .hero-unit {
-	margin: 50px auto 0 auto;
-/* 	width: 800px; */
-	font-size: 18px;
-	font-weight: 200;
-	line-height: 30px;
-	background-color: #eee;
-	border-radius: 6px;
-	padding: 60px;
+    margin: 50px auto 0 auto;
+    /* 	width: 800px; */
+    font-size: 18px;
+    font-weight: 200;
+    line-height: 30px;
+    background-color: #eee;
+    border-radius: 6px;
+    padding: 60px;
 }
 
 .hero-unit h1 {
-	font-size: 5em;
-	line-height: 1;
-	letter-spacing: -1px;
-	text-transform: uppercase;
+    font-size: 5em;
+    line-height: 1;
+    letter-spacing: -1px;
+    text-transform: uppercase;
 }
+
 .hero-unit h1:FIRST-LETTER {
-	color: #A00;
-	font-size: 1.2em;
+    color: #A00;
+    font-size: 1.2em;
 }
 
 /* MEDIA SEARCH */
@@ -48,40 +50,46 @@ form.media-search .genre {
 }
 
 .check-control {
-    text-align:right;
+    text-align: right;
 }
+
 .check-control i {
     cursor: pointer;
 }
 
 /* MEDIA LIST */
 .media-icon {
-    width:10%;
+    width: 10%;
     cursor: pointer;
 }
+
 .media-body {
     cursor: pointer;
 }
+
 .media-body-without-poster {
     margin-left: 10%;
 }
 
-.pagination  {
+.pagination {
     text-align: center;
 }
+
 .pagination a {
     cursor: pointer;
 }
 
 /* MEDIA VIEW */
-.child-hover{
+.child-hover {
     display: none;
 }
+
 .parent-hover:hover .child-hover {
-    display:inline-block;
+    display: inline-block;
 }
+
 .loading-text, .notfound-text {
-    margin:100px auto;
+    margin: 100px auto;
     font-size: 1.3em;
     text-align: center;
 }
@@ -91,15 +99,16 @@ form.media-search .genre {
 }
 
 .crew-list li {
-    float:left;
+    float: left;
     margin: 1%;
     width: 30%;
 }
 
 .crew-list img {
     height: 2.1em;
-    float:left;
+    float: left;
 }
+
 .crew-list span {
     padding-left: 5px;
 }
@@ -140,7 +149,7 @@ form.media-search .genre {
 }
 
 .sheet .crewList img {
-    width:20%;
+    width: 20%;
 }
 
 .sheet .crewList span.crew {
@@ -149,4 +158,32 @@ form.media-search .genre {
 
 .sheet .crewList span.crewName {
     padding-left: 10px;
+}
+
+/* PLAYER */
+.player .progress {
+    width: 400px;
+    margin: 10px;
+}
+
+.player .progress span {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+.player .brand {
+    max-width: 400px;
+}
+
+.player .ctrl {
+    margin-left: 140px;
+}
+
+.player-tagline {
+    margin-top: 5px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    font-size: 12px;
+    font-style: italic;
 }

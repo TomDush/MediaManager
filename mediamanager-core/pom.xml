@@ -54,6 +54,16 @@
             <artifactId>jongo</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 
     <build>

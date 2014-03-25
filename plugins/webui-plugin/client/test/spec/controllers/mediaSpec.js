@@ -31,7 +31,7 @@ describe('Controller -', function () {
             SearchCtrl = $controller('SearchCtrl', { $scope: scope, $stateParams: stateParams, $state: state });
         }));
 
-        it('should initialize with stateParams', function () {
+        it('should initialise with stateParams', function () {
             expect(scope.request).toBeDefined();
             expect(scope.request).toEqual({media: ['shows'], genres: ['Action', 'Comedy'], title: "Ironman 1"});
         });

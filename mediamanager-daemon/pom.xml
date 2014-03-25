@@ -26,6 +26,7 @@
             <groupId>fr.dush</groupId>
             <artifactId>moviedatabase-mediamanager-plugin</artifactId>
             <version>${project.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>fr.dush</groupId>
@@ -39,6 +40,12 @@
             <artifactId>webui-mediamanager-plugin</artifactId>
             <version>${project.version}</version>
             <type>war</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.dush</groupId>
+            <artifactId>mplayer-plugin</artifactId>
+            <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
 

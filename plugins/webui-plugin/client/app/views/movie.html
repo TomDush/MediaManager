@@ -8,7 +8,7 @@
 
     <div class="row-fluid">
         <div class="span4 poster" ng-show="movie.poster">
-            <a href="/{{movie.poster}}?size=ORIGINAL" ng-repeat="backdrop in movie.backdrops" target="_blank"> <img
+            <a href="/{{movie.poster}}?size=ORIGINAL" target="_blank"> <img
                     alt="{{movie.title}}" ng-src="/{{movie.poster}}?size=THUMBS" /> </a>
         </div>
         <div class="" ng-class="{span12 : !movie.poster, span8: movie.poster}">

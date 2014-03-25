@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mappings xmlns="http://dozer.sourceforge.net"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://dozer.sourceforge.net
+          http://dozer.sourceforge.net/schema/beanmapping.xsd">
+
+    <mapping>
+        <class-a>fr.dush.mediamanager.domain.media.video.Movie</class-a>
+        <class-b>fr.dush.mediacenters.modules.webui.rest.dto.MovieInfo</class-b>
+    </mapping>
+
+</mappings>

@@ -120,7 +120,7 @@ angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $
     };
 });
 
-angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, $stateParams) {
+angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, $stateParams, Player) {
 
     $scope.movieId = $stateParams.movieId;
     $scope.movie = undefined; // undefined => empty request ; {} => not found ; {a lot of things} => found !
@@ -152,6 +152,7 @@ angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, 
 
     $scope.play = function () {
         console.log("Play movie " + $scope.movie.title)
+        Player.play({type: "MOVIE", mediaId: $scope.movie.id, path: $scope.movie.videoFiles[0].file});
     };
     $scope.resume = function () {
         console.log("Resume movie " + $scope.movie.title)

@@ -1,5 +1,6 @@
 package fr.dush.mediamanager.plugins.jmplayer;
 
+import fr.dush.mediamanager.events.play.PlayerEvent;
 import org.assertj.core.data.MapEntry;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -31,6 +32,8 @@ public class JMPlayerTest {
 
     public static final String FILE =
             "/mnt/data/Films/Sagas/Transformers/Transformers.Dark.Of.The.Moon.2011.FRENCH.DVDRip.XviD-AYMO.CD1.avi";
+    //    public static final String FILE =
+    //            "/mnt/unsafe/Movies/Riddick 2013 BRRip AC3 XviD-haяkš/Riddick 2013 BRRip AC3 XviD-haяkš.avi";
 
     public static final String MPLAYER_PATH = "/usr/bin/mplayer";
     public static final String OPT = " -fs";
@@ -59,7 +62,7 @@ public class JMPlayerTest {
         LOGGER.info("Time length: {}", player.getTotalLength());
 
         int i = 0;
-        while (player.isPlaying()) {
+        while (player.isActive()) {
             Thread.sleep(1000);
 
             //            System.out.println("Current: " + player.getPosition() + " paused? " + player.isPaused());

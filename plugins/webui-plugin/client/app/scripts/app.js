@@ -11,14 +11,16 @@ angular.module('mediamanager', ['ui.router', 'ui.bootstrap', 'mediaServices' ]).
             url: "/",
             views: {
                 "menu": { templateUrl: "views/topMenu.html" },
-                "content": { templateUrl: "views/home.html", controller: "HomeCtrl" }
+                "content": { templateUrl: "views/home.html", controller: "HomeCtrl" },
+                "player": {templateUrl: "views/player.html", controller: "PlayerCtrl" }
             }
         })
         .state('medias', {
             abstract: true,
             views: {
                 "menu": { templateUrl: "views/topMenu.html" },
-                "content": { templateUrl: "layouts/mediaList.html", controller: "ParentCtrl" }
+                "content": { templateUrl: "layouts/mediaList.html", controller: "ParentCtrl" },
+                "player": {templateUrl: "views/player.html", controller: "PlayerCtrl" }
             }/*,
              resolve:{
              reloadOnSearch: false // Do not reload this page when url/param changed.
@@ -37,7 +39,8 @@ angular.module('mediamanager', ['ui.router', 'ui.bootstrap', 'mediaServices' ]).
             abstract: true,
             views: {
                 "menu": { templateUrl: "views/topMenu.html" },
-                "content": { templateUrl: "layouts/sheet.html" }
+                "content": { templateUrl: "layouts/sheet.html" },
+                "player": {templateUrl: "views/player.html", controller: "PlayerCtrl" }
             }
         })
         .state('sheet.movie', {
@@ -88,4 +91,24 @@ angular.module('mediamanager', ['ui.router', 'ui.bootstrap', 'mediaServices' ]).
                 });
             }
         }
-    });
+    })
+    .filter('time', function () {
+        return function (input) {
+            if (!input) return "";
+
+            var out = "";
+            var hours = Math.floor(input / 3600);
+            if (hours > 0) {
+                out += hours + "h ";
+            }
+
+            var mins = Math.floor((input % 3600) / 60);
+            if (mins > 0) {
+                out += mins + "'";
+            }
+            out += input % 60 + "\"";
+
+            return out;
+        };
+    })
+;

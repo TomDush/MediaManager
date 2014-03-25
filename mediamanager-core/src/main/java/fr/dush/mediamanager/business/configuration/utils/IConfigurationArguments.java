@@ -17,7 +17,7 @@ public interface IConfigurationArguments {
 	public String getName();
 
 	/**
-	 * File's URL (in class path) containing properties descriptions and default value. Used to initialize configuration.
+	 * File's URL (in class path) containing properties descriptions and default value. Used to initialise configuration.
 	 *
 	 * @return can be null or empty.
 	 */

@@ -1,13 +1,8 @@
 package fr.dush.mediamanager.plugins.jmplayer;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import lombok.AccessLevel;
-import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.collect.Lists.transform;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
-import javax.enterprise.event.Event;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -15,16 +10,29 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.google.common.collect.Lists.*;
-import static org.apache.commons.lang3.StringUtils.*;
+import javax.enterprise.event.Event;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+
+import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
+import fr.dush.mediamanager.events.play.PlayerEvent;
+import fr.dush.mediamanager.modulesapi.player.PlayerType;
 
 /**
  * A player which is actually an interface to the famous MPlayer.
- *
+ * 
  * @author Adrian BER
  * @author Thomas Duchatelle
  */
-public class JMPlayer implements OutputListener {
+public class JMPlayer implements OutputListener, EmbeddedPlayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JMPlayer.class.getName());
 
@@ -37,7 +45,8 @@ public class JMPlayer implements OutputListener {
     public static final Pattern PARAMETER_PATTERN = Pattern.compile("ANS_(\\w+)=(.*)");
     public static final int PROPERTY_TIMEOUT = 1000;
 
-    private Event<PlayerEvent> onPlayerEvent;
+    @Setter
+    private Event<PlayerEvent> busEvent;
 
     /** The path to the MPlayer executable. */
     private final String mplayerPath;
@@ -60,20 +69,20 @@ public class JMPlayer implements OutputListener {
     private Set<ArgReader> argReaders = Collections.synchronizedSet(new HashSet<ArgReader>());
     private long statusHits = 0;
 
-    public JMPlayer(Event<PlayerEvent> onPlayerEvent, String mplayerPath, String mplayerOptions) {
-        this.onPlayerEvent = onPlayerEvent;
+    public JMPlayer(Event<PlayerEvent> busEvent, String mplayerPath, String mplayerOptions) {
+        this.busEvent = busEvent;
         this.mplayerPath = mplayerPath;
         this.mplayerOptions = REQUIRED_OPTION + " " + mplayerOptions;
     }
 
-    /** Start playing 1 file */
+    @Override
     public void play(Path path) throws IOException {
         ArrayList paths = new ArrayList();
         paths.add(path);
         play(paths);
     }
 
-    /** Start file to read together as 1 bigger file */
+    @Override
     public void play(List<Path> paths) throws IOException {
         if (mplayerProcess != null) {
             throw new IllegalStateException("Player already running, could not start reading another file.");
@@ -83,15 +92,17 @@ public class JMPlayer implements OutputListener {
 
         // Start MPlayer as an external process
         String filePaths = Joiner.on(" ").join(transform(paths, new Function<Path, Object>() {
+
             @Override
             public Object apply(Path input) {
                 return input.toAbsolutePath();
             }
         }));
 
-        String command = mplayerPath + " " + mplayerOptions + " " + filePaths;
+        String command = mplayerPath + " " + mplayerOptions + " '" + filePaths + "'";
         LOGGER.info("Starting MPlayer process: " + command);
-        mplayerProcess = Runtime.getRuntime().exec(command);
+        mplayerProcess = Runtime.getRuntime().exec(new String[] { mplayerPath, REQUIRED_OPTION, "-fs", filePaths });
+        // TODO Use ProcessBuilder seams better and make options non static...
 
         // create the threads to redirect the standard output and error of MPlayer
         new OutputReader(Level.INFO, this, mplayerProcess.getInputStream()).start();
@@ -104,30 +115,29 @@ public class JMPlayer implements OutputListener {
         fireEvent(PlayerEvent.START);
     }
 
-    /** Quit and return position */
-    public long quit() throws InterruptedException {
+    @Override
+    public long quit() {
         if (mplayerProcess != null) {
             execute(QUIT_COMMAND);
-
-            mplayerProcess.waitFor();
             mplayerProcess = null;
         }
 
         return position.longValue();
     }
 
-    /** Toggle pause/play, return current position */
+    @Override
     public long pause() {
         execute(PAUSE_COMMAND);
 
         return position.longValue();
     }
 
-    /** Return if mplayer instance is still alive, return true even if it's paused. */
-    public boolean isPlaying() {
+    @Override
+    public boolean isActive() {
         return mplayerProcess != null;
     }
 
+    @Override
     public long getPosition() {
         if (position != null) {
             return position.longValue();
@@ -135,15 +145,18 @@ public class JMPlayer implements OutputListener {
 
         try {
             return (long) Double.parseDouble(getProperty("stream_time_pos"));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             return -1;
         }
     }
 
+    @Override
     public void setPosition(long position) {
         execute("set time_pos " + position);
     }
 
+    @Override
     public long getTotalLength() {
         if (totalLength == null) {
             String value = getProperty("length");
@@ -153,6 +166,16 @@ public class JMPlayer implements OutputListener {
         }
 
         return totalLength == null ? 0 : totalLength;
+    }
+
+    @Override
+    public PlayerType getType() {
+        return PlayerType.BOTH;
+    }
+
+    @Override
+    public void seek(int time) {
+        execute("seek " + time);
     }
 
     /** Read a property */
@@ -171,7 +194,8 @@ public class JMPlayer implements OutputListener {
                 execute("get_property " + name);
                 reader.wait(PROPERTY_TIMEOUT);
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e) {
             LOGGER.warn("Process has been interrupted...", e);
         }
 
@@ -180,7 +204,7 @@ public class JMPlayer implements OutputListener {
 
     /**
      * Sends a command to MPlayer..
-     *
+     * 
      * @param command the command to be sent
      */
     protected void execute(String command) {
@@ -194,7 +218,7 @@ public class JMPlayer implements OutputListener {
     }
 
     private void fireEvent(int type) {
-        onPlayerEvent.fire(new PlayerEvent(this, type, getPosition(), getTotalLength(), medias));
+        busEvent.fire(new PlayerEvent(this, type, getPosition(), getTotalLength(), medias));
     }
 
     /** DO NOT USE: internal purpose method to read events from MPlayer */
@@ -202,7 +226,8 @@ public class JMPlayer implements OutputListener {
     public void readMPlayerLog(Level level, String line) {
         if (level == Level.WARN) {
             LOGGER.warn("[MPlayer] {}", line);
-        } else if (level == Level.QUIT && mplayerProcess != null) {
+        }
+        else if (level == Level.QUIT && mplayerProcess != null) {
             mplayerProcess = null;
             fireEvent(PlayerEvent.FINISHED);
         }
@@ -223,7 +248,8 @@ public class JMPlayer implements OutputListener {
                 }
             }
 
-        } else if (line.startsWith("ANS_")) {
+        }
+        else if (line.startsWith("ANS_")) {
             // Response to a parameter
             Matcher matcher = PARAMETER_PATTERN.matcher(line);
             if (matcher.matches()) {
@@ -232,7 +258,8 @@ public class JMPlayer implements OutputListener {
                 }
             }
 
-        } else if (line.contains("PAUSE")) {
+        }
+        else if (line.contains("PAUSE")) {
             // Is paused
             paused = true;
 
@@ -240,5 +267,4 @@ public class JMPlayer implements OutputListener {
         }
 
     }
-
 }

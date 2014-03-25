@@ -1,0 +1,34 @@
+<div class="navbar navbar-fixed-bottom player" ng-show="playing">
+    <div class="navbar-inner">
+        <div class="container">
+            <div class="nav" ng-show="player.media.poster">
+                <a ui-sref="sheet.movie({movieId : player.media.id})" title="{{player.media.title}}"> <img
+                        alt="{{player.media.title}}" ng-src="/{{player.media.poster}}?size=MINI" style="width:50px;" />
+                </a>
+            </div>
+            <a ui-sref="sheet.movie({movieId : player.media.id})" title="{{player.media.title}}">
+                <div class="brand">
+                    {{player.media.title}}<br /> <span class="player-tagline">{{player.media.tagline}}</span>
+                </div>
+            </a>
+
+            <div class="nav">
+                <div class="progress progress-striped active">
+                    <span>{{player.position | time}} / {{player.length | time}}</span>
+
+                    <div class="bar" style="width: {{progression}}%;"></div>
+                </div>
+
+                <div class="ctrl btn-group">
+                    <button class="btn btn-large" ng-click="stepBack()"><i class="icon-step-backward" /></button>
+                    <button class="btn btn-large" ng-click="stop()"><i class="icon-stop" /></button>
+                    <button class="btn btn-large" ng-click="togglePause()" ng-show="player.paused"><i
+                            class="icon-play" /></button>
+                    <button class="btn btn-large" ng-click="togglePause()" ng-hide="player.paused"><i
+                            class="icon-pause" /></button>
+                    <button class="btn btn-large" ng-click="stepForward()"><i class="icon-step-forward" /></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

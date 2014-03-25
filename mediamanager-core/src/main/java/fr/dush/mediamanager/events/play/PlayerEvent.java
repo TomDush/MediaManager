@@ -1,5 +1,6 @@
-package fr.dush.mediamanager.plugins.jmplayer;
+package fr.dush.mediamanager.events.play;
 
+import fr.dush.mediamanager.modulesapi.player.Player;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -24,13 +25,13 @@ public class PlayerEvent {
     /** Video is paused */
     public static final int POSITION = 5;
 
-    private final JMPlayer player;
+    private final Player player;
     private final int type;
     private final long position;
     private final long length;
     private final List<Path> medias;
 
-    public PlayerEvent(JMPlayer player, int type, long position, long length, List<Path> medias) {
+    public PlayerEvent(Player player, int type, long position, long length, List<Path> medias) {
         this.player = player;
         this.type = type;
         this.position = position;
