@@ -14,4 +14,6 @@ public class PlayerInfo {
     private boolean paused;
 
     private MovieInfo media;
+    private String name;
+
 }

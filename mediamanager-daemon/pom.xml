@@ -48,6 +48,12 @@
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>fr.dush</groupId>
+            <artifactId>amarok-plugin</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Command Line Parser... -->
         <dependency>

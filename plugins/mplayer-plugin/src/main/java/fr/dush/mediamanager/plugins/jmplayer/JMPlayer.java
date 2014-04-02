@@ -1,8 +1,17 @@
 package fr.dush.mediamanager.plugins.jmplayer;
 
-import static com.google.common.collect.Lists.transform;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import fr.dush.mediamanager.events.play.PlayerEvent;
+import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
+import fr.dush.mediamanager.modulesapi.player.PlayerType;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.enterprise.event.Event;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
@@ -10,25 +19,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.enterprise.event.Event;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-
-import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
-import fr.dush.mediamanager.events.play.PlayerEvent;
-import fr.dush.mediamanager.modulesapi.player.PlayerType;
+import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * A player which is actually an interface to the famous MPlayer.
- * 
+ *
  * @author Adrian BER
  * @author Thomas Duchatelle
  */
@@ -101,7 +97,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
 
         String command = mplayerPath + " " + mplayerOptions + " '" + filePaths + "'";
         LOGGER.info("Starting MPlayer process: " + command);
-        mplayerProcess = Runtime.getRuntime().exec(new String[] { mplayerPath, REQUIRED_OPTION, "-fs", filePaths });
+        mplayerProcess = Runtime.getRuntime().exec(new String[]{mplayerPath, REQUIRED_OPTION, "-fs", filePaths});
         // TODO Use ProcessBuilder seams better and make options non static...
 
         // create the threads to redirect the standard output and error of MPlayer
@@ -113,6 +109,11 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
 
         // Fire event to prevent start reading
         fireEvent(PlayerEvent.START);
+    }
+
+    @Override
+    public String getName() {
+        return "MPlayer";
     }
 
     @Override
@@ -145,8 +146,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
 
         try {
             return (long) Double.parseDouble(getProperty("stream_time_pos"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return -1;
         }
     }
@@ -194,8 +194,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
                 execute("get_property " + name);
                 reader.wait(PROPERTY_TIMEOUT);
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             LOGGER.warn("Process has been interrupted...", e);
         }
 
@@ -204,7 +203,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
 
     /**
      * Sends a command to MPlayer..
-     * 
+     *
      * @param command the command to be sent
      */
     protected void execute(String command) {
@@ -226,8 +225,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
     public void readMPlayerLog(Level level, String line) {
         if (level == Level.WARN) {
             LOGGER.warn("[MPlayer] {}", line);
-        }
-        else if (level == Level.QUIT && mplayerProcess != null) {
+        } else if (level == Level.QUIT && mplayerProcess != null) {
             mplayerProcess = null;
             fireEvent(PlayerEvent.FINISHED);
         }
@@ -248,8 +246,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
                 }
             }
 
-        }
-        else if (line.startsWith("ANS_")) {
+        } else if (line.startsWith("ANS_")) {
             // Response to a parameter
             Matcher matcher = PARAMETER_PATTERN.matcher(line);
             if (matcher.matches()) {
@@ -258,8 +255,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
                 }
             }
 
-        }
-        else if (line.contains("PAUSE")) {
+        } else if (line.contains("PAUSE")) {
             // Is paused
             paused = true;
 

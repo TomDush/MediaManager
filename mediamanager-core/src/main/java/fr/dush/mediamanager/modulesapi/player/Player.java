@@ -5,6 +5,9 @@ package fr.dush.mediamanager.modulesapi.player;
  */
 public interface Player {
 
+    /** Name of this player */
+    String getName();
+
     /** Quit and return position, quit command could be asynchronous */
     long quit();
 

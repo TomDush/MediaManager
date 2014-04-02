@@ -18,6 +18,7 @@
 		<module>moviedatabase-plugin</module>
 		<module>webui-plugin</module>
 		<module>mplayer-plugin</module>
+		<module>amarok-plugin</module>
 	</modules>
 
 </project>

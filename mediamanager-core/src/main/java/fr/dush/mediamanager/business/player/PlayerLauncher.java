@@ -3,7 +3,6 @@ package fr.dush.mediamanager.business.player;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -102,21 +101,17 @@ public class PlayerLauncher {
 
         if (implementation instanceof MetaPlayer) {
             player = (MetaPlayer<Movie, VideoFile>) implementation;
-            player.initialise(generateId(), movie, videoFile, null);
+            player.initialise(movie, videoFile, null);
         }
         else if (implementation instanceof EmbeddedPlayer) {
             player = moviePlayerFactory.get();
-            player.initialise(generateId(), movie, videoFile, (EmbeddedPlayer) implementation);
+            player.initialise(movie, videoFile, (EmbeddedPlayer) implementation);
         }
         else {
             throw new ConfigurationException("Player must implement MetaPlayer or EmbeddedPlayer to read a Movie");
         }
 
         player.play();
-    }
-
-    private static String generateId() {
-        return UUID.randomUUID().toString();
     }
 
     private void closeOtherPlayers(PlayerType type) {

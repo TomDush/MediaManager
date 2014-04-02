@@ -23,13 +23,12 @@ public interface MetaPlayer<M extends Media, F extends MediaFile> extends Player
 
     /**
      * Initialise player with metadata, real implementation to use, ...
-     * 
-     * @param id Unique media identifier
+     *
      * @param media Media will be read
      * @param file MediaFile to read
-     * @param embeddedPlayer Real implementation to use
+     * @param embeddedPlayer Real implementation to use (can be null)
      */
-    void initialise(String id, M media, F file, EmbeddedPlayer embeddedPlayer);
+    void initialise(M media, F file, EmbeddedPlayer embeddedPlayer);
 
     /** Just start to play from beginning */
     void play() throws PlayerException;

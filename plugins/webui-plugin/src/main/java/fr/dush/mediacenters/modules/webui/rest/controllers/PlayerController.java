@@ -75,6 +75,7 @@ public class PlayerController {
 
             for (Player player : event.getPlayers()) {
                 PlayerInfo info = new PlayerInfo();
+                info.setName(player.getName());
                 info.setPosition(player.getPosition());
                 info.setLength(player.getTotalLength());
                 info.setPaused(player.isPaused());
@@ -82,7 +83,9 @@ public class PlayerController {
                 if (player instanceof MetaPlayer) {
                     MetaPlayer<?, ?> metaPlayer = (MetaPlayer<?, ?>) player;
                     info.setId(metaPlayer.getId());
-                    info.setMedia(mapper.map(metaPlayer.getMedia(), MovieInfo.class));
+                    if (metaPlayer.getMedia() != null) {
+                        info.setMedia(mapper.map(metaPlayer.getMedia(), MovieInfo.class));
+                    }
                 }
 
                 players.add(info);

@@ -49,7 +49,7 @@ public class MoviePlayerWrapperTest extends CdiJunitTest {
         // Create one...
         MoviePlayerWrapper wrapper = moviePlayerWrappersFactory.get();
         assertThat(wrapper).isNotNull();
-        wrapper.initialise("aa", null, null, player1);
+        wrapper.initialise(null, null, player1);
 
         // After collect 1       
         assertCollector(wrapper);
@@ -57,7 +57,7 @@ public class MoviePlayerWrapperTest extends CdiJunitTest {
         // Create second...
         MoviePlayerWrapper wrapper2 = moviePlayerWrappersFactory.get();
         assertThat(wrapper2).isNotNull();
-        wrapper2.initialise("bb", null, null, player2);
+        wrapper2.initialise(null, null, player2);
 
         assertCollector(wrapper, wrapper2);
 

@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.enterprise.event.Event;
-import javax.inject.Inject;
 
 import fr.dush.mediacenters.modules.webui.tools.DozerMapperFactory;
 import org.bson.types.ObjectId;
@@ -41,7 +40,6 @@ import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
 public class PlayerControllerTest {
 
     private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
-    public static final String ID = "one-id";
     public static final long POSITION = 12L;
     public static final long LENGTH = 42L;
 
@@ -70,7 +68,7 @@ public class PlayerControllerTest {
         movie = newMovie();
         videoFile = new VideoFile();
 
-        player.initialise(ID, movie, videoFile, internalPlayer);
+        player.initialise(movie, videoFile, internalPlayer);
 
         when(internalPlayer.getPosition()).thenReturn(POSITION);
         when(internalPlayer.getTotalLength()).thenReturn(LENGTH);
@@ -93,7 +91,7 @@ public class PlayerControllerTest {
         List<PlayerInfo> infoList = playerController.getPlaysInProgress();
         assertThat(infoList).hasSize(1);
 
-        Assertions.assertThat(infoList.get(0)).hasId(ID).hasLength(LENGTH).hasPosition(POSITION);
+        Assertions.assertThat(infoList.get(0)).hasLength(LENGTH).hasPosition(POSITION);
         Assertions.assertThat(infoList.get(0).getMedia()).hasId("5200c7a884ae0d25732cd70a")
                 .hasPoster("/some/poster.jpg").hasTitle("Iron Man 1").hasGenres("action");
     }
