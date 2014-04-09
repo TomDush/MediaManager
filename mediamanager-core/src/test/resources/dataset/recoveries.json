@@ -1,0 +1,17 @@
+[
+    {
+        "_id": {
+            "mediaType": "MOVIE",
+            "id": "5240760958eff5a9e1d18203"
+        },
+        "position": 5,
+        "length": 100,
+        "mediaFiles": [
+            "ironman.avi"
+        ],
+        "mediaSummary": {
+            "mediaType": "MOVIE",
+            "id": "5240760958eff5a9e1d18203"
+        }
+    }
+]

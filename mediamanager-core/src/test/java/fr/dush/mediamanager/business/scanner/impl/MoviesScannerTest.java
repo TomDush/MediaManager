@@ -10,7 +10,7 @@ import fr.dush.mediamanager.domain.configuration.ScannerConfiguration;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;

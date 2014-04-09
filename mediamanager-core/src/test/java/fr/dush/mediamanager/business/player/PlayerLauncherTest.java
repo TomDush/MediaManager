@@ -1,33 +1,31 @@
 package fr.dush.mediamanager.business.player;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
-
+import fr.dush.mediamanager.business.modules.IModulesManager;
+import fr.dush.mediamanager.dao.media.IMovieDAO;
+import fr.dush.mediamanager.domain.media.MediaType;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.media.video.VideoFile;
+import fr.dush.mediamanager.engine.SimpleJunitTest;
+import fr.dush.mediamanager.events.play.PlayRequestEvent;
+import fr.dush.mediamanager.events.play.PlayerEvent;
+import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
+import fr.dush.mediamanager.modulesapi.player.PlayerProvider;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import fr.dush.mediamanager.business.modules.IModulesManager;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.domain.media.video.Movie;
-import fr.dush.mediamanager.domain.media.video.VideoFile;
-import fr.dush.mediamanager.engine.SimpleJunitTest;
-import fr.dush.mediamanager.events.play.MoviePlayRequestEvent;
-import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
-import fr.dush.mediamanager.events.play.PlayerEvent;
-import fr.dush.mediamanager.modulesapi.player.PlayerProvider;
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.Instance;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import static com.google.common.collect.Lists.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Thomas Duchatelle
@@ -91,7 +89,9 @@ public class PlayerLauncherTest extends SimpleJunitTest {
 
     @Test
     public void testSimpleFile() throws Exception {
-        playerLauncher.playMovie(new MoviePlayRequestEvent("53277c9eef5bc47460a18ad0", "/it/the/first/video.AVI"));
+        playerLauncher.playMedia(new PlayRequestEvent(MediaType.MOVIE,
+                                                      "53277c9eef5bc47460a18ad0",
+                                                      "/it/the/first/video.AVI"));
 
         verify(aviProvider).createPlayerInstance();
         ArrayList<Path> paths = new ArrayList<Path>();
@@ -102,11 +102,13 @@ public class PlayerLauncherTest extends SimpleJunitTest {
 
     @Test
     public void testMultipleFile() throws Exception {
-        playerLauncher.playMovie(new MoviePlayRequestEvent("53277c9eef5bc47460a18ad0", "/highQualityVideo_CD1.mp4"));
+        playerLauncher.playMedia(new PlayRequestEvent(MediaType.MOVIE,
+                                                      "53277c9eef5bc47460a18ad0",
+                                                      "/highQualityVideo_CD1.mp4"));
 
         verify(mp4Provider).createPlayerInstance();
-        verify(player).play(
-                newArrayList(Paths.get("/highQualityVideo_CD1.mp4"), Paths.get("/highQualityVideo_CD2.mp4")));
+        verify(player).play(newArrayList(Paths.get("/highQualityVideo_CD1.mp4"),
+                                         Paths.get("/highQualityVideo_CD2.mp4")));
 
     }
 }

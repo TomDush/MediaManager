@@ -5,6 +5,7 @@ import fr.dush.mediamanager.modulesapi.player.Player;
 import fr.dush.mediamanager.modulesapi.player.PlayerType;
 import lombok.EqualsAndHashCode;
 
+/** Control every player using a resource type (Video, Audio, Both) */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PlayerControlEventByType extends PlayerControlEvent {

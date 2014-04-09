@@ -42,11 +42,6 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>2.10.1</version>
         </dependency>
-        <!-- <dependency> -->
-        <!-- <groupId>de.flapdoodle.embed</groupId> -->
-        <!-- <artifactId>de.flapdoodle.embed.mongo</artifactId> -->
-        <!-- <version>1.28</version> -->
-        <!-- </dependency> -->
 
         <!-- MongoDB DAO utils -->
         <dependency>
@@ -63,6 +58,13 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
             <version>1.1</version>
+        </dependency>
+
+        <!-- Bean mapping -->
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>5.4.0</version>
         </dependency>
     </dependencies>
 
@@ -85,6 +87,11 @@
                     <packages>
                         <param>fr.dush.mediamanager.domain.media.art</param>
                     </packages>
+                    <classes>
+                        <param>fr.dush.mediamanager.domain.media.MediaReference</param>
+                        <param>fr.dush.mediamanager.domain.media.MediaSummary</param>
+                        <param>fr.dush.mediamanager.domain.media.Recovery</param>
+                    </classes>
                 </configuration>
                 <dependencies>
                     <dependency>

@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Data;
 import fr.dush.mediamanager.modulesapi.player.Player;
 
+/** Event to collect all players running. (each player is asking to register) */
 @Data
 public class PlayerCollectorEvent {
 

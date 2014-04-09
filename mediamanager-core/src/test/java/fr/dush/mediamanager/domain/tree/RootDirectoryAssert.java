@@ -2,6 +2,7 @@ package fr.dush.mediamanager.domain.tree;
 
 import static java.lang.String.format;
 
+import fr.dush.mediamanager.domain.media.MediaType;
 import org.fest.assertions.api.AbstractAssert;
 import org.fest.assertions.api.Assertions;
 import java.util.Date;

@@ -54,13 +54,6 @@
             <artifactId>resteasy-jackson2-provider</artifactId>
             <version>3.0.5.Final</version>
         </dependency>
-
-        <!-- Bean mapping -->
-        <dependency>
-            <groupId>net.sf.dozer</groupId>
-            <artifactId>dozer</artifactId>
-            <version>5.4.0</version>
-        </dependency>
     </dependencies>
 
     <profiles>
@@ -242,14 +235,14 @@
                 </executions>
                 <configuration>
                     <!--<packages>-->
-                        <!--<param>fr.dush.mediamanager.dao.media.queries</param>-->
+                    <!--<param>fr.dush.mediamanager.dao.media.queries</param>-->
                     <!--</packages>-->
                     <classes>
                         <param>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</param>
                         <param>fr.dush.mediacenters.modules.webui.rest.dto.Pagination</param>
                         <param>fr.dush.mediamanager.dao.media.queries.SearchForm</param>
                         <param>fr.dush.mediamanager.dao.media.queries.SearchLimit</param>
-                        <param>fr.dush.mediacenters.modules.webui.rest.dto.MovieInfo</param>
+                        <param>fr.dush.mediamanager.domain.media.MediaSummary</param>
                         <param>fr.dush.mediacenters.modules.webui.rest.dto.PlayerInfo</param>
                     </classes>
                 </configuration>

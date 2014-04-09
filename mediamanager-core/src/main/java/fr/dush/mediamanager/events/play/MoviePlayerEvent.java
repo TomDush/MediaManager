@@ -3,6 +3,7 @@ package fr.dush.mediamanager.events.play;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import lombok.Getter;
 
+/** Event from video player playing a movie */
 @Getter
 public class MoviePlayerEvent extends PlayerEvent {
 

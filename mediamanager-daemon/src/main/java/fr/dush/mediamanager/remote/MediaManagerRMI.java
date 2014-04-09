@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.launcher.Status;
 
 /**

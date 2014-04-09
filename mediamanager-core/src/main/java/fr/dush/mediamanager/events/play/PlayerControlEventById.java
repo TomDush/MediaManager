@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import fr.dush.mediamanager.modulesapi.player.MetaPlayer;
 import fr.dush.mediamanager.modulesapi.player.Player;
 
+/** Get a player with its ID */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PlayerControlEventById extends PlayerControlEvent {

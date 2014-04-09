@@ -1,11 +1,14 @@
-package fr.dush.mediacenters.modules.webui.tools;
+package fr.dush.mediamanager.tools;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
+import org.bson.types.ObjectId;
+import org.dozer.BeanFactory;
 import org.dozer.DozerBeanMapper;
+import org.dozer.DozerConverter;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ public class DozerMapperFactory {
 
         DozerBeanMapper mapper = new DozerBeanMapper();
 
+        // Find mapping file in classpath
         try {
             final Pattern pattern = Pattern.compile(".*dozer/.*mappers\\.xml");
             ImmutableSet<ClassPath.ResourceInfo> allResources =
@@ -61,6 +65,46 @@ public class DozerMapperFactory {
             throw new ConfigurationException("Couldn't load Dozer files.", e);
         }
 
+        // Register custom converters
+        //        mapper.setCustomConverters(newArrayList(new ObjectIdConverter()));
+        //        mapper.setFactories();
+
         return mapper;
+    }
+
+    public static class ObjectIdFactory implements BeanFactory {
+
+        @Override
+        public Object createBean(Object source, Class<?> sourceClass, String targetBeanId) {
+            if (source instanceof String) {
+                return new ObjectId((String) source);
+            }
+            return null;
+        }
+    }
+
+    public static class StringFactory implements BeanFactory {
+
+        @Override
+        public Object createBean(Object source, Class<?> sourceClass, String targetBeanId) {
+            return source == null ? null : source.toString();
+        }
+    }
+
+    public static class ObjectIdConverter extends DozerConverter<ObjectId, ObjectId> {
+
+        public ObjectIdConverter() {
+            super(ObjectId.class, ObjectId.class);
+        }
+
+        @Override
+        public ObjectId convertTo(ObjectId source, ObjectId destination) {
+            return new ObjectId(source.toString());
+        }
+
+        @Override
+        public ObjectId convertFrom(ObjectId source, ObjectId destination) {
+            return new ObjectId(source.toString());
+        }
     }
 }

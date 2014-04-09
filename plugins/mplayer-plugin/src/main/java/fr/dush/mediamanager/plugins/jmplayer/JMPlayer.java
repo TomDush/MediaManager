@@ -227,7 +227,7 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
             LOGGER.warn("[MPlayer] {}", line);
         } else if (level == Level.QUIT && mplayerProcess != null) {
             mplayerProcess = null;
-            fireEvent(PlayerEvent.FINISHED);
+            fireEvent(PlayerEvent.QUIT);
         }
 
         if (line.startsWith("A:")) {

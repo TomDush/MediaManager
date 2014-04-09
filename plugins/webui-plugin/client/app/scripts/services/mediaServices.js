@@ -32,9 +32,10 @@ angular.module('mediaServices', [ 'ngResource' ])
     })
     .factory('Player', function ($resource) {
         return $resource('api/players/:cmd/:type:playerId/:mediaId:action/:path', {}, {
-            play: { method: 'GET', params:{ cmd: "play"}},
-            playing: { method: 'GET', params:{ cmd: "playing.json"}, isArray: true},
-            ctrl: { method: 'GET', params:{ cmd: "ctrl"}}
+            play: { method: 'GET', params: { cmd: "play"}},
+            resume: { method: 'GET', params: { cmd: "resume"}},
+            playing: { method: 'GET', params: { cmd: "playing.json"}, isArray: true},
+            ctrl: { method: 'GET', params: { cmd: "ctrl"}}
         });
     })
 

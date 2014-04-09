@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 import fr.dush.mediamanager.launcher.ContextLauncher;
 import fr.dush.mediamanager.launcher.Status;

@@ -4,7 +4,7 @@ import fr.dush.mediamanager.dao.mediatech.IArtDAO;
 import fr.dush.mediamanager.domain.media.art.Art;
 import fr.dush.mediamanager.domain.media.art.ArtQuality;
 import fr.dush.mediamanager.domain.media.art.ArtType;
-import fr.dush.mediamanager.domain.media.art.Assertions;
+import fr.dush.mediamanager.domain.media.Assertions;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import org.junit.Test;
 

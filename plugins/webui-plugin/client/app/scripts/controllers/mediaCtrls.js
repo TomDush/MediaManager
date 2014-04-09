@@ -156,6 +156,7 @@ angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, 
     };
     $scope.resume = function () {
         console.log("Resume movie " + $scope.movie.title)
+        Player.resume({type: "MOVIE", mediaId: $scope.movie.id});
     };
 
 });

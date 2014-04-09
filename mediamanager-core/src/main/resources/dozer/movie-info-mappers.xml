@@ -6,7 +6,16 @@
 
     <mapping>
         <class-a>fr.dush.mediamanager.domain.media.video.Movie</class-a>
-        <class-b>fr.dush.mediacenters.modules.webui.rest.dto.MovieInfo</class-b>
+        <class-b>fr.dush.mediamanager.domain.media.MediaSummary</class-b>
     </mapping>
 
+    <mapping>
+        <class-a>fr.dush.mediamanager.domain.media.video.Movie</class-a>
+        <class-b>fr.dush.mediamanager.domain.media.video.Movie</class-b>
+
+        <field copy-by-reference="true">
+            <a>id</a>
+            <b>id</b>
+        </field>
+    </mapping>
 </mappings>

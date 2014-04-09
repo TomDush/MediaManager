@@ -4,7 +4,7 @@ import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.business.scanner.impl.AbstractScanner;
 import fr.dush.mediamanager.business.scanner.impl.MoviesScanner;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.events.scan.ScanResponseEvent;

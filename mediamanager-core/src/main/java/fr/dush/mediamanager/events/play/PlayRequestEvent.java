@@ -1,14 +1,15 @@
 package fr.dush.mediamanager.events.play;
 
+import fr.dush.mediamanager.domain.media.MediaType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/**
- * @author Thomas Duchatelle
- */
+/** Request to play a given movie */
 @Data
 @AllArgsConstructor
-public class MoviePlayRequestEvent {
+public class PlayRequestEvent {
+
+    private MediaType type;
 
     private String movieId;
 

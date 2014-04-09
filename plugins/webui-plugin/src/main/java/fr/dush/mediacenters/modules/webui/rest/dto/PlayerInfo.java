@@ -1,5 +1,6 @@
 package fr.dush.mediacenters.modules.webui.rest.dto;
 
+import fr.dush.mediamanager.domain.media.MediaSummary;
 import lombok.Data;
 
 /** Information on player currently playing */
@@ -13,7 +14,7 @@ public class PlayerInfo {
 
     private boolean paused;
 
-    private MovieInfo media;
+    private MediaSummary media;
     private String name;
 
 }

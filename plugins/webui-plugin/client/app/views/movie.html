@@ -8,8 +8,9 @@
 
     <div class="row-fluid">
         <div class="span4 poster" ng-show="movie.poster">
-            <a href="/{{movie.poster}}?size=ORIGINAL" target="_blank"> <img
-                    alt="{{movie.title}}" ng-src="/{{movie.poster}}?size=THUMBS" /> </a>
+            <a href="/{{movie.poster}}?size=ORIGINAL" target="_blank"> <img alt="{{movie.title}}"
+                                                                            ng-src="/{{movie.poster}}?size=THUMBS" />
+            </a>
         </div>
         <div class="" ng-class="{span12 : !movie.poster, span8: movie.poster}">
             <h1><span class="pull-right title-date">{{movie.release |date:'yyyy'}}</span>{{movie.title}}</h1>
@@ -27,8 +28,9 @@
 
             <!-- Action buttons -->
             <div class="actionsButton">
-                <a ng-click="resume()" class="btn btn-primary"><i class="icon-film icon-white"></i> Resume</a> <a
-                    ng-click="play()" class="btn btn-primary"><i class="icon-play icon-white"></i> Play</a>
+                <a ng-click="resume()" class="btn btn-primary" ng-show="movie.recovery.position"><i
+                        class="icon-film icon-white"></i> Resume</a> <a ng-click="play()" class="btn btn-primary"><i
+                    class="icon-play icon-white"></i> Play</a>
 
             </div>
         </div>

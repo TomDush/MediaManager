@@ -1,9 +1,9 @@
-package fr.dush.mediamanager.domain.tree;
+package fr.dush.mediamanager.domain.media;
 
 import java.util.Arrays;
 
 /**
- * {@link RootDirectory}'s media type : key to determine which scanner to use.
+ * {@link fr.dush.mediamanager.domain.tree.RootDirectory}'s media type : key to determine which scanner to use.
  *
  * @author Thomas Duchatelle
  *

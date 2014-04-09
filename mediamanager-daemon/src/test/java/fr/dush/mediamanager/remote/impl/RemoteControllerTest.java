@@ -27,7 +27,7 @@ import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.remote.ConfigurationField;

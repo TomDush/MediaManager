@@ -1,6 +1,5 @@
 package fr.dush.mediacenters.modules.webui.rest.dto;
 
-import fr.dush.mediamanager.domain.media.Media;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +14,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class MediaPage<T extends Media> implements Serializable {
+public class MediaPage<T> implements Serializable {
 
     /** Index of this page, 0 if pagination isn't available. */
     private int page = 0;

@@ -7,7 +7,7 @@ angular.module('mediamanager').controller('PlayerCtrl', function ($scope, $state
     /** Get player in use and update scope*/
     function updatePlayers() {
 
-        $scope.players = Player.playing({}, function (val) {
+        Player.playing({}, function (val) {
             // Get non-background player, with defined media.
             var toDisplay = null;
             angular.forEach(val, function (value, key) {
@@ -27,6 +27,10 @@ angular.module('mediamanager').controller('PlayerCtrl', function ($scope, $state
             if ($scope.playing) {
                 $scope.progression = Math.round(100 * $scope.player.position / $scope.player.length);
             }
+
+            // Set flag 'otherPlayers'
+            $scope.otherPlayers = val.length > 1;
+            $scope.players = val;
         });
     }
 
@@ -49,17 +53,15 @@ angular.module('mediamanager').controller('PlayerCtrl', function ($scope, $state
     };
 
     // Start listening ...
-    $interval(updatePlayers, 1000);
+    $interval(updatePlayers, 1500);
 
     // Force first update
     updatePlayers();
 
     // Define function used by UI
-    $scope.otherPlayers = function () {
-        return $scope.players.length > 1;
-    }
     $scope.getDisplayName = function (player) {
-        console.log("Display name: " + player.name);
+        if (!player) return "undefined";
+
         var name = player.name;
         if (player.media != null) {
             name += ": " + player.media.title;

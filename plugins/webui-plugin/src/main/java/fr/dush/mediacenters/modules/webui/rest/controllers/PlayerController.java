@@ -1,11 +1,9 @@
 package fr.dush.mediacenters.modules.webui.rest.controllers;
 
-import fr.dush.mediacenters.modules.webui.rest.dto.MovieInfo;
 import fr.dush.mediacenters.modules.webui.rest.dto.PlayerInfo;
-import fr.dush.mediamanager.events.play.MoviePlayRequestEvent;
-import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
-import fr.dush.mediamanager.events.play.PlayerControlEvent;
-import fr.dush.mediamanager.events.play.PlayerControlEventById;
+import fr.dush.mediamanager.domain.media.MediaReference;
+import fr.dush.mediamanager.domain.media.MediaSummary;
+import fr.dush.mediamanager.events.play.*;
 import fr.dush.mediamanager.modulesapi.player.MetaPlayer;
 import fr.dush.mediamanager.modulesapi.player.Player;
 import org.dozer.Mapper;
@@ -38,7 +36,9 @@ public class PlayerController {
     private Mapper mapper;
 
     @Inject
-    private Event<MoviePlayRequestEvent> playBus;
+    private Event<PlayRequestEvent> playBus;
+    @Inject
+    private Event<ResumeRequestEvent> resumeBus;
     @Inject
     private Event<PlayerCollectorEvent> collectorBus;
     @Inject
@@ -51,11 +51,28 @@ public class PlayerController {
         LOGGER.debug("Play request: [type={} ; mediaId={} ; path={}]", type, mediaId, path);
 
         try {
-            playBus.fire(new MoviePlayRequestEvent(mediaId, path));
+            playBus.fire(new PlayRequestEvent(fr.dush.mediamanager.domain.media.MediaType.MOVIE, mediaId, path));
             return "{play: 1}";
 
         } catch (Exception e) {
             LOGGER.error("Can't play movie {} [{}]", path, mediaId, e);
+            return "{play: 0}";
+        }
+
+    }
+
+    @Path("/resume/{type:\\w+}/{mediaId}")
+    public String play(@PathParam("type") fr.dush.mediamanager.domain.media.MediaType type,
+                       @PathParam("mediaId") String mediaId) {
+
+        LOGGER.debug("Resume request: [type={} ; mediaId={} ]", type, mediaId);
+
+        try {
+            resumeBus.fire(new ResumeRequestEvent(this, new MediaReference(type, mediaId)));
+            return "{play: 1}";
+
+        } catch (Exception e) {
+            LOGGER.error("Can't resume media {}", mediaId, e);
             return "{play: 0}";
         }
 
@@ -84,7 +101,7 @@ public class PlayerController {
                     MetaPlayer<?, ?> metaPlayer = (MetaPlayer<?, ?>) player;
                     info.setId(metaPlayer.getId());
                     if (metaPlayer.getMedia() != null) {
-                        info.setMedia(mapper.map(metaPlayer.getMedia(), MovieInfo.class));
+                        info.setMedia(mapper.map(metaPlayer.getMedia(), MediaSummary.class));
                     }
                 }
 

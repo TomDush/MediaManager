@@ -14,7 +14,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
-import fr.dush.mediamanager.domain.tree.MediaType;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.exceptions.RootDirectoryAlreadyExistsException;

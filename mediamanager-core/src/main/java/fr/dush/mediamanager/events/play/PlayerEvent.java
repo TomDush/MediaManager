@@ -8,7 +8,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * @author Thomas Duchatelle
+ * Event from a player. Its subclasses can contains metadata.
+ *
+ * @see fr.dush.mediamanager.events.play.MoviePlayerEvent
  */
 @Getter
 @ToString(of = {"type", "position", "length"})
@@ -16,8 +18,8 @@ public class PlayerEvent {
 
     /** Video is starting to play */
     public static final int START = 1;
-    /** Video is finished */
-    public static final int FINISHED = 2;
+    /** Player quit. Media can be finished, or interrupted. */
+    public static final int QUIT = 2;
     /** Stopped/paused video is restarted */
     public static final int PLAY = 3;
     /** Video is paused */

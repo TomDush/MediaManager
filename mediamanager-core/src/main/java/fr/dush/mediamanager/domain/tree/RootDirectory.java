@@ -1,5 +1,6 @@
 package fr.dush.mediamanager.domain.tree;
 
+import fr.dush.mediamanager.domain.media.MediaType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
