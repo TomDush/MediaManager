@@ -132,6 +132,17 @@ public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovie
     }
 
     @Override
+    public void markAsViewed(ObjectId id) {
+        getCollection().update("{_id : #, $or: [ {seen: {$exists: 0}}, {seen : {$lt: 1}} ] }", id)
+                       .with("{$set: {seen: 1}}");
+    }
+
+    @Override
+    public void markAsUnViewed(ObjectId id) {
+        getCollection().update("{_id : #}", id).with("{$set: {seen: 0}}");
+    }
+
+    @Override
     public PaginatedList<Movie> search(SearchForm form, SearchLimit limit, Order... orders) {
         LOGGER.info("Search movies: form={} , limit={} , orders={}", form, limit, orders);
 

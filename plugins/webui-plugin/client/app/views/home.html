@@ -23,17 +23,28 @@
     <div class="row-fluid">
         <div class="span4">
             <h2>In Progress</h2>
-            <h4>Movies</h4>
+            <div ng-show="inProgress.length == 0">
+                No media in progress...
+            </div>
 
-            <ul>
-                <li ng-repeat="m in inprogress.movies | orderBy:'title'">{{m.title}}</li>
-            </ul>
+            <div ng-repeat="recovery in inProgress" class="media">
+                <a ui-sref="sheet.movie({movieId : recovery.mediaSummary.id})" class="media-icon pull-left">
+                    <poster url="{{recovery.mediaSummary.poster}}" size="MINI" />
+                </a>
 
-            <h4>Shows</h4>
+                <div class="media-body">
+                    <a class="pull-right btn btn-info btn-mini" ng-click="resume(recovery)"><i
+                            class="icon-play icon-white"></i> </a>
+                    <h4 class="media-heading" ui-sref="sheet.movie({movieId : recovery.mediaSummary.id})">
+                        <mediatitle media="recovery.mediaSummary" />
+                    </h4>
 
-            <ul>
-                <li ng-repeat="m in inprogress.shows | orderBy:'title'">{{m.title}}</li>
-            </ul>
+                    <div class="span6">
+                        <timeprogressbar status="recovery" />
+                    </div>
+                </div>
+            </div>
+
         </div>
         <div class="span4">
             <h2>{{lastMovies.elements.length}} last unseen movies</h2>

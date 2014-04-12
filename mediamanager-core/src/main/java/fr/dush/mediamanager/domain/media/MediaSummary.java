@@ -23,6 +23,8 @@ public class MediaSummary extends MediaReference {
     private Date release;
     private String tagline;
 
+    private int seen = 0;
+
     private Set<String> genres = new HashSet<>();
     private List<Person> mainActors = new ArrayList<>();
 

@@ -120,7 +120,7 @@ angular.module('mediamanager').controller('ListCtrl', function ($scope, Movie, $
     };
 });
 
-angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, $stateParams, Player) {
+angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, $stateParams, Player, Admin) {
 
     $scope.movieId = $stateParams.movieId;
     $scope.movie = undefined; // undefined => empty request ; {} => not found ; {a lot of things} => found !
@@ -150,6 +150,7 @@ angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, 
         }
     });
 
+    // ** Player control
     $scope.play = function () {
         console.log("Play movie " + $scope.movie.title)
         Player.play({type: "MOVIE", mediaId: $scope.movie.id, path: $scope.movie.videoFiles[0].file});
@@ -159,6 +160,16 @@ angular.module('mediamanager').controller('MovieCtrl', function ($scope, Movie, 
         Player.resume({type: "MOVIE", mediaId: $scope.movie.id});
     };
 
+    // ** Actions control
+    $scope.admin = function (request) {
+        request.id = $scope.movie.id;
+        request.type = 'MOVIE';
+        Admin.ctrl(request);
+
+        if (request.action == 'REMOVE_RESUME') {
+            $scope.movie.recovery = null;
+        }
+    };
 });
 
 /** Object is null or empty (no attribute), or array is empty */

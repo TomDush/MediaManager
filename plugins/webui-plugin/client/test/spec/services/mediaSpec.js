@@ -76,4 +76,31 @@ describe('MediaServices -', function () {
             expect(movie).toEqualData(response);
         });
     });
+
+    describe('Media Controller', function () {
+
+        var Media;
+
+        beforeEach(inject(function ($injector, _$httpBackend_) {
+            $httpBackend = _$httpBackend_;
+
+            Media = $injector.get('Media');
+        }));
+
+
+        it("should get list of inprogress media", function () {
+            // Expected...
+            var response = [
+                {summary: {title: 'Ironman'}}
+            ];
+            $httpBackend.expectGET('api/medias/inProgress.json').respond(response);
+
+            // Run
+            var genres = Media.inProgress();
+
+            // Check
+            $httpBackend.flush();
+            expect(genres).toEqualData(response);
+        });
+    });
 });

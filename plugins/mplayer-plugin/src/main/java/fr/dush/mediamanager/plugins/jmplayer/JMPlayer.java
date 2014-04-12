@@ -120,7 +120,6 @@ public class JMPlayer implements OutputListener, EmbeddedPlayer {
     public long quit() {
         if (mplayerProcess != null) {
             execute(QUIT_COMMAND);
-            mplayerProcess = null;
         }
 
         return position.longValue();

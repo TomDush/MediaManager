@@ -8,6 +8,8 @@ import fr.dush.mediamanager.domain.media.MediaSummary;
 import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.media.Recovery;
 import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.events.mediatech.MovieAdminEvent;
+import fr.dush.mediamanager.events.mediatech.Operation;
 import fr.dush.mediamanager.events.play.MoviePlayerEvent;
 import fr.dush.mediamanager.events.play.PlayerEvent;
 import org.dozer.Mapper;
@@ -47,17 +49,25 @@ public class RecoveryService {
 
     public void handleMovieEvents(@Observes MoviePlayerEvent event) {
         if (event.getType() == PlayerEvent.QUIT) {
-            LOGGER.info("QUIT event: {}", event);
+            LOGGER.debug("QUIT event: {}", event);
+
             double ratio = event.getLength() > 0 ? (double) event.getPosition() / (double) event.getLength() : 0;
             if (ratio > FINISHED_RATIO) {
                 LOGGER.info("Mark movie as read: {}", event.getMovie().getTitle());
                 markMovieHasSeen(event.getMovie());
 
-            }
-            else if (ratio > STARTED_RATIO) {
+            } else if (ratio > STARTED_RATIO) {
                 LOGGER.info("Save recovery for {}", event.getMovie().getTitle());
                 saveRecovery(event.getPosition(), event.getLength(), event.getMovie(), event.getMedias());
             }
+        }
+    }
+
+    /** Listen all movies events and execute expected REMOVE_RESUME operation */
+    public void handleOperation(@Observes MovieAdminEvent event) {
+        if (event.getOperation() == Operation.REMOVE_RESUME) {
+            recoveryDAO.delete(new MediaReference(MediaType.MOVIE, event.getId()));
+            event.markHandled();
         }
     }
 

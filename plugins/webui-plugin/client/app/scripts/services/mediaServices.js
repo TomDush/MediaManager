@@ -38,5 +38,13 @@ angular.module('mediaServices', [ 'ngResource' ])
             ctrl: { method: 'GET', params: { cmd: "ctrl"}}
         });
     })
-
-;
+    .factory('Media', function ($resource) {
+        return $resource('api/medias/:request.json', {}, {
+            inProgress: { method: 'GET', params: { request: "inProgress"}, isArray: true}
+        });
+    })
+    .factory('Admin', function ($resource) {
+        return $resource('api/admin/:type/:id/:action', {}, {
+            ctrl: { method: 'GET'}
+        });
+    })

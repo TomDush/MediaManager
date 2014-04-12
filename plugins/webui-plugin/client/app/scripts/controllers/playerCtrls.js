@@ -24,9 +24,6 @@ angular.module('mediamanager').controller('PlayerCtrl', function ($scope, $state
 
             // Set is-playing flag and compute progression
             $scope.playing = $scope.player != null;
-            if ($scope.playing) {
-                $scope.progression = Math.round(100 * $scope.player.position / $scope.player.length);
-            }
 
             // Set flag 'otherPlayers'
             $scope.otherPlayers = val.length > 1;

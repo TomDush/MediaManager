@@ -24,6 +24,9 @@ import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerA
 public class MovieDAOImplTest extends MongoJunitTest {
 
     private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+    public static final String IRON_MAN_1_ID = "5200c7a884ae0d25732cd70a";
+    public static final String IRON_MAN_2_ID = "5200c7a884ae0d25732cd70b";
+    public static final String STAR_TRECK_ID = "5200c7a884ae0d25732cd70c";
 
     @Inject
     private IMovieDAO movieDAO;
@@ -130,26 +133,84 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
     @Test
     public void test_incViewCount() throws Exception {
-        final Movie movie = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70a"));
+        final Movie movie = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
         assertThat(movie).as("DataTest invalid").isNotNull();
 
         // Exec
         movieDAO.incrementViewCount(movie.getId(), 2);
 
         // Test
-        final Movie reloaded = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70a"));
+        final Movie reloaded = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
         assertThat(reloaded).hasSeen(4);
 
         // ** Other test (field doesn't exist)
-        final Movie movie2 = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70b"));
+        final Movie movie2 = movieDAO.findById(new ObjectId(IRON_MAN_2_ID));
         assertThat(movie2).as("DataTest invalid").isNotNull();
 
         // Exec
         movieDAO.incrementViewCount(movie2.getId(), 1);
 
         // Test
-        final Movie reloaded2 = movieDAO.findById(new ObjectId("5200c7a884ae0d25732cd70b"));
+        final Movie reloaded2 = movieDAO.findById(new ObjectId(IRON_MAN_2_ID));
         assertThat(reloaded2).hasSeen(1);
+    }
+
+    /** Mark unseen movie as seen */
+    @Test
+    public void test_markViewed_unseen() throws Exception {
+        // Before
+        Movie reloaded = movieDAO.findById(new ObjectId(STAR_TRECK_ID));
+        assertThat(reloaded).hasSeen(0);
+
+        // Exec
+        movieDAO.markAsViewed(new ObjectId(STAR_TRECK_ID));
+
+        // Assert after
+        reloaded = movieDAO.findById(new ObjectId(STAR_TRECK_ID));
+        assertThat(reloaded).hasSeen(1);
+
+        // Retry don't change anything
+        movieDAO.markAsViewed(new ObjectId(STAR_TRECK_ID));
+
+        reloaded = movieDAO.findById(new ObjectId(STAR_TRECK_ID));
+        assertThat(reloaded).hasSeen(1);
+
+        // ** If properties seen wasn't existing..
+        assertThat(movieDAO.findById(new ObjectId(IRON_MAN_2_ID))).hasSeen(0);
+
+        movieDAO.markAsViewed(new ObjectId(IRON_MAN_2_ID));
+        assertThat(movieDAO.findById(new ObjectId(IRON_MAN_2_ID))).hasSeen(1);
+
+    }
+
+    /** Mark unseen movie as seen */
+    @Test
+    public void test_markViewed_alreadySeen() throws Exception {
+        // Before
+        Movie reloaded = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
+        assertThat(reloaded).hasSeen(2);
+
+        // Exec
+        movieDAO.markAsViewed(new ObjectId(IRON_MAN_1_ID));
+
+        // After
+        reloaded = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
+        assertThat(reloaded).hasSeen(2);
+    }
+
+    /** Mark unseen movie as seen */
+    @Test
+    public void test_markUnViewed() throws Exception {
+        // Before
+        Movie reloaded = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
+        assertThat(reloaded).hasSeen(2);
+
+        // Exec
+        movieDAO.markAsUnViewed(new ObjectId(IRON_MAN_1_ID));
+
+        // After
+        reloaded = movieDAO.findById(new ObjectId(IRON_MAN_1_ID));
+        assertThat(reloaded).hasSeen(0);
     }
 
     @Test
