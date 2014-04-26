@@ -24,20 +24,20 @@
         <!-- Built-in (pre-installed) plugins -->
         <dependency>
             <groupId>fr.dush</groupId>
-            <artifactId>moviedatabase-mediamanager-plugin</artifactId>
+            <artifactId>moviedatabase-plugin</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>fr.dush</groupId>
-            <artifactId>webui-mediamanager-plugin</artifactId>
+            <artifactId>webui-plugin</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>fr.dush</groupId>
-            <artifactId>webui-mediamanager-plugin</artifactId>
+            <artifactId>webui-plugin</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>runtime</scope>

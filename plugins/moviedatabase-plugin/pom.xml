@@ -1,34 +1,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>fr.dush</groupId>
-		<artifactId>builtin-mediamanager-plugins</artifactId>
-		<version>0.2-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>fr.dush</groupId>
+        <artifactId>plugins</artifactId>
+        <version>0.2-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>moviedatabase-mediamanager-plugin</artifactId>
-	<name>MediaManager - Movie Database Plugin</name>
-	<packaging>jar</packaging>
+    <artifactId>moviedatabase-plugin</artifactId>
+    <name>MediaManager - Movie Database Plugin</name>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<!-- Media Manager API -->
-		<dependency>
-			<groupId>fr.dush</groupId>
-			<artifactId>mediamanager-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependencies>
+        <!-- Media Manager API -->
+        <dependency>
+            <groupId>fr.dush</groupId>
+            <artifactId>mediamanager-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-		<!-- MovieDatabase java API -->
-		<dependency>
-			<groupId>com.omertron</groupId>
-			<artifactId>themoviedbapi</artifactId>
-			<version>3.4</version>
-		</dependency>
+        <!-- MovieDatabase java API -->
+        <dependency>
+            <groupId>com.omertron</groupId>
+            <artifactId>themoviedbapi</artifactId>
+            <version>3.4</version>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 </project>

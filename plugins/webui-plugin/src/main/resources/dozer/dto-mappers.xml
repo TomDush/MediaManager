@@ -5,12 +5,12 @@
           http://dozer.sourceforge.net/schema/beanmapping.xsd">
 
     <mapping>
-        <class-a>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</class-a>
+        <class-a>fr.dush.mediamanager.plugins.webui.rest.dto.RequestFilter</class-a>
         <class-b>fr.dush.mediamanager.dao.media.queries.SearchForm</class-b>
     </mapping>
 
     <mapping>
-        <class-a>fr.dush.mediacenters.modules.webui.rest.dto.RequestFilter</class-a>
+        <class-a>fr.dush.mediamanager.plugins.webui.rest.dto.RequestFilter</class-a>
         <class-b>fr.dush.mediamanager.dao.media.queries.SearchLimit</class-b>
         <field>
             <a>pagination.index</a>

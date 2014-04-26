@@ -1,24 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                      
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>fr.dush</groupId>
-		<artifactId>mediamanager</artifactId>
-		<version>0.2-SNAPSHOT</version>
-	</parent>
 
-	<artifactId>builtin-mediamanager-plugins</artifactId>
-	<name>MediaManager - PLUGINS</name>
-	<packaging>pom</packaging>
+    <modelVersion>4.0.0</modelVersion>
 
-	<modules>
-		<module>moviedatabase-plugin</module>
-		<module>webui-plugin</module>
-		<module>mplayer-plugin</module>
-		<module>amarok-plugin</module>
-	</modules>
+    <parent>
+        <groupId>fr.dush</groupId>
+        <artifactId>mediamanager</artifactId>
+        <version>0.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>plugins</artifactId>
+    <name>MediaManager - PLUGINS</name>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>moviedatabase-plugin</module>
+        <module>webui-plugin</module>
+        <module>mplayer-plugin</module>
+        <module>amarok-plugin</module>
+    </modules>
 
 </project>
