@@ -3,11 +3,14 @@ package fr.dush.mediamanager.business.configuration.producers;
 import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerAssertions.*;
 import static org.fest.assertions.api.Assertions.*;
 
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,10 +20,14 @@ import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.engine.CdiJunitTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // FIXME This class stop unit test with intelliJ...
 @Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")
 public class ConfigurationProducerTest extends CdiJunitTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationProducerTest.class);
 
 	@Inject
 	private ObjectMapper mapper;
@@ -52,6 +59,8 @@ public class ConfigurationProducerTest extends CdiJunitTest {
 		fields.get(0).setDescription("Host on which is installed players.");
 		fields.get(0).setDefaultValue(true);
 
-		mapper.writeValue(System.out, fields);
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(new WriterOutputStream(writer), fields);
+        LOGGER.info("Object mapped: {}", writer.toString());
 	}
 }
