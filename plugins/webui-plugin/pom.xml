@@ -15,7 +15,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <jetty-version>9.0.5.v20130815</jetty-version>
+        <jetty-version>9.2.0.M0</jetty-version>
     </properties>
 
     <dependencies>
@@ -32,27 +32,22 @@
             <artifactId>weld-servlet-core</artifactId>
             <version>${weld-version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core-jsf</artifactId>
-            <version>${weld-version}</version>
-        </dependency>
 
         <!-- WS REST : RestEasy -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-servlet-initializer</artifactId>
-            <version>3.0.5.Final</version>
+            <version>3.0.8.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
-            <version>3.0.5.Final</version>
+            <version>3.0.8.Final</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jackson2-provider</artifactId>
-            <version>3.0.5.Final</version>
+            <version>3.0.8.Final</version>
         </dependency>
     </dependencies>
 

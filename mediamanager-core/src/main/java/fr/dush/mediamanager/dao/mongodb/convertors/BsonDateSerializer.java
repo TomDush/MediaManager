@@ -5,16 +5,14 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Convert Java date to BSON dates : <code> { creation : {$date : '2013-12-20T11:28:41.852Z'} }</code> instead of : <code>{ creation :
- * '2013-12-20T11:28:41.852Z' } </code>
+ * Convert Java date to BSON dates : <code> { creation : {$date : '2013-12-20T11:28:41.852Z'} }</code> instead of :
+ * <code>{ creation : '2013-12-20T11:28:41.852Z' } </code>
  */
-@ApplicationScoped
 public class BsonDateSerializer extends StdSerializer<Date> {
 
     public BsonDateSerializer() {
@@ -22,7 +20,8 @@ public class BsonDateSerializer extends StdSerializer<Date> {
     }
 
     @Override
-    public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException, JsonGenerationException {
+    public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException,
+            JsonGenerationException {
         jgen.writeStartObject();
         jgen.writeFieldName("$date");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");

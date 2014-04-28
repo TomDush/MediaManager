@@ -79,7 +79,7 @@ public class PlayerLauncherTest extends SimpleJunitTest {
 
         when(modulesManager.findModuleByType(PlayerProvider.class)).thenReturn(providers);
 
-        playerLauncher.loadProviders(modulesManager);
+        playerLauncher.loadProviders();
 
         // Movie wrapper factory
         MoviePlayerWrapper wrapper = new MoviePlayerWrapper();

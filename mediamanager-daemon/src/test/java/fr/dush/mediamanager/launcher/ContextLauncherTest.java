@@ -1,20 +1,18 @@
 package fr.dush.mediamanager.launcher;
 
-import static org.fest.assertions.api.Assertions.*;
-
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.junit.Ignore;
+import fr.dush.mediamanager.remote.Stopper;
+import fr.dush.mediamanager.tools.CDIUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.remote.Stopper;
-import fr.dush.mediamanager.tools.CDIUtils;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.fest.assertions.api.Assertions.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ContextLauncherTest implements UncaughtExceptionHandler {
@@ -51,21 +49,6 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
         if (catchedException != null && catchedException instanceof Exception) {
             throw (Exception) catchedException;
         }
-    }
-
-    @Test
-    @Ignore
-    public void startLocal() throws Exception {
-        System.setProperty("webui.resources", Paths.get("../plugins/webui-plugin/src/main/webapp").toAbsolutePath().normalize().toString());
-
-        ContextLauncher launcher = new ContextLauncher(configFile, DEFAULT_JUNIT_PORT);
-        synchronized (launcher) {
-            launcher.start();
-
-            launcher.wait(1000);
-        }
-
-        launcher.join();
     }
 
     @Override

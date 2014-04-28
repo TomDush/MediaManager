@@ -37,7 +37,7 @@ public class TheMovieDBProvider {
         String host = configuration.readDeepValue("proxy.host", null);
         if (isNotEmpty(host)) {
             WebBrowser.setProxyHost(host);
-            WebBrowser.setProxyPort(configuration.readDeepValue("proxy.port", null));
+            WebBrowser.setProxyPort(configuration.readValueAsInt("proxy.port"));
             WebBrowser.setProxyUsername(configuration.readDeepValue("proxy.username", null));
             WebBrowser.setProxyPassword(configuration.readDeepValue("proxy.password", null));
         }

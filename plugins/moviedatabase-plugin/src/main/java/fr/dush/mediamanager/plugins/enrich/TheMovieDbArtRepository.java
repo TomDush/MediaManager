@@ -36,6 +36,10 @@ public class TheMovieDbArtRepository implements ArtRepository {
     @Inject
     private TheMovieDbApi api;
 
+    // Used only by postConstruct
+    @Inject
+    private Event<ArtRepositoryRegisterEvent> bus;
+
     private static final Map<String, String> qualities = new HashMap<>();
 
     static {
@@ -57,8 +61,7 @@ public class TheMovieDbArtRepository implements ArtRepository {
     }
 
     @PostConstruct
-    @Inject
-    public void register(Event<ArtRepositoryRegisterEvent> bus) {
+    public void register() {
         bus.fire(new ArtRepositoryRegisterEvent(TheMovieDbEnricher.MOVIEDB_ID_TYPE, this));
     }
 

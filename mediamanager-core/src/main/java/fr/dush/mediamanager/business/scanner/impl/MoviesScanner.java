@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -199,7 +200,9 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
         }
 
         // Internal ID based on title (from file name)
-        m.getMediaIds().add(new SourceId(SourceId.INTERNAL, Hashing.sha1().hashString(m.getTitle()).toString()));
+        m.getMediaIds()
+         .add(new SourceId(SourceId.INTERNAL,
+                           Hashing.sha1().hashString(m.getTitle(), Charset.forName("UTF-8")).toString()));
 
         return m;
     }

@@ -8,7 +8,6 @@ import com.google.common.collect.Collections2;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.media.queries.*;
 import fr.dush.mediamanager.dao.mongodb.AbstractDAO;
@@ -19,7 +18,6 @@ import org.jongo.Find;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +33,6 @@ import static org.apache.commons.lang3.StringUtils.*;
  *
  * @author Thomas Duchatelle
  */
-@ApplicationScoped
-@Startup(superclass = IMovieDAO.class)
 public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovieDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);
