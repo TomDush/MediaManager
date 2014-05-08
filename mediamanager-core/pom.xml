@@ -19,14 +19,14 @@
         <dependency>
             <groupId>com.github.axet</groupId>
             <artifactId>vget</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.5</version>
         </dependency>
 
         <!-- Parser JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.2.1</version>
+            <version>2.4.0-rc2</version>
         </dependency>
 
         <!-- Re root logger to SLF4J (for Openwebbeans) -->
@@ -40,31 +40,19 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
-            <version>2.10.1</version>
+            <version>2.12.1</version>
         </dependency>
-
-        <!-- MongoDB DAO utils -->
         <dependency>
             <groupId>org.jongo</groupId>
             <artifactId>jongo</artifactId>
             <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.1</version>
         </dependency>
 
         <!-- Bean mapping -->
         <dependency>
             <groupId>net.sf.dozer</groupId>
             <artifactId>dozer</artifactId>
-            <version>5.4.0</version>
+            <version>5.5.1</version>
         </dependency>
     </dependencies>
 

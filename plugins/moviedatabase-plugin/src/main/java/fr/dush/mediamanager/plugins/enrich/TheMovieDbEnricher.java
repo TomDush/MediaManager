@@ -52,7 +52,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbEnricher.class);
 
-    public static final int CASTING_SIZE = 6;
+    private static final int CASTING_SIZE = 6;
 
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -70,7 +70,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
         try {
             // Search in database
             final List<MovieDb> foundMovies =
-                    api.searchMovie(filename.getMovieName(), filename.getYear(), "en", false, 0);
+                    api.searchMovie(filename.getMovieName(), filename.getYear(), "en", false, 0).getResults();
 
             // Convert information
             return Lists.transform(foundMovies, converter);
@@ -101,9 +101,10 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
                                                                               String lang) throws EnrichException {
         try {
             final int id = getId(media.getMediaIds(), media.getTitle());
-            return Lists.transform(api.getMovieTrailers(id, isBlank(lang) ? "en" : lang), trailerConverter);
+            return Lists.transform(api.getMovieTrailers(id, isBlank(lang) ? "en" : lang).getResults(),
+                                   trailerConverter);
         } catch (MovieDbException e) {
-            throw new EnrichException(String.format("Can't find trailers for media {}.", media), e);
+            throw new EnrichException(String.format("Can't find trailers for media %s.", media), e);
         }
     }
 
@@ -210,7 +211,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             movie.setVoteAverage(movieDb.getVoteAverage() / 10);
 
             // Find main actors...
-            PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
+            PersonParser parser = new PersonParser(this, api.getMovieCasts(id).getResults());
             movie.setMainActors(parser.getCasting(CASTING_SIZE));
             movie.setDirectors(parser.getDirectors());
 

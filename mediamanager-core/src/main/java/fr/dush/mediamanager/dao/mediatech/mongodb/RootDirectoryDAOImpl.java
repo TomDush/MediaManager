@@ -7,7 +7,6 @@ import fr.dush.mediamanager.domain.tree.RootDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Date;
@@ -20,7 +19,6 @@ import static com.google.common.collect.Lists.*;
  *
  * @author Thomas Duchatelle
  */
-@ApplicationScoped
 public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> implements IRootDirectoryDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RootDirectoryDAOImpl.class);
@@ -52,7 +50,8 @@ public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> imp
             return null;
         }
 
-        throw new IllegalStateException("Saved RootDirectories are in illegal state : found multiple root for one path : " + path);
+        throw new IllegalStateException(
+                "Saved RootDirectories are in illegal state : found multiple root for one path : " + path);
     }
 
     @Override

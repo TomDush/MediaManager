@@ -3,10 +3,10 @@ package fr.dush.mediamanager.plugins.enrich.moviesdb;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.model.*;
+import com.omertron.themoviedbapi.results.TmdbResultsList;
 import fr.dush.mediamanager.tools.RetryApi;
 
 import javax.enterprise.inject.Alternative;
-import java.util.List;
 
 /**
  * If you have a bad internet connection, like me, this decorator retry some times each request before giving up.<br/>
@@ -27,115 +27,124 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public MovieDb getMovieInfo(final int movieId, final String language) throws MovieDbException {
+    public MovieDb getMovieInfo(final int movieId, final String language, final String... appendToResponse) throws
+            MovieDbException {
 
         return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
             @Override
             public MovieDb doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieInfo(movieId, language);
+                return theMovieDbApi.getMovieInfo(movieId, language, appendToResponse);
             }
         });
     }
 
     @Override
-    public MovieDb getMovieInfoImdb(final String imdbId, final String language) throws MovieDbException {
+    public MovieDb getMovieInfoImdb(final String imdbId, final String language, final String... appendToResponse)
+            throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
             @Override
             public MovieDb doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieInfoImdb(imdbId, language);
+                return theMovieDbApi.getMovieInfoImdb(imdbId, language, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<AlternativeTitle> getMovieAlternativeTitles(final int movieId,
-                                                            final String country) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<AlternativeTitle>>() {
+    public TmdbResultsList<AlternativeTitle> getMovieAlternativeTitles(final int movieId, final String country,
+                                                                       final String... appendToResponse) throws
+            MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<AlternativeTitle>>() {
             @Override
-            public List<AlternativeTitle> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieAlternativeTitles(movieId, country);
+            public TmdbResultsList<AlternativeTitle> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieAlternativeTitles(movieId, country, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<Person> getMovieCasts(final int movieId) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Person>>() {
+    public TmdbResultsList<Person> getMovieCasts(final int movieId, final String... appendToResponse) throws
+            MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Person>>() {
             @Override
-            public List<Person> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieCasts(movieId);
+            public TmdbResultsList<Person> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieCasts(movieId, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<Artwork> getMovieImages(final int movieId, final String language) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
+    public TmdbResultsList<Artwork> getMovieImages(final int movieId, final String language,
+                                                   final String... appendToResponse) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Artwork>>() {
             @Override
-            public List<Artwork> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieImages(movieId, language);
+            public TmdbResultsList<Artwork> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieImages(movieId, language, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<Keyword> getMovieKeywords(final int movieId) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Keyword>>() {
+    public TmdbResultsList<Keyword> getMovieKeywords(final int movieId, final String... appendToResponse) throws
+            MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Keyword>>() {
             @Override
-            public List<Keyword> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieKeywords(movieId);
+            public TmdbResultsList<Keyword> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieKeywords(movieId, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<ReleaseInfo> getMovieReleaseInfo(final int movieId, final String language) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<ReleaseInfo>>() {
+    public TmdbResultsList<ReleaseInfo> getMovieReleaseInfo(final int movieId, final String language,
+                                                            final String... appendToResponse) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<ReleaseInfo>>() {
             @Override
-            public List<ReleaseInfo> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieReleaseInfo(movieId, language);
+            public TmdbResultsList<ReleaseInfo> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieReleaseInfo(movieId, language, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<Trailer> getMovieTrailers(final int movieId, final String language) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Trailer>>() {
+    public TmdbResultsList<Trailer> getMovieTrailers(final int movieId, final String language,
+                                                     final String... appendToResponse) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Trailer>>() {
             @Override
-            public List<Trailer> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieTrailers(movieId, language);
+            public TmdbResultsList<Trailer> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieTrailers(movieId, language, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<Translation> getMovieTranslations(final int movieId) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Translation>>() {
+    public TmdbResultsList<Translation> getMovieTranslations(final int movieId, final String... appendToResponse)
+            throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Translation>>() {
             @Override
-            public List<Translation> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieTranslations(movieId);
+            public TmdbResultsList<Translation> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieTranslations(movieId, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<MovieDb> getSimilarMovies(final int movieId, final String language,
-                                          final int page) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieDb>>() {
+    public TmdbResultsList<MovieDb> getSimilarMovies(final int movieId, final String language, final int page,
+                                                     final String... appendToResponse) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieDb>>() {
             @Override
-            public List<MovieDb> doIt() throws MovieDbException {
-                return theMovieDbApi.getSimilarMovies(movieId, language, page);
+            public TmdbResultsList<MovieDb> doIt() throws MovieDbException {
+                return theMovieDbApi.getSimilarMovies(movieId, language, page, appendToResponse);
             }
         });
     }
 
     @Override
-    public List<MovieList> getMovieLists(final int movieId, final String language,
-                                         final int page) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieList>>() {
+    public TmdbResultsList<MovieList> getMovieLists(final int movieId, final String language, final int page,
+                                                    final String... appendToResponse) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieList>>() {
             @Override
-            public List<MovieList> doIt() throws MovieDbException {
-                return theMovieDbApi.getMovieLists(movieId, language, page);
+            public TmdbResultsList<MovieList> doIt() throws MovieDbException {
+                return theMovieDbApi.getMovieLists(movieId, language, page, appendToResponse);
             }
         });
     }
@@ -161,17 +170,18 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public List<Artwork> getCollectionImages(final int collectionId, final String language) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
+    public TmdbResultsList<Artwork> getCollectionImages(final int collectionId,
+                                                        final String language) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Artwork>>() {
             @Override
-            public List<Artwork> doIt() throws MovieDbException {
+            public TmdbResultsList<Artwork> doIt() throws MovieDbException {
                 return theMovieDbApi.getCollectionImages(collectionId, language);
             }
         });
     }
 
     @Override
-    public Person getPersonInfo(final int personId) throws MovieDbException {
+    public Person getPersonInfo(final int personId, String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<Person>() {
             @Override
             public Person doIt() throws MovieDbException {
@@ -181,32 +191,32 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public List<Artwork> getPersonImages(final int personId) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Artwork>>() {
+    public TmdbResultsList<Artwork> getPersonImages(final int personId) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Artwork>>() {
             @Override
-            public List<Artwork> doIt() throws MovieDbException {
+            public TmdbResultsList<Artwork> doIt() throws MovieDbException {
                 return theMovieDbApi.getPersonImages(personId);
             }
         });
     }
 
     @Override
-    public List<MovieDb> searchMovie(final String movieName, final int searchYear, final String language,
-                                     final boolean includeAdult, final int page) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<MovieDb>>() {
+    public TmdbResultsList<MovieDb> searchMovie(final String movieName, final int searchYear, final String language,
+                                                final boolean includeAdult, final int page) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieDb>>() {
             @Override
-            public List<MovieDb> doIt() throws MovieDbException {
+            public TmdbResultsList<MovieDb> doIt() throws MovieDbException {
                 return theMovieDbApi.searchMovie(movieName, searchYear, language, includeAdult, page);
             }
         });
     }
 
     @Override
-    public List<Collection> searchCollection(final String query, final String language,
-                                             final int page) throws MovieDbException {
-        return RetryApi.retry(new RetryApi.MethodWithReturn<List<Collection>>() {
+    public TmdbResultsList<Collection> searchCollection(final String query, final String language,
+                                                        final int page) throws MovieDbException {
+        return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Collection>>() {
             @Override
-            public List<Collection> doIt() throws MovieDbException {
+            public TmdbResultsList<Collection> doIt() throws MovieDbException {
                 return theMovieDbApi.searchCollection(query, language, page);
             }
         });

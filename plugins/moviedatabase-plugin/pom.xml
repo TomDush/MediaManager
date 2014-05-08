@@ -26,9 +26,8 @@
         <dependency>
             <groupId>com.omertron</groupId>
             <artifactId>themoviedbapi</artifactId>
-            <version>3.4</version>
+            <version>3.9</version>
         </dependency>
-
     </dependencies>
 
 </project>

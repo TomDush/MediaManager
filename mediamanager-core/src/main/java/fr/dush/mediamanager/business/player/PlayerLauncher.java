@@ -50,13 +50,16 @@ public class PlayerLauncher {
     @Inject
     private Event<PlayerControlEvent> controlBus;
 
+    // Used only by post construct...
+    @Inject
+    private IModulesManager modulesManager;
+
     /** Providers by extensions */
     private Map<String, PlayerProvider> providers = new HashMap<>();
     private PlayerProvider defaultProvider;
 
-    @Inject
     @PostConstruct
-    public void loadProviders(IModulesManager modulesManager) {
+    public void loadProviders() {
         Collection<PlayerProvider> playerProviders = modulesManager.findModuleByType(PlayerProvider.class);
 
         // Load players and organize them by extension. Custom configuration management is to do...
