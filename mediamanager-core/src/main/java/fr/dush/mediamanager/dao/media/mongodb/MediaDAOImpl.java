@@ -39,13 +39,13 @@ public class MediaDAOImpl implements IMediaDAO {
                                               }
                                           });
 
-        LOGGER.debug("Found genres : {}", genres);
 
         if (genres == null || genres.isEmpty()) {
-            LOGGER.error("Couldn't get genres list...");
+            LOGGER.error("Couldn't get genres list... (database empty?)");
             return new HashSet<>();
         }
 
+        LOGGER.debug("Found genres : {}", genres);
         return new HashSet<>(genres.get(0));
     }
 }

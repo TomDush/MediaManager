@@ -18,9 +18,9 @@ import java.util.Set;
 
 /**
  * Find in loaded classpath Providers and Resources.
- * <p/>
- * <p> RestEasy scanner search resources and providers from WEB-INF/classes and libs. But, this paths are not deploy in
- * MediaManager. </p>
+ * <p> RestEasy scanner search resources and providers from
+ * WEB-INF/classes and libs. But, this directory is not deployed in MediaManager zip file. This alternative scan real
+ * classpath.</p>
  *
  * @author Thomas Duchatelle
  */
@@ -39,7 +39,7 @@ public class WebUiApplication extends Application {
         try {
             scanPackage("fr.dush");
             scanPackage("com.fasterxml");
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
             LOGGER.error("Can't scan classes", e);
         }
     }
