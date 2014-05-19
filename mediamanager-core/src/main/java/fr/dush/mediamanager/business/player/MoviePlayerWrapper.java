@@ -1,6 +1,7 @@
 package fr.dush.mediamanager.business.player;
 
 import com.google.common.base.Function;
+import com.google.common.eventbus.EventBus;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.media.video.VideoFile;
 import fr.dush.mediamanager.events.play.MoviePlayerEvent;
@@ -13,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.event.Event;
-import javax.enterprise.util.TypeLiteral;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -47,26 +45,10 @@ public class MoviePlayerWrapper extends AbstractMetaPlayer<Movie, VideoFile> {
         this.file = file;
         this.wrappedPlayer = embeddedPlayer;
 
-        wrappedPlayer.setBusEvent(new Event<PlayerEvent>() {
-
+        wrappedPlayer.setBusEvent(new EventBus() {
             @Override
-            public void fire(PlayerEvent playerEvent) {
-                fireEvent(playerEvent);
-            }
-
-            @Override
-            public Event<PlayerEvent> select(Annotation... annotations) {
-                throw new IllegalStateException("Method not implemented");
-            }
-
-            @Override
-            public <U extends PlayerEvent> Event<U> select(Class<U> uClass, Annotation... annotations) {
-                throw new IllegalStateException("Method not implemented");
-            }
-
-            @Override
-            public <U extends PlayerEvent> Event<U> select(TypeLiteral<U> uTypeLiteral, Annotation... annotations) {
-                throw new IllegalStateException("Method not implemented");
+            public void post(Object event) {
+                fireEvent((PlayerEvent) event);
             }
         });
 
@@ -97,7 +79,7 @@ public class MoviePlayerWrapper extends AbstractMetaPlayer<Movie, VideoFile> {
 
     /** Intercept event launched by the wrapped player and enrich it. */
     protected void fireEvent(PlayerEvent playerEvent) {
-        busEvent.fire(new MoviePlayerEvent(playerEvent, media));
+        busEvent.post(new MoviePlayerEvent(playerEvent, media));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.plugins.amarok;
 
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.player.AbstractMetaPlayer;
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.MediaFile;

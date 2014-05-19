@@ -1,7 +1,8 @@
 package fr.dush.mediamanager.business.player;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mediatech.IRecoveryDAO;
@@ -19,13 +20,11 @@ import fr.dush.mediamanager.modulesapi.player.*;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +32,13 @@ import java.util.Map;
 /**
  * Listen to PlayRequestEvent to stop others players and start the new one.
  */
-@ApplicationScoped
-@Startup
+@Named
 public class PlayerLauncher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerLauncher.class);
+
+    @Inject
+    private ApplicationContext applicationContext;
 
     @Inject
     private IMovieDAO movieDAO;
@@ -45,10 +46,7 @@ public class PlayerLauncher {
     private IRecoveryDAO recoveryDAO;
 
     @Inject
-    private Instance<MoviePlayerWrapper> moviePlayerFactory;
-
-    @Inject
-    private Event<PlayerControlEvent> controlBus;
+    private EventBus controlBus;
 
     // Used only by post construct...
     @Inject
@@ -79,7 +77,8 @@ public class PlayerLauncher {
     /**
      * Play the media requested in the event after closing all other players.
      */
-    public void playMedia(@Observes PlayRequestEvent event) throws PlayerException {
+    @Subscribe
+    public void playMedia(PlayRequestEvent event) throws PlayerException {
         LOGGER.info("Play request: {}", event);
 
         // Start playing...
@@ -114,7 +113,7 @@ public class PlayerLauncher {
             player = (MetaPlayer<Movie, VideoFile>) implementation;
             player.initialise(movie, videoFile, null);
         } else if (implementation instanceof EmbeddedPlayer) {
-            player = moviePlayerFactory.get();
+            player = getMovieVideoFileMetaPlayer();
             player.initialise(movie, videoFile, (EmbeddedPlayer) implementation);
         } else {
             throw new ConfigurationException("Player must implement MetaPlayer or EmbeddedPlayer to read a Movie");
@@ -128,7 +127,12 @@ public class PlayerLauncher {
         }
     }
 
-    public void resume(@Observes ResumeRequestEvent event) throws PlayerException {
+    private MetaPlayer<Movie, VideoFile> getMovieVideoFileMetaPlayer() {
+        return applicationContext.getBean(MoviePlayerWrapper.class);
+    }
+
+    @Subscribe
+    public void resume(ResumeRequestEvent event) throws PlayerException {
         Recovery recovery = recoveryDAO.findById(event.getReference());
         if (recovery == null) {
             LOGGER.warn("No media to recover with ID: {}", recovery);
@@ -139,7 +143,7 @@ public class PlayerLauncher {
     }
 
     private void closeOtherPlayers(PlayerType type) {
-        controlBus.fire(new PlayerControlEventByType(PlayerControlEvent.PlayerControl.STOP, type));
+        controlBus.post(new PlayerControlEventByType(PlayerControlEvent.PlayerControl.STOP, type));
     }
 
     private PlayerProvider getPlayerProvider(MediaFile videoFile) {

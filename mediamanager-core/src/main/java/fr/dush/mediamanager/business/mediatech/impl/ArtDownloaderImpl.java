@@ -2,7 +2,6 @@ package fr.dush.mediamanager.business.mediatech.impl;
 
 import com.google.common.hash.Hashing;
 import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
@@ -14,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,8 +26,7 @@ import java.nio.file.Paths;
 import static com.google.common.io.Files.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
-@ApplicationScoped
-@Startup
+@Named
 public class ArtDownloaderImpl implements IArtDownloader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);

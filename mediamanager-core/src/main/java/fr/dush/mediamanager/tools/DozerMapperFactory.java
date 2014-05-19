@@ -12,9 +12,9 @@ import org.dozer.DozerConverter;
 import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -26,12 +26,12 @@ import static com.google.common.collect.Sets.filter;
 /**
  * @author Thomas Duchatelle
  */
+@Configuration
 public class DozerMapperFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DozerMapperFactory.class);
 
-    @Produces
-    @ApplicationScoped
+    @Bean
     public Mapper getDozerMapper() {
 
         DozerBeanMapper mapper = new DozerBeanMapper();

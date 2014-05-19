@@ -3,6 +3,7 @@ package fr.dush.mediamanager.business.scanner.impl;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
+import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import fr.dush.mediamanager.annotations.Configuration;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -64,7 +64,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     private IMoviesEnricher enricher;
 
     @Inject
-    private Event<AmbiguousEnrichment> ambiguousEnrichmentDispatcher;
+    private EventBus eventBus;
 
     /** Pattern to find date in filenames */
     protected Pattern datePattern;
@@ -123,7 +123,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
                 // If enrichment is ambiguous, first one will be choose, but an event is fired to save this
                 // confusion, or display it.
                 final AmbiguousEnrichment event = new AmbiguousEnrichment(this, Movie.class, file.getFile(), movies);
-                ambiguousEnrichmentDispatcher.fire(event);
+                eventBus.post(event);
             }
 
             // Return first or null

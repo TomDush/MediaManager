@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;

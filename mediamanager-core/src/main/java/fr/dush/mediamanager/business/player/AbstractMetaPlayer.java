@@ -1,27 +1,22 @@
 package fr.dush.mediamanager.business.player;
 
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.MediaFile;
 import fr.dush.mediamanager.events.EventBusRegisterEvent;
 import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
 import fr.dush.mediamanager.events.play.PlayerControlEvent;
-import fr.dush.mediamanager.events.play.PlayerEvent;
 import fr.dush.mediamanager.exceptions.PlayerException;
 import fr.dush.mediamanager.modulesapi.player.MetaPlayer;
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.util.UUID;
 
 /** Register listener into Guava Events Bus and provide method to unregister it. */
 public abstract class AbstractMetaPlayer<M extends Media, F extends MediaFile> implements MetaPlayer<M, F> {
@@ -33,9 +28,7 @@ public abstract class AbstractMetaPlayer<M extends Media, F extends MediaFile> i
 
     @Inject
     @Setter
-    protected Event<PlayerEvent> busEvent;
-    @Inject
-    private Event<EventBusRegisterEvent> guavaBusEvent;
+    protected EventBus busEvent;
 
     public AbstractMetaPlayer() {
         id = generateId();
@@ -43,11 +36,11 @@ public abstract class AbstractMetaPlayer<M extends Media, F extends MediaFile> i
 
     @PostConstruct
     public void registerItself() {
-        guavaBusEvent.fire(new EventBusRegisterEvent(this, true));
+        busEvent.post(new EventBusRegisterEvent(this, true));
     }
 
     protected void unregisterItself() {
-        guavaBusEvent.fire(new EventBusRegisterEvent(this, false));
+        busEvent.post(new EventBusRegisterEvent(this, false));
     }
 
     @Subscribe
@@ -55,8 +48,7 @@ public abstract class AbstractMetaPlayer<M extends Media, F extends MediaFile> i
         LOGGER.debug("-->{}.registerPlayer({})", this.getClass(), event);
         if (isActive()) {
             event.registerPlayer(this);
-        }
-        else {
+        } else {
             unregisterItself();
         }
     }

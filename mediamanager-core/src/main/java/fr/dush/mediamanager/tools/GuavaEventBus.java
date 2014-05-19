@@ -1,46 +1,24 @@
 package fr.dush.mediamanager.tools;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Produces;
-
+import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.eventbus.EventBus;
-import fr.dush.mediamanager.events.EventBusRegisterEvent;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Configure Guava Event Bus to get CDI event and broadcast them to it.
  */
-@ApplicationScoped
+@Configuration
 public class GuavaEventBus {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuavaEventBus.class);
 
     private static final EventBus eventBus = new EventBus();
 
-    @Produces
-    @ApplicationScoped
+    @Bean
     private EventBus createGuavaEventBus() {
         return eventBus;
-    }
-
-    public void broadcastEveryEvent(@Observes Object event) {
-        if (event instanceof EventBusRegisterEvent) {
-            if (((EventBusRegisterEvent) event).isRegister()) {
-                eventBus.register(((EventBusRegisterEvent) event).getSource());
-            }
-            else {
-                eventBus.unregister(this);
-            }
-
-        }
-        else {
-            LOGGER.debug("Broadcast event: {}", event);
-            eventBus.post(event);
-
-        }
     }
 
     public static void register(Object bean) {

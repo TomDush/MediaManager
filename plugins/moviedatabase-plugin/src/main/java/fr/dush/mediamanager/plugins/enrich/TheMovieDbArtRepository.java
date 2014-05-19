@@ -2,7 +2,6 @@ package fr.dush.mediamanager.plugins.enrich;
 
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.ArtRepositoryRegisterEvent;
 import fr.dush.mediamanager.domain.media.art.Art;

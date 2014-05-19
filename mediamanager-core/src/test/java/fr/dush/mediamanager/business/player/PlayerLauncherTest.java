@@ -1,5 +1,6 @@
 package fr.dush.mediamanager.business.player;
 
+import com.google.common.eventbus.EventBus;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.domain.media.MediaType;
@@ -7,7 +8,6 @@ import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.media.video.VideoFile;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
 import fr.dush.mediamanager.events.play.PlayRequestEvent;
-import fr.dush.mediamanager.events.play.PlayerEvent;
 import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
 import fr.dush.mediamanager.modulesapi.player.PlayerProvider;
 import org.bson.types.ObjectId;
@@ -15,9 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationContext;
 
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,12 +45,12 @@ public class PlayerLauncherTest extends SimpleJunitTest {
     private PlayerProvider mp4Provider;
 
     @Mock
-    private Instance<MoviePlayerWrapper> moviePlayerFactory;
+    private ApplicationContext applicationContext;
     @Mock
     private EmbeddedPlayer player;
 
     @Mock
-    private Event<PlayerEvent> bus;
+    private EventBus bus;
 
     @Before
     public void setUp() throws Exception {
@@ -84,7 +83,7 @@ public class PlayerLauncherTest extends SimpleJunitTest {
         // Movie wrapper factory
         MoviePlayerWrapper wrapper = new MoviePlayerWrapper();
         wrapper.setBusEvent(bus);
-        when(moviePlayerFactory.get()).thenReturn(wrapper);
+        when(applicationContext.getBean(MoviePlayerWrapper.class)).thenReturn(wrapper);
     }
 
     @Test

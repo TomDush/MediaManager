@@ -9,10 +9,9 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import org.jongo.Jongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 
 import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import java.net.UnknownHostException;
 
@@ -22,7 +21,7 @@ import java.net.UnknownHostException;
  * @author Thomas Duchatelle
  */
 @Module(id = "mongo-provider", name = "MongoDB Configurator", packageName = "persistence")
-@ApplicationScoped
+@org.springframework.context.annotation.Configuration
 public class MongoProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
@@ -36,7 +35,6 @@ public class MongoProvider {
 
     private DB db = null;
 
-
     private Jongo jongo;
 
     @PreDestroy
@@ -47,26 +45,29 @@ public class MongoProvider {
         }
     }
 
-    @Produces
-    @ApplicationScoped
+    @Bean
     public MongoClient producesMogoClient() throws UnknownHostException {
         LOGGER.debug("Instanciate new MongoClient");
-        mongoClient = new MongoClient(configuration.readValue("mongodb.host"), configuration.readValueAsInt("mongodb.port"));
+        if (mongoClient == null) {
+            mongoClient = new MongoClient(configuration.readValue("mongodb.host"),
+                                          configuration.readValueAsInt("mongodb.port"));
+        }
+
         return mongoClient;
     }
 
-    @Produces
-    public DB producesMogoDB(MongoClient mongoClient) throws UnknownHostException {
+    @Bean
+    public DB producesMogoDB() throws UnknownHostException {
         if (db == null) {
             LOGGER.debug("Instanciate new MongoDB and connection");
-            db = mongoClient.getDB(configuration.readValue("mongodb.databaseName"));
+            db = producesMogoClient().getDB(configuration.readValue("mongodb.databaseName"));
         }
 
         return db;
     }
 
     /** Jongo driver to MongoDB natural and fast use */
-    @Produces
+    @Bean
     public Jongo producesJongoConfig(DB mongodb) {
         if (jongo == null) {
             jongo = new Jongo(mongodb);

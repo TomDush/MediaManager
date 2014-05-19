@@ -2,12 +2,13 @@ package fr.dush.mediamanager.tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import javax.enterprise.inject.Produces;
-
+@Configuration
 public class JsonConverterProducer {
 
-    @Produces
+    @Bean
     public ObjectMapper produceObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);

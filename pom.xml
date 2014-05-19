@@ -21,9 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.7</java-version>
         <slf4j-version>1.7.7</slf4j-version>
-
-        <deltaspike-version>0.7</deltaspike-version>
-        <weld-version>1.1.19.Final</weld-version>
+        <spring.version>4.0.4.RELEASE</spring.version>
     </properties>
 
     <developers>
@@ -55,36 +53,18 @@
     <dependencies>
         <!-- NECESSARY DEPENDENCIES -->
 
-        <!-- CDI : context and dependencies injection -->
+        <!-- DI : Dependencies Injection -->
         <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.2</version>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
         </dependency>
 
-        <!-- CDI Standalone : JBoss Weld -->
+        <!-- Spring -->
         <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se-core</artifactId>
-            <version>${weld-version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- CDI Wrapper and Utils -->
-        <dependency>
-            <groupId>org.apache.deltaspike.core</groupId>
-            <artifactId>deltaspike-core-api</artifactId>
-            <version>0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.deltaspike.cdictrl</groupId>
-            <artifactId>deltaspike-cdictrl-weld</artifactId>
-            <version>${deltaspike-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.deltaspike.core</groupId>
-            <artifactId>deltaspike-core-impl</artifactId>
-            <version>0.7</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <!-- Logging -->
@@ -142,12 +122,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert-core</artifactId>
-            <version>2.0M10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>1.6.0</version>
@@ -157,6 +131,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
 

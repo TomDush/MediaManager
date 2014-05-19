@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.*;
