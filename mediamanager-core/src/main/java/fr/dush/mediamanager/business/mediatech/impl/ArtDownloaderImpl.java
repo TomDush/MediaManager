@@ -2,7 +2,6 @@ package fr.dush.mediamanager.business.mediatech.impl;
 
 import com.google.common.hash.Hashing;
 import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.Startup;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
@@ -14,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,8 +26,7 @@ import java.nio.file.Paths;
 import static com.google.common.io.Files.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
-@ApplicationScoped
-@Startup
+@Named
 public class ArtDownloaderImpl implements IArtDownloader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
@@ -46,21 +44,21 @@ public class ArtDownloaderImpl implements IArtDownloader {
      */
     @PostConstruct
     public void readConfiguration() {
-        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
-
-        try {
-            temp = Files.createTempDirectory("MM_Downloader");
-        } catch (IOException e) {
-            throw new ConfigurationException("Can't create new temporary directory.", e);
-        }
+//        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
+//
+//        try {
+//            temp = Files.createTempDirectory("MM_Downloader");
+//        } catch (IOException e) {
+//            throw new ConfigurationException("Can't create new temporary directory.", e);
+//        }
 
         LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; temp = {}", imageRootPath, temp);
 
-        imageRootPath.toFile().mkdirs();
-        for (ArtType t : ArtType.values()) {
-            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
-        }
-        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
+//        imageRootPath.toFile().mkdirs();
+//        for (ArtType t : ArtType.values()) {
+//            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
+//        }
+//        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
     }
 
     @Override

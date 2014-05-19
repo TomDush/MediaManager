@@ -1,6 +1,18 @@
 package fr.dush.mediamanager.plugins.amarok;
 
-import fr.dush.mediamanager.annotations.Startup;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import javax.inject.Named;
+
+import lombok.Getter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import fr.dush.mediamanager.business.player.AbstractMetaPlayer;
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.MediaFile;
@@ -8,19 +20,8 @@ import fr.dush.mediamanager.events.play.PlayerControlEvent;
 import fr.dush.mediamanager.exceptions.PlayerException;
 import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
 import fr.dush.mediamanager.modulesapi.player.PlayerType;
-import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import static org.apache.commons.lang3.StringUtils.*;
-
-@ApplicationScoped
-@Startup
+@Named
 public class AmarokPlayer extends AbstractMetaPlayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmarokPlayer.class);
@@ -77,7 +78,8 @@ public class AmarokPlayer extends AbstractMetaPlayer {
 
             return false;
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             LOGGER.error("Could not determine if Amarok is running.", e);
             return false;
         }
@@ -145,7 +147,8 @@ public class AmarokPlayer extends AbstractMetaPlayer {
         try {
             Runtime.getRuntime().exec(BINARY + " " + command);
 
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             LOGGER.error("Can't execute amarok command: {}", command);
         }
     }

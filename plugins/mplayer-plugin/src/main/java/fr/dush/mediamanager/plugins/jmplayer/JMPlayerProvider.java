@@ -1,19 +1,20 @@
 package fr.dush.mediamanager.plugins.jmplayer;
 
-import fr.dush.mediamanager.annotations.Module;
-import fr.dush.mediamanager.modulesapi.player.Player;
-import fr.dush.mediamanager.events.play.PlayerEvent;
-import fr.dush.mediamanager.modulesapi.player.PlayerProvider;
+import static com.google.common.collect.Lists.newArrayList;
 
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import java.util.List;
 
-import static com.google.common.collect.Lists.*;
+import javax.inject.Inject;
+
+import com.google.common.eventbus.EventBus;
+
+import fr.dush.mediamanager.annotations.Module;
+import fr.dush.mediamanager.modulesapi.player.Player;
+import fr.dush.mediamanager.modulesapi.player.PlayerProvider;
 
 /**
  * Provide JMPlayer instance to play video with MPlayer
- *
+ * 
  * @author Thomas Duchatelle
  */
 @Module(id = "jmplayer", name = "MPlayer-plugin")
@@ -24,11 +25,11 @@ public class JMPlayerProvider implements PlayerProvider {
     public static final String MPLAYER_OPTIONS = "-fs";
 
     @Inject
-    private Event<PlayerEvent> playerEventBus;
+    private EventBus eventBus;
 
     @Override
     public Player createPlayerInstance() {
-        return new JMPlayer(playerEventBus, MPLAYER_PATH, MPLAYER_OPTIONS);
+        return new JMPlayer(eventBus, MPLAYER_PATH, MPLAYER_OPTIONS);
     }
 
     @Override

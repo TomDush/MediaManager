@@ -7,6 +7,7 @@ import fr.dush.mediamanager.domain.media.video.*;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 import fr.dush.mediamanager.tools.PathsUtils;
+import org.assertj.core.api.Assertions;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
@@ -71,7 +72,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
         // Tests ...
         List<Movie> movies = movieDAO.findAll();
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
 
         Movie reloaded = movies.get(0);
 
@@ -96,7 +97,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
 
         // Tests ...
         movies = movieDAO.findAll();
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
 
         reloaded = movies.get(0);
         assertThat(reloaded).hasTitle("Iron Man")
@@ -216,7 +217,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
     @Test
     public void test_findUnseen() throws Exception {
         final List<Movie> movies = movieDAO.findUnseen();
-        assertThat(movies).hasSize(2);
+        Assertions.assertThat(movies).hasSize(2);
 
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
         assertThat(movies.get(1)).hasMediaIds("junit", "IRONMAN_4");
@@ -227,14 +228,14 @@ public class MovieDAOImplTest extends MongoJunitTest {
         // Action only
         List<Movie> movies = movieDAO.findByGenres("action");
 
-        assertThat(movies).hasSize(2);
+        Assertions.assertThat(movies).hasSize(2);
         assertThat(movies.get(0)).hasMediaIds("imdb", "0123654789");
         assertThat(movies.get(1)).hasMediaIds("junit", "IRONMAN_4");
 
         // Action AND fantastic only
         movies = movieDAO.findByGenres("action", "fantastic");
 
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "IRONMAN_4");
     }
 
@@ -243,14 +244,14 @@ public class MovieDAOImplTest extends MongoJunitTest {
         // Robert Downey Jr
         List<Movie> movies = movieDAO.findByCrew(new SourceId("MovieDB", "3223"));
 
-        assertThat(movies).hasSize(2);
+        Assertions.assertThat(movies).hasSize(2);
         assertThat(movies.get(0)).hasMediaIds("imdb", "0123654789");
         assertThat(movies.get(1)).hasMediaIds("junit", "IRONMAN_4");
 
         // WillSmith OR J J Abrams
         movies = movieDAO.findByCrew(new SourceId("junit", "3224"), new SourceId("junit", "jjabrams"));
 
-        assertThat(movies).hasSize(2);
+        Assertions.assertThat(movies).hasSize(2);
         assertThat(movies.get(0)).hasMediaIds("junit", "IRONMAN_4");
         assertThat(movies.get(1)).hasMediaIds("junit", "STAR_TREK");
     }
@@ -258,7 +259,7 @@ public class MovieDAOImplTest extends MongoJunitTest {
     @Test
     public void test_findBySourceId() throws Exception {
         final List<Movie> movies = movieDAO.findBySourceId(new SourceId("imdb", "0123654789"));
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
 
         // Test...
         Movie reloaded = movies.get(0);
@@ -275,19 +276,19 @@ public class MovieDAOImplTest extends MongoJunitTest {
     public void test_findByTitle() throws Exception {
         List<Movie> movies = movieDAO.findByTitle("Star Trek");
 
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 
         // Full text searching...
         movies = movieDAO.findByTitle("trek");
 
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
 
         // With pagination
         movies = movieDAO.search(new SearchForm("trek"), new SearchLimit(1, 10), Order.LIST).getList();
 
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
     }
 
@@ -295,17 +296,17 @@ public class MovieDAOImplTest extends MongoJunitTest {
     public void test_fullSearch() {
         List<Movie> movies = movieDAO.search(new SearchForm("Star Trek"), null).getList();
 
-        assertThat(movies).hasSize(1);
+        Assertions.assertThat(movies).hasSize(1);
         assertThat(movies.get(0)).hasMediaIds("junit", "STAR_TREK");
     }
 
     @Test
     public void test_random() throws Exception {
         PaginatedList<Movie> movies = movieDAO.search(new SearchForm(), new SearchLimit(3), Order.RANDOM);
-        assertThat(new HashSet<>(movies.getList())).hasSize(3);
+        Assertions.assertThat(new HashSet<>(movies.getList())).hasSize(3);
 
         movies = movieDAO.search(new SearchForm(), new SearchLimit(1), Order.RANDOM);
-        assertThat(new HashSet<>(movies.getList())).hasSize(1);
+        Assertions.assertThat(new HashSet<>(movies.getList())).hasSize(1);
     }
 
     @Test
@@ -320,6 +321,6 @@ public class MovieDAOImplTest extends MongoJunitTest {
         PaginatedList<Movie> movies = movieDAO.search(form, new SearchLimit(), Order.ALPHA);
         System.out.println(movies);
 
-        assertThat(movies.getList()).hasSize(1);
+        Assertions.assertThat(movies.getList()).hasSize(1);
     }
 }

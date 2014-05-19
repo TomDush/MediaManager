@@ -1,6 +1,6 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
-import fr.dush.mediamanager.annotations.Startup;
+import com.google.common.eventbus.Subscribe;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.ArtRepositoryRegisterEvent;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
@@ -14,16 +14,14 @@ import fr.dush.mediamanager.tools.RetryApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-@ApplicationScoped
-@Startup
+@Named
 public class ArtManagerImpl implements IArtManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtManagerImpl.class);
@@ -36,7 +34,8 @@ public class ArtManagerImpl implements IArtManager {
 
     private Map<String, ArtRepository> repositories = new HashMap<>();
 
-    public void registerArtRepository(@Observes ArtRepositoryRegisterEvent event) {
+    @Subscribe
+    public void registerArtRepository(ArtRepositoryRegisterEvent event) {
         if (repositories.containsKey(event.getName())) {
             throw new ConfigurationException(
                     "Could not register 2 ArtRepository with the same name. Previous was: {}, new one is: {}",

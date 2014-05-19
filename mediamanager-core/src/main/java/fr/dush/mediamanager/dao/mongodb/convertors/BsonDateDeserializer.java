@@ -5,11 +5,13 @@ import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
+import javax.inject.Named;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /** Deserialize Bson date */
+@Named
 public class BsonDateDeserializer extends JsonDeserializer<Date> {
 
     @Override

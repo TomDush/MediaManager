@@ -1,6 +1,7 @@
 package fr.dush.mediamanager.business.player;
 
 import com.google.common.base.Function;
+import com.google.common.eventbus.Subscribe;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.mediatech.IRecoveryDAO;
 import fr.dush.mediamanager.domain.media.MediaReference;
@@ -16,9 +17,8 @@ import org.dozer.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -28,7 +28,7 @@ import static com.google.common.collect.Lists.*;
  * This service listening players events to mark movies as seen, and be able to restart movie from where it has been
  * stopped.
  */
-@ApplicationScoped
+@Named
 public class RecoveryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecoveryService.class);
@@ -47,7 +47,8 @@ public class RecoveryService {
     @Inject
     private Mapper mapper;
 
-    public void handleMovieEvents(@Observes MoviePlayerEvent event) {
+    @Subscribe
+    public void handleMovieEvents(MoviePlayerEvent event) {
         if (event.getType() == PlayerEvent.QUIT) {
             LOGGER.debug("QUIT event: {}", event);
 
@@ -64,7 +65,8 @@ public class RecoveryService {
     }
 
     /** Listen all movies events and execute expected REMOVE_RESUME operation */
-    public void handleOperation(@Observes MovieAdminEvent event) {
+    @Subscribe
+    public void handleOperation(MovieAdminEvent event) {
         if (event.getOperation() == Operation.REMOVE_RESUME) {
             recoveryDAO.delete(new MediaReference(MediaType.MOVIE, event.getId()));
             event.markHandled();

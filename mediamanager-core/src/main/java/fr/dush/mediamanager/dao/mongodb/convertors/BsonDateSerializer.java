@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
+import javax.inject.Named;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Date;
  * Convert Java date to BSON dates : <code> { creation : {$date : '2013-12-20T11:28:41.852Z'} }</code> instead of :
  * <code>{ creation : '2013-12-20T11:28:41.852Z' } </code>
  */
+@Named
 public class BsonDateSerializer extends StdSerializer<Date> {
 
     public BsonDateSerializer() {

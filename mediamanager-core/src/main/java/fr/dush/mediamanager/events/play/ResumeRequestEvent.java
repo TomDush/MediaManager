@@ -1,11 +1,13 @@
 package fr.dush.mediamanager.events.play;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import fr.dush.mediamanager.domain.media.MediaReference;
 import fr.dush.mediamanager.events.AbstractEvent;
-import lombok.Data;
 
 /** Request to play a given movie */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ResumeRequestEvent extends AbstractEvent {
 
     private MediaReference reference;

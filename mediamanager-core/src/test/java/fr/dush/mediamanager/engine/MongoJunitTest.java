@@ -8,16 +8,16 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 @RunWith(MongoDBJunitClassRunner.class)
-public abstract class MongoJunitTest {
+public abstract class MongoJunitTest extends SpringJUnitTest {
 
-	@Inject
-	private DB db;
+    @Inject
+    private DB db;
 
-	protected DB getDb() {
-		return db;
-	}
+    protected DB getDb() {
+        return db;
+    }
 
-	protected DBCollection getCollection(String collectionName) {
-		return db.getCollection(collectionName);
-	}
+    protected DBCollection getCollection(String collectionName) {
+        return db.getCollection(collectionName);
+    }
 }

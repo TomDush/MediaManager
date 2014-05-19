@@ -28,16 +28,23 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Configuration {
 
+    /** File description identifier */
+//    String id();
+
 	/** Module name, can be override by name in definition file. */
-	String name() default "";
+    @Deprecated
+    String name() default "";
 
 	/** Package's name : used as key to find appropriate {@link ModuleConfiguration}. */
-	String packageName() default "";
+    @Deprecated
+    String packageName() default "";
 
 	/** Module entry point, by default use class in which is injected configuration. */
-	Class<?> entryPoint() default Configuration.class;
+    @Deprecated
+    Class<?> entryPoint() default Configuration.class;
 
 	/** URL to file containing meta information on each configuration parameter. This file must be in class path. */
-	String definition() default "";
+    @Deprecated
+    String definition() default "";
 
 }

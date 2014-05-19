@@ -1,5 +1,6 @@
 package fr.dush.mediamanager.business.scanner.impl;
 
+import com.google.common.eventbus.EventBus;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.configuration.producers.ScannerConfigurationProducer;
 import fr.dush.mediamanager.business.mediatech.IArtManager;
@@ -7,13 +8,12 @@ import fr.dush.mediamanager.business.mediatech.IRootDirectoryManager;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.domain.configuration.ScannerConfiguration;
+import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.engine.SimpleJunitTest;
-import fr.dush.mediamanager.events.scan.AmbiguousEnrichment;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
 import org.hamcrest.BaseMatcher;
@@ -26,14 +26,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -56,7 +55,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
     private IMoviesEnricher enricher;
 
     @Mock
-    protected Event<AmbiguousEnrichment> ambiguousEnrichmentDispatcher;
+    protected EventBus ambiguousEnrichmentDispatcher;
 
     @Mock
     private ModuleConfiguration moduleConfiguration;
@@ -65,7 +64,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
     private IMovieDAO movieDAO;
 
     @Mock
-    private Instance<ScanningExceptionHandler> scanningExceptionHandlerFactory;
+    private ApplicationContext applicationContext;
 
     @Mock
     private IRootDirectoryManager rootDirectoryManager;
@@ -103,7 +102,7 @@ public class MoviesScannerTest extends SimpleJunitTest {
     @Before
     public void postConstruct() throws ModuleLoadingException {
         when(modulesManager.findModuleById(any(Class.class), anyString())).thenReturn(enricher);
-        when(scanningExceptionHandlerFactory.get()).thenReturn(handler);
+        when(applicationContext.getBean(ScanningExceptionHandler.class)).thenReturn(handler);
         scanner.initializePatterns();
 
         when(moduleConfiguration.readValue(anyString())).thenReturn("default-enricher");

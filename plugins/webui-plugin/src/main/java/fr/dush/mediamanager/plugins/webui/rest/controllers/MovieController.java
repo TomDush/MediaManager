@@ -1,6 +1,22 @@
 package fr.dush.mediamanager.plugins.webui.rest.controllers;
 
+import static com.google.common.collect.Lists.transform;
+
+import java.net.HttpURLConnection;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import org.bson.types.ObjectId;
+import org.dozer.Mapper;
+import org.jboss.resteasy.annotations.Form;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Function;
+
 import fr.dush.mediamanager.dao.media.IMovieDAO;
 import fr.dush.mediamanager.dao.media.queries.PaginatedList;
 import fr.dush.mediamanager.dao.media.queries.SearchForm;
@@ -14,21 +30,8 @@ import fr.dush.mediamanager.plugins.webui.rest.dto.MediaPage;
 import fr.dush.mediamanager.plugins.webui.rest.dto.MovieDTO;
 import fr.dush.mediamanager.plugins.webui.rest.dto.RecoveryDTO;
 import fr.dush.mediamanager.plugins.webui.rest.dto.RequestFilter;
-import org.bson.types.ObjectId;
-import org.dozer.Mapper;
-import org.jboss.resteasy.annotations.Form;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.net.HttpURLConnection;
-
-import static com.google.common.collect.Lists.*;
-
-@RequestScoped
+@Named
 @Path("/")
 public class MovieController {
 
@@ -46,8 +49,8 @@ public class MovieController {
     @GET
     @Path("movies")
     public String home() {
-        return String.format("<h1>Welcome in REST Service</h1><p>There are <b>%d</b> movies in database.</p>",
-                             movieDAO.findAll().size());
+        return String.format("<h1>Welcome in REST Service</h1><p>There are <b>%d</b> movies in database.</p>", movieDAO
+                .findAll().size());
     }
 
     @GET
@@ -58,11 +61,11 @@ public class MovieController {
 
         // Exec request
         PaginatedList<Movie> movies = movieDAO.search(dozerMapper.map(filter, SearchForm.class),
-                                                      dozerMapper.map(filter, SearchLimit.class),
-                                                      filter.getOrder());
+                dozerMapper.map(filter, SearchLimit.class), filter.getOrder());
 
         // Create request result
         MediaPage mediaPage = new MediaPage(transform(movies.getList(), new Function<Movie, MediaSummary>() {
+
             @Override
             public MediaSummary apply(Movie input) {
                 return dozerMapper.map(input, MediaSummary.class);
@@ -94,16 +97,16 @@ public class MovieController {
             MovieDTO dto = dozerMapper.map(movie, MovieDTO.class);
 
             // Recovering?
-            Recovery recovery =
-                    recoveryDAO.findById(new MediaReference(fr.dush.mediamanager.domain.media.MediaType.MOVIE,
-                                                            movie.getId()));
+            Recovery recovery = recoveryDAO.findById(new MediaReference(
+                    fr.dush.mediamanager.domain.media.MediaType.MOVIE, movie.getId()));
             if (recovery != null) {
                 dto.setRecovery(dozerMapper.map(recovery, RecoveryDTO.class));
             }
 
             return dto;
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             LOGGER.error("Could not find movie with id [{}].", id, e);
             throw new WebApplicationException(id + " not found...", HttpURLConnection.HTTP_NOT_FOUND);
         }

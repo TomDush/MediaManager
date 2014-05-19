@@ -1,12 +1,6 @@
 package fr.dush.mediamanager.launcher;
 
-import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
-import fr.dush.mediamanager.remote.Stopper;
-import fr.dush.mediamanager.tools.CDIUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,11 +8,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import static com.google.common.collect.Lists.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.context.ApplicationContext;
+
+import fr.dush.mediamanager.exceptions.ModuleLoadingException;
+import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
+import fr.dush.mediamanager.remote.Stopper;
 
 /**
  * Create and configure CDI context (Apache DeltaSpike), and start application.
- *
+ * 
  * @author Thomas Duchatelle
  */
 public class ContextLauncher extends Thread {
@@ -73,23 +74,27 @@ public class ContextLauncher extends Thread {
 
         try {
             fireStart(lifeCycleServices);
-            CDIUtils.bootCdiContainer();
+            //            CDIUtils.bootCdiContainer();
+            // TODO Start SPRING context
+            ApplicationContext context = null;
 
             // Wait application end...
-            final Stopper stopper = CDIUtils.getBean(Stopper.class);
+            final Stopper stopper = context.getBean(Stopper.class);
             fireInitialized(stopper);
             LOGGER.info("Server started.");
             stopper.waitApplicationEnd();
 
             // Stopping CDI
             LOGGER.info("Stopping server container.");
-            CDIUtils.stopCdiContainer();
+            //            CDIUtils.stopCdiContainer();
+            // TODO Stop application context
 
             fireStop(lifeCycleServices);
 
             LOGGER.info("Server stopped.");
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             catchedException = e;
 
             if (e instanceof RuntimeException) {
@@ -115,9 +120,9 @@ public class ContextLauncher extends Thread {
     private List<MediaManagerLifeCycleService> findLifecycleListeners() {
         List<MediaManagerLifeCycleService> lifeCycleServices = newArrayList();
 
-        final ServiceLoader<MediaManagerLifeCycleService> services =
-                ServiceLoader.load(MediaManagerLifeCycleService.class);
-        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext(); ) {
+        final ServiceLoader<MediaManagerLifeCycleService> services = ServiceLoader
+                .load(MediaManagerLifeCycleService.class);
+        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext();) {
             lifeCycleServices.add(it.next());
         }
         return lifeCycleServices;

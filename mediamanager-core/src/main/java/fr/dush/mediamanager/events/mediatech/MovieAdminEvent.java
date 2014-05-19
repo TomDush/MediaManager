@@ -1,11 +1,13 @@
 package fr.dush.mediamanager.events.mediatech;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author Thomas Duchatelle
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MovieAdminEvent extends AdminEvent {
 
     /** Movie ID */
