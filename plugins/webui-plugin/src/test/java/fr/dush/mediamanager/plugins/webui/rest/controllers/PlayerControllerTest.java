@@ -1,14 +1,17 @@
 package fr.dush.mediamanager.plugins.webui.rest.controllers;
 
-import fr.dush.mediamanager.business.player.MoviePlayerWrapper;
-import fr.dush.mediamanager.domain.media.Assertions;
-import fr.dush.mediamanager.domain.media.SourceId;
-import fr.dush.mediamanager.domain.media.video.*;
-import fr.dush.mediamanager.events.play.PlayRequestEvent;
-import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
-import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
-import fr.dush.mediamanager.plugins.webui.rest.dto.PlayerInfo;
-import fr.dush.mediamanager.tools.DozerMapperFactory;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
+
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.dozer.Mapper;
 import org.junit.Before;
@@ -21,17 +24,16 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
-import javax.enterprise.event.Event;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import com.google.common.eventbus.EventBus;
 
-import static com.google.common.collect.Sets.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import fr.dush.mediamanager.business.player.MoviePlayerWrapper;
+import fr.dush.mediamanager.domain.media.Assertions;
+import fr.dush.mediamanager.domain.media.SourceId;
+import fr.dush.mediamanager.domain.media.video.*;
+import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
+import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
+import fr.dush.mediamanager.plugins.webui.rest.dto.PlayerInfo;
+import fr.dush.mediamanager.tools.DozerMapperFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlayerControllerTest {
@@ -47,9 +49,7 @@ public class PlayerControllerTest {
     private Mapper dozerMapper = new DozerMapperFactory().getDozerMapper();
 
     @Mock
-    private Event<PlayRequestEvent> bus;
-    @Mock
-    private Event<PlayerCollectorEvent> collectorBus;
+    private EventBus eventBus;
 
     @Spy
     private MoviePlayerWrapper player = new MoviePlayerWrapper();
@@ -80,7 +80,7 @@ public class PlayerControllerTest {
 
                 return null;
             }
-        }).when(collectorBus).fire(any(PlayerCollectorEvent.class));
+        }).when(eventBus).post(any(PlayerCollectorEvent.class));
     }
 
     @Test
@@ -89,11 +89,8 @@ public class PlayerControllerTest {
         assertThat(infoList).hasSize(1);
 
         Assertions.assertThat(infoList.get(0)).hasLength(LENGTH).hasPosition(POSITION);
-        Assertions.assertThat(infoList.get(0).getMedia())
-                  .hasId("5200c7a884ae0d25732cd70a")
-                  .hasPoster("/some/poster.jpg")
-                  .hasTitle("Iron Man 1")
-                  .hasGenres("action");
+        Assertions.assertThat(infoList.get(0).getMedia()).hasId("5200c7a884ae0d25732cd70a")
+                .hasPoster("/some/poster.jpg").hasTitle("Iron Man 1").hasGenres("action");
     }
 
     public Movie newMovie() throws ParseException {

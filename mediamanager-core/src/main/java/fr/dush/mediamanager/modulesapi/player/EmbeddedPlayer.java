@@ -12,7 +12,7 @@ public interface EmbeddedPlayer extends Player {
     /** Start playing 1 file */
     void play(Path path) throws IOException;
 
-    void setBusEvent(EventBus onPlayerEvent);
+    void setEventBus(EventBus onPlayerEvent);
 
     /** Start file to read together as 1 bigger file */
     void play(List<Path> paths) throws IOException;

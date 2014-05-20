@@ -1,21 +1,18 @@
 package fr.dush.mediamanager.plugins.webui;
 
-import fr.dush.mediamanager.tools.CDIUtils;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static org.fest.assertions.api.Assertions.*;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class WebUIModuleTest {
 
@@ -36,16 +33,8 @@ public class WebUIModuleTest {
 
         assertThat(sendGet("http://localhost:8080/")).isEqualTo(200);
 
-        final CDI<Object> weld = CDI.current();
-        final BeanManager beanManager = weld.getBeanManager();
-        LOGGER.info("Bean manager found : {}", beanManager);
-
-        CDIUtils.bootCdiContainer();
-
-        CDIUtils.stopCdiContainer();
-        launcher.afterStopCdi();
-
-        assertThat(sendGet("http://localhost:8080/")).isEqualTo(-1);
+        // Must stop application now...
+        //        assertThat(sendGet("http://localhost:8080/")).isEqualTo(-1);
     }
 
     private int sendGet(String url) throws Exception {
@@ -70,7 +59,8 @@ public class WebUIModuleTest {
 
             return con.getResponseCode();
 
-        } catch (ConnectException e) {
+        }
+        catch (ConnectException e) {
             return -1;
         }
     }

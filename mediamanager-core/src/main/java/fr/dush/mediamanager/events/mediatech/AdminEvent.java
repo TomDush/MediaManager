@@ -1,14 +1,16 @@
 package fr.dush.mediamanager.events.mediatech;
 
-import fr.dush.mediamanager.events.AbstractEvent;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import fr.dush.mediamanager.events.AbstractEvent;
 
 /**
  * Event to administrate mediatech.
- *
+ * 
  * @author Thomas Duchatelle
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class AdminEvent extends AbstractEvent {
 
     private Operation operation;

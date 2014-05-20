@@ -1,33 +1,35 @@
 package fr.dush.mediamanager.plugins.enrich;
 
-import com.omertron.themoviedbapi.MovieDbException;
-import com.omertron.themoviedbapi.TheMovieDbApi;
-import fr.dush.mediamanager.business.mediatech.ArtRepository;
-import fr.dush.mediamanager.business.mediatech.ArtRepositoryRegisterEvent;
-import fr.dush.mediamanager.domain.media.art.Art;
-import fr.dush.mediamanager.domain.media.art.ArtQuality;
-import fr.dush.mediamanager.domain.media.art.ArtType;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.eventbus.EventBus;
+import com.omertron.themoviedbapi.MovieDbException;
+import com.omertron.themoviedbapi.TheMovieDbApi;
+
+import fr.dush.mediamanager.business.mediatech.ArtRepository;
+import fr.dush.mediamanager.business.mediatech.ArtRepositoryRegisterEvent;
+import fr.dush.mediamanager.domain.media.art.Art;
+import fr.dush.mediamanager.domain.media.art.ArtQuality;
+import fr.dush.mediamanager.domain.media.art.ArtType;
 
 /**
  * @author Thomas Duchatelle
  */
-@ApplicationScoped
-@Startup
+@Named
 public class TheMovieDbArtRepository implements ArtRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDbArtRepository.class);
@@ -37,7 +39,7 @@ public class TheMovieDbArtRepository implements ArtRepository {
 
     // Used only by postConstruct
     @Inject
-    private Event<ArtRepositoryRegisterEvent> bus;
+    private EventBus eventBus;
 
     private static final Map<String, String> qualities = new HashMap<>();
 
@@ -61,7 +63,7 @@ public class TheMovieDbArtRepository implements ArtRepository {
 
     @PostConstruct
     public void register() {
-        bus.fire(new ArtRepositoryRegisterEvent(TheMovieDbEnricher.MOVIEDB_ID_TYPE, this));
+        eventBus.post(new ArtRepositoryRegisterEvent(TheMovieDbEnricher.MOVIEDB_ID_TYPE, this));
     }
 
     @Override
@@ -75,7 +77,8 @@ public class TheMovieDbArtRepository implements ArtRepository {
             IOUtils.copy(imageUrl.openStream(), outputStream);
             return true;
 
-        } catch (MovieDbException e) {
+        }
+        catch (MovieDbException e) {
             throw new IOException("Could not resolve art path: " + ref, e);
 
         }

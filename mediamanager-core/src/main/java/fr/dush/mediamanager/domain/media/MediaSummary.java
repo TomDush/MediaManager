@@ -1,18 +1,20 @@
 package fr.dush.mediamanager.domain.media;
 
-import fr.dush.mediamanager.domain.media.video.Person;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.*;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import fr.dush.mediamanager.domain.media.video.Person;
 
 /**
  * Only reference to media isn't enough: we're not using relational database. This class contains basic data about a
  * media to be used without lookup full media.
- *
+ * 
  * @author Thomas Duchatelle
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class MediaSummary extends MediaReference {
 

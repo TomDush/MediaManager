@@ -45,7 +45,7 @@ public class MoviePlayerWrapper extends AbstractMetaPlayer<Movie, VideoFile> {
         this.file = file;
         this.wrappedPlayer = embeddedPlayer;
 
-        wrappedPlayer.setBusEvent(new EventBus() {
+        wrappedPlayer.setEventBus(new EventBus() {
             @Override
             public void post(Object event) {
                 fireEvent((PlayerEvent) event);
