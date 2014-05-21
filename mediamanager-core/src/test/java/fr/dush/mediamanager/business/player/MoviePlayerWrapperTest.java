@@ -1,7 +1,7 @@
 package fr.dush.mediamanager.business.player;
 
 import com.google.common.eventbus.EventBus;
-import fr.dush.mediamanager.engine.CdiJunitTest;
+import fr.dush.mediamanager.engine.SpringJUnitTest;
 import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
 import fr.dush.mediamanager.modulesapi.player.EmbeddedPlayer;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class MoviePlayerWrapperTest extends CdiJunitTest {
+public class MoviePlayerWrapperTest extends SpringJUnitTest {
 
     @Inject
     private ApplicationContext applicationContext;

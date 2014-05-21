@@ -8,13 +8,14 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.collect.Lists.*;
 
-public class MongoDBJunitClassRunner extends CdiJunitClassRunner {
+public class MongoDBJunitClassRunner extends SpringJUnit4ClassRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBJunitClassRunner.class);
 

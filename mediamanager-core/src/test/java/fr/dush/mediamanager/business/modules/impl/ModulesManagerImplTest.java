@@ -1,11 +1,11 @@
 package fr.dush.mediamanager.business.modules.impl;
 
-import fr.dush.mediamanager.engine.CdiJunitTest;
+import fr.dush.mediamanager.engine.SpringJUnitTest;
 
 //@ApplicationScoped
 //@Module(id = "junit-modulesmanagement", name = "Testing Module Management")
 //@ToString(of = "instanceId")
-public abstract class ModulesManagerImplTest extends CdiJunitTest {
+public abstract class ModulesManagerImplTest extends SpringJUnitTest {
 
     // TODO Add tests if system if kept
 

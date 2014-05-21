@@ -17,7 +17,7 @@ public class GuavaEventBus {
     private static final EventBus eventBus = new EventBus();
 
     @Bean
-    private EventBus createGuavaEventBus() {
+    public EventBus createGuavaEventBus() {
         return eventBus;
     }
 

@@ -6,7 +6,7 @@ import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.domain.configuration.Field;
-import fr.dush.mediamanager.engine.CdiJunitTest;
+import fr.dush.mediamanager.engine.SpringJUnitTest;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ import static fr.dush.mediamanager.engine.festassert.configuration.MediaManagerA
 
 // FIXME This class stop unit test with intelliJ...
 @Module(name = "JUNIT Module", description = "Fake description", id = "junit-configurationmanager")
-public class ConfigurationProducerTest extends CdiJunitTest {
+public class ConfigurationProducerTest extends SpringJUnitTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationProducerTest.class);
 
