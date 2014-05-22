@@ -28,7 +28,9 @@ public class ConfigurationProducerTest extends SpringJUnitTest {
     private ObjectMapper mapper;
 
     @Inject
-    @Config(packageName = "fr.dush.mediamanager.business.foobar", definition = "configuration/config-test.json")
+    @Config(id = "foobar",
+            packageName = "fr.dush.mediamanager.business.foobar",
+            definition = "configuration/config-test.json")
     private ModuleConfiguration config;
 
     @Test

@@ -1,6 +1,6 @@
 {
     "name": "MongoDB (Database)",
-    "fieldSet": [
+    "fields": [
         {
             "key": "embedded",
             "value": "false",

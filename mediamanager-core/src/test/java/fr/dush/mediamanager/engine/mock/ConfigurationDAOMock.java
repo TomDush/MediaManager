@@ -19,7 +19,7 @@ public class ConfigurationDAOMock implements IConfigurationDAO {
     @Override
     public List<Field> findByPackage(String packageName) {
         if (map.containsKey(packageName)) {
-            return newArrayList(map.get(packageName).getFields().values());
+            return newArrayList(map.get(packageName).getFieldMap().values());
         }
 
         return newArrayList();

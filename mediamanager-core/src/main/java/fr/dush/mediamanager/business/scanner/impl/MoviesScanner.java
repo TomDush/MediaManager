@@ -57,7 +57,9 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     private IMovieDAO movieDAO;
 
     @Inject
-    @Config(definition = "configuration/modules.json", packageName = "fr.dush.mediamanager.business.scanner")
+    @Config(id = "modules",
+            definition = "configuration/modules.json",
+            packageName = "fr.dush.mediamanager.business.scanner")
     private ModuleConfiguration moduleConfiguration;
 
     /** Media enricher */

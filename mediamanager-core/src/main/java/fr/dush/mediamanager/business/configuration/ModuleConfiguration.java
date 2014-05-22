@@ -82,7 +82,7 @@ public class ModuleConfiguration {
 
     /** Get value, don't resolve it */
     private String getValue(String key, Properties defaultProperties, boolean acceptDefault) {
-        Field field = fieldSet.getFields().get(key);
+        Field field = fieldSet.getFieldMap().get(key);
 
         // Find value in this field set...
         String value = null;
@@ -185,8 +185,8 @@ public class ModuleConfiguration {
      * Add field, or override existing
      */
     public void addField(Field field) {
-        if (fieldSet.getFields().containsKey(field.getKey())) {
-            fieldSet.getFields().get(field.getKey()).merge(field);
+        if (fieldSet.getFieldMap().containsKey(field.getKey())) {
+            fieldSet.getFieldMap().get(field.getKey()).merge(field);
 
         } else {
             simpleAdd(field);
@@ -216,14 +216,14 @@ public class ModuleConfiguration {
      * Return field, or null.
      */
     public Field getField(String key) {
-        return fieldSet.getFields().get(key);
+        return fieldSet.getFieldMap().get(key);
     }
 
     /**
-     * Return all fieldSet.getFields().
+     * Return all fieldSet.getFieldMap().
      */
     public Collection<Field> getAllFields() {
-        return fieldSet.getFields().values();
+        return fieldSet.getFieldMap().values();
     }
 
     public String getName() {
@@ -238,7 +238,7 @@ public class ModuleConfiguration {
      * Override existing field if any...
      */
     protected void simpleAdd(Field field) {
-        fieldSet.getFields().put(field.getKey(), field);
+        fieldSet.getFieldMap().put(field.getKey(), field);
     }
 
 }

@@ -1,25 +1,28 @@
 package fr.dush.mediamanager.launcher;
 
-import static com.google.common.collect.Lists.newArrayList;
+import fr.dush.mediamanager.SpringConfiguration;
+import fr.dush.mediamanager.exceptions.ModuleLoadingException;
+import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
+import fr.dush.mediamanager.remote.Stopper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.core.env.PropertiesPropertySource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.ServiceLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.context.ApplicationContext;
-
-import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
-import fr.dush.mediamanager.remote.Stopper;
+import static com.google.common.collect.Lists.*;
 
 /**
  * Create and configure CDI context (Apache DeltaSpike), and start application.
- * 
+ *
  * @author Thomas Duchatelle
  */
 public class ContextLauncher extends Thread {
@@ -48,6 +51,7 @@ public class ContextLauncher extends Thread {
         super("mediamanagerDaemon");
         setDaemon(true);
         this.configFile = configFile;
+        // TODO Create config file if it doesn't exist
 
         String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (installPath.matches("^/[A-Z]:/.*$")) {
@@ -75,7 +79,18 @@ public class ContextLauncher extends Thread {
         try {
             fireStart(lifeCycleServices);
             //            CDIUtils.bootCdiContainer();
+
+            Properties source = new Properties();
+            source.put("mediamanager.propertiesfile", pathToString(configFile));
+
             // TODO Start SPRING context
+            AnnotationConfigApplicationContext app = new AnnotationConfigApplicationContext();
+            app.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("config-files", source));
+            app.register(SpringConfiguration.class);
+            app.refresh();
+
+            //            ApplicationContext app = new GenericApplicationContext(SpringConfiguration.class);
+
             ApplicationContext context = null;
 
             // Wait application end...
@@ -93,8 +108,7 @@ public class ContextLauncher extends Thread {
 
             LOGGER.info("Server stopped.");
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             catchedException = e;
 
             if (e instanceof RuntimeException) {
@@ -120,9 +134,9 @@ public class ContextLauncher extends Thread {
     private List<MediaManagerLifeCycleService> findLifecycleListeners() {
         List<MediaManagerLifeCycleService> lifeCycleServices = newArrayList();
 
-        final ServiceLoader<MediaManagerLifeCycleService> services = ServiceLoader
-                .load(MediaManagerLifeCycleService.class);
-        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext();) {
+        final ServiceLoader<MediaManagerLifeCycleService> services =
+                ServiceLoader.load(MediaManagerLifeCycleService.class);
+        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext(); ) {
             lifeCycleServices.add(it.next());
         }
         return lifeCycleServices;

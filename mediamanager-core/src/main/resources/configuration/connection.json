@@ -1,6 +1,6 @@
 {
     "name": "Connection (proxy)",
-    "fieldSet": [
+    "fields": [
         {
             "key": "proxy.host",
             "name": "Proxy host",

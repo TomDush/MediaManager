@@ -43,7 +43,7 @@ public class MongoConfigurationDAOImpl implements IConfigurationDAO {
 
         final BasicDBObject values = new BasicDBObject();
         obj.put("values", values);
-        for (Field f : configuration.getFields().values()) {
+        for (Field f : configuration.getFieldMap().values()) {
             values.put(f.getKey(), f.getValue());
         }
 

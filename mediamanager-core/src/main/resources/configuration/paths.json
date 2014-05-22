@@ -1,11 +1,11 @@
 {
     "name": "Directories",
-    "fieldSet": [
+    "fields": [
         {
-            "key":"root",
-            "value":"${user.home}/.mediamanager",
-            "name":"Root directory",
-            "description":"Directory where MediaManager files will be stored."
+            "key": "root",
+            "value": "${user.home}/.mediamanager",
+            "name": "Root directory",
+            "description": "Directory where MediaManager files will be stored."
         },
         {
             "key": "imagespath",
