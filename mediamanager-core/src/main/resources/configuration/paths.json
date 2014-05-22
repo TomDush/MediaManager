@@ -1,0 +1,22 @@
+{
+    "name": "Directories",
+    "fields": [
+        {
+            "key": "root",
+            "value": "${user.home}/.mediamanager",
+            "name": "Root directory",
+            "description": "Directory where MediaManager files will be stored."
+        },
+        {
+            "key": "imagespath",
+            "value": "${root}/images",
+            "name": "Images directory",
+            "description": "Directory where posters, portraits and backdrops are stored."
+        },
+        {
+            "key": "trailerpath",
+            "value": "${root}/trailers",
+            "name": "Trailer directory",
+            "description": "Directory where trailers are downloaded."
+        }
+    ]}

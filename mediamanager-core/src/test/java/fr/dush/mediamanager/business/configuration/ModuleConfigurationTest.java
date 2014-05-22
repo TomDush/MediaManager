@@ -2,66 +2,98 @@ package fr.dush.mediamanager.business.configuration;
 
 import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
+import fr.dush.mediamanager.exceptions.PropertyUnresolvableException;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ModuleConfigurationTest {
+
+    @Mock
+    private IConfigurationManager configurationManager;
 
     @Test
     public void testResolveProperties() throws Exception {
-        final ModuleConfiguration generic = new ModuleConfiguration(null, new FieldSet("generic"));
-        generic.addField(new Field("host", "localhost", true));
-        generic.addField(new Field("mediamanager.root", "${user.home}/.mediamanager"));
+        // ** Tests on a single Module configuration
+        when(configurationManager.getModuleConfiguration("user")).thenThrow(new ConfigurationException(
+                "Expected exception"));
+        when(configurationManager.getModuleConfiguration("somewhereElse")).thenThrow(new ConfigurationException(
+                "Expected exception"));
 
-        ModuleConfiguration config = new ModuleConfiguration(generic, new FieldSet("foobar"));
-        config.addField(new Field("port", "80", false));
+        final ModuleConfiguration generic = new ModuleConfiguration("mediamanager", new FieldSet("mediamanager"));
+        generic.setConfigurationManager(configurationManager);
+        generic.addField(new Field("host", "localhost", false));
+        generic.addField(new Field("port", "80", true));
+        generic.addField(new Field("local", "true", false));
+        generic.addField(new Field("server", "Local Server", true));
+        generic.addField(new Field("root", "${user.home}/.mediamanager"));
+        generic.addField(new Field("secret", null, true));
 
-        // Read existing
-        final String root = System.getProperty("user.home") + "/.mediamanager";
-        assertThat(generic.readValue("mediamanager.root")).isEqualTo(root);
+        // Assert on this single
+        assertThat(generic.readValue("host")).isEqualTo("localhost");
+        assertThat(generic.readValue("mediamanager.host")).isEqualTo("localhost");
+        assertThat(generic.readValueAsInt("port")).isEqualTo(80);
+        assertThat(generic.readValueAsBoolean("local")).isTrue();
+        assertThat(generic.readValue("server")).isEqualTo("Local Server");
+        assertThat(generic.readValue("host", "foobar")).isEqualTo("localhost");
+        assertThat(generic.readValue("server", "foobar")).isEqualTo("foobar");
+
+        assertThat(generic.readValue("secret", "foobar")).isEqualTo("foobar");
+
+        // Failures...
+        try {
+            generic.readValue("secret"); // Hasn't value
+            failBecauseExceptionWasNotThrown(PropertyUnresolvableException.class);
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(PropertyUnresolvableException.class);
+        }
+        try {
+            generic.readValue("toto"); // Is not defined
+            failBecauseExceptionWasNotThrown(PropertyUnresolvableException.class);
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(PropertyUnresolvableException.class);
+        }
+
+        // ** Test with another module
+        when(configurationManager.getModuleConfiguration("mediamanager")).thenReturn(generic);
+
+        ModuleConfiguration config = new ModuleConfiguration("proxy", new FieldSet("proxy"));
+        config.setConfigurationManager(configurationManager);
+        config.addField(new Field("port", "80", true));
+        config.addField(new Field("rootpath", null, true));
+
+        // Read Complex...
+        final String expectedRoot = System.getProperty("user.home") + "/.mediamanager";
+        assertThat(generic.readValue("mediamanager.root")).isEqualTo(expectedRoot);
 
         // Read non-existing
-        final String temp = config.readValue("temp", "temp_dir");
-        assertThat(temp).isEqualTo("temp_dir");
+        try {
+            config.readValue("somewhereElse.temp");
+            failBecauseExceptionWasNotThrown(PropertyUnresolvableException.class);
+        } catch (Exception e) {
+            assertThat(e).isInstanceOf(PropertyUnresolvableException.class);
+        }
 
         // Read with properties
         Properties props = new Properties();
-        props.put("host", "mediamanagerserver");
-        props.put("port", "8080");
-        props.put("rootpath", "index.xhtml");
+        props.put("mediamanager.host", "mediamanagerserver");
+        props.put("port", "8090"); // Useless because no prefix
+        props.put("proxy.port", "8080");
+        props.put("proxy.rootpath", "index.xhtml");
 
-        final String resolved =
-                config.resolveProperties("http://${host}:${port}/${rootpath}?path=${mediamanager.root}", props);
-        assertThat(resolved).isEqualTo("http://mediamanagerserver:80/index.xhtml?path=" + root);
-
-    }
-
-    @Test
-    public void testGetPropertyPriority() throws Exception {
-        final ModuleConfiguration generic = new ModuleConfiguration(null, new FieldSet("generic"));
-        ModuleConfiguration config = new ModuleConfiguration(generic, new FieldSet("foobar"));
-
-        assertThat(config.readValue("foo")).isEqualTo(null);
-
-        generic.addField(new Field("foo", "genericDefault", true));
-        assertThat(config.readValue("foo")).isEqualTo("genericDefault");
-
-        config.addField(new Field("foo", "specificDefault", true));
-        assertThat(config.readValue("foo")).isEqualTo("specificDefault");
-
-        assertThat(config.readValue("foo", "givenDefault")).isEqualTo("givenDefault");
-
-        System.setProperty("foo", "systemValue");
-        assertThat(config.readValue("foo", "givenDefault")).isEqualTo("systemValue");
-
-        generic.addField(new Field("foo", "genericValue", false));
-        assertThat(config.readValue("foo", "givenDefault")).isEqualTo("genericValue");
-
-        config.addField(new Field("foo", "specificValue", false));
-        assertThat(config.readValue("foo", "givenDefault")).isEqualTo("specificValue");
+        final String resolved = config.resolveProperties(
+                "http://${mediamanager.host}:${port}/${rootpath}?path=${mediamanager.root}",
+                props);
+        assertThat(resolved).isEqualTo("http://localhost:8080/index.xhtml?path=" + expectedRoot);
 
     }
+
 }

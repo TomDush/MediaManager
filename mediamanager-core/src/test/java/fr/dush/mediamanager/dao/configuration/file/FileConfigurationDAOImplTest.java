@@ -28,8 +28,8 @@ public class FileConfigurationDAOImplTest {
         FieldSet set = new FieldSet();
         set.addAllFields(fields, true);
 
-        assertThat(set.getFields().get("activated").getValue()).isEqualTo("true");
-        assertThat(set.getFields().get("visible")).isNull();
+        assertThat(set.getFieldMap().get("activated").getValue()).isEqualTo("true");
+        assertThat(set.getFieldMap().get("visible")).isNull();
 
     }
 

@@ -43,7 +43,7 @@ public class ArtDownloaderImplTest {
 
     @Spy
     private ModuleConfiguration configuration =
-            new MockedConfiguration("downloader.imagespath", "target/", "downloader.trailerpath", "target/");
+            new MockedConfiguration("imagespath", "target/", "trailerpath", "target/");
 
     @Before
     public void initMockito() throws IOException {

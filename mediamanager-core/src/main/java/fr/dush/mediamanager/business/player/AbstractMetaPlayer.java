@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.MediaFile;
-import fr.dush.mediamanager.events.EventBusRegisterEvent;
 import fr.dush.mediamanager.events.play.PlayerCollectorEvent;
 import fr.dush.mediamanager.events.play.PlayerControlEvent;
 import fr.dush.mediamanager.exceptions.PlayerException;
@@ -14,7 +13,6 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.UUID;
 
@@ -34,13 +32,8 @@ public abstract class AbstractMetaPlayer<M extends Media, F extends MediaFile> i
         id = generateId();
     }
 
-    @PostConstruct
-    public void registerItself() {
-        busEvent.post(new EventBusRegisterEvent(this, true));
-    }
-
     protected void unregisterItself() {
-        busEvent.post(new EventBusRegisterEvent(this, false));
+        busEvent.unregister(this);
     }
 
     @Subscribe

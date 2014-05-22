@@ -1,0 +1,15 @@
+{
+    "name": "JUNIT Module",
+    "fields": [
+        {
+            "key": "host",
+            "value": "localhost",
+            "name": "Target host",
+            "description": "Host on which is installed players."
+        },
+        {
+            "key": "user.home",
+            "value": "Value/not/used"
+        }
+    ]
+}

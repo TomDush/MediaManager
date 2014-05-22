@@ -27,7 +27,7 @@ public class MongoConfigurationDAOImplTest extends MongoJunitTest {
     public void testSaveAndRead() throws Exception {
         final FieldSet set = new FieldSet();
         set.setName("Configuration name");
-        set.setPackageName("junit.dao.config");
+        set.setConfigId("junit.dao.config");
 
         set.addValue("working", "true", false);
         set.addValue("testCount", "42", true);

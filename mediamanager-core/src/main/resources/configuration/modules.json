@@ -1,0 +1,10 @@
+{
+    "name": "Default modules",
+    "fields": [
+        {
+            "key": "movies.enricher",
+            "value": "enricher-themoviesdb",
+            "name": "Movie default enricher",
+            "description": "Enricher used by default."
+        }
+    ]}

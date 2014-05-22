@@ -3,6 +3,7 @@ package fr.dush.mediamanager.engine;
 import com.google.common.collect.Lists;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScript;
 import fr.dush.mediamanager.engine.mongodb.DatabaseScripts;
+import fr.dush.mediamanager.engine.mongodb.MongoDBDatasetManager;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -44,10 +45,17 @@ public class MongoDBJunitClassRunner extends SpringJUnit4ClassRunner {
 
         // Initialize data set...
         LOGGER.debug("Initialize with scrips : {}", scripts);
+        MongoJunitTest junitTest = null;
+        if (test instanceof MongoJunitTest) {
+            junitTest = (MongoJunitTest) test;
+        } else if (!scripts.isEmpty()) {
+            throw new RuntimeException(
+                    "Test class should inherit from MongoJunitTest to use @DatabaseScripts annotation");
+        }
         for (DatabaseScript script : Lists.reverse(scripts)) {
-            // TODO Fix that...
-            //			final MongoDBDatasetManager datasetManager = CDIUtils.getBean(MongoDBDatasetManager.class);
-            //			datasetManager.initializeDataset(script);
+            MongoDBDatasetManager datasetManager = junitTest.getApplicationContext().getBean(MongoDBDatasetManager
+                                                                                                     .class);
+            datasetManager.initializeDataset(script);
         }
 
         // Method execution...

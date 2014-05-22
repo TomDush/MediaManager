@@ -10,10 +10,10 @@ import static java.lang.annotation.ElementType.*;
 
 /**
  * All entry point module must defined this annotation. <p/> <p> The only mandatory field is {@link #name()}. This is to
- * be displayed in UI. </p> <p/> <p> This annotation is used to configuration, see {@link Configuration}. </p>
+ * be displayed in UI. </p> <p/> <p> This annotation is used to configuration, see {@link Config}. </p>
  *
  * @author Thomas Duchatelle
- * @see Configuration
+ * @see Config
  */
 @Target({TYPE})
 @Retention(RetentionPolicy.RUNTIME)

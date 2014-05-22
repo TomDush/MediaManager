@@ -6,7 +6,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
@@ -56,8 +56,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     @Inject
     private IMovieDAO movieDAO;
 
-    @Inject
-    @Configuration(definition = "configuration/scanners.json", packageName = "fr.dush.mediamanager.business.scanner")
+    @Config(id = "modules")
     private ModuleConfiguration moduleConfiguration;
 
     /** Media enricher */
@@ -89,7 +88,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
         String enricherName = rootDirectory.getEnricher();
         if (isBlank(enricherName)) {
-            enricherName = moduleConfiguration.readValue("movies.defaultenricher");
+            enricherName = moduleConfiguration.readValue("defaultenricher");
         }
 
         try {
@@ -139,8 +138,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
                 // Download elements
                 if (isNotEmpty(chosenMovie.getPoster())) {
-                    addToDownloadList(chosenMovie.getPoster(),
-                                      new ArtQuality[]{ArtQuality.MINI, ArtQuality.THUMBS, ArtQuality.DISPLAY});
+                    addToDownloadList(chosenMovie.getPoster(), ArtQuality.MINI, ArtQuality.THUMBS, ArtQuality.DISPLAY);
                     for (Person p : chosenMovie.getMainActors()) {
                         addToDownloadList(p.getPicture(), ArtQuality.MINI);
                     }

@@ -1,0 +1,34 @@
+{
+    "name": "MongoDB (Database)",
+    "fields": [
+        {
+            "key": "embedded",
+            "value": "false",
+            "name": "Embedded MongoDB",
+            "description": "Use embedded MongoDB (if no DB is installed)."
+        },
+        {
+            "key": "host",
+            "value": "localhost",
+            "name": "MongoDB host",
+            "description": "Host to connect to MongoDB (if not embedded)"
+        },
+        {
+            "key": "port",
+            "value": "27017",
+            "name": "MongoDB port",
+            "description": "Port used by MongoDB (standalone and embedded)"
+        },
+        {
+            "key": "databaseName",
+            "value": "mediamanager",
+            "name": "Database name",
+            "description": "MongoDB database's name."
+        },
+        {
+            "key": "embedded.directory",
+            "value": "${mediamanager.root}/mongodb",
+            "name": "Embedded local file",
+            "description": "File where MongoDB stores data (default : ${user.home}/.mediamanager/mongodb)."
+        }
+    ]}

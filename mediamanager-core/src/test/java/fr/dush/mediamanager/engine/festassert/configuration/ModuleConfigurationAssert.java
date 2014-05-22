@@ -136,18 +136,18 @@ public class ModuleConfigurationAssert extends AbstractAssert<ModuleConfiguratio
     }
 
     /**
-     * Verifies that the actual ModuleConfiguration's packageName is equal to the given one.
+     * Verifies that the actual ModuleConfiguration's configId is equal to the given one.
      *
-     * @param packageName the given packageName to compare the actual ModuleConfiguration's packageName to.
+     * @param packageName the given configId to compare the actual ModuleConfiguration's configId to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual ModuleConfiguration's packageName is not equal to the given one.
+     * @throws AssertionError - if the actual ModuleConfiguration's configId is not equal to the given one.
      */
     public ModuleConfigurationAssert hasPackageName(String packageName) {
         // check that actual ModuleConfiguration we want to make assertions on is not null.
         isNotNull();
 
         // we overrides the default error message with a more explicit one
-        String errorMessage = format("Expected ModuleConfiguration's packageName to be <%s> but was <%s>",
+        String errorMessage = format("Expected ModuleConfiguration's configId to be <%s> but was <%s>",
                                      packageName,
                                      actual.getPackageName());
 

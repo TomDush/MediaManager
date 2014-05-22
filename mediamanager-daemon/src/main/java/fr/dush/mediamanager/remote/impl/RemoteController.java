@@ -1,8 +1,28 @@
 package fr.dush.mediamanager.remote.impl;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import com.google.common.eventbus.EventBus;
+import fr.dush.mediamanager.annotations.Config;
+import fr.dush.mediamanager.business.configuration.IConfigurationManager;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.business.scanner.IScanRegister;
+import fr.dush.mediamanager.domain.configuration.Field;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.domain.media.MediaType;
+import fr.dush.mediamanager.domain.scan.ScanStatus;
+import fr.dush.mediamanager.events.scan.ScanRequestEvent;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
+import fr.dush.mediamanager.launcher.Status;
+import fr.dush.mediamanager.remote.ConfigurationField;
+import fr.dush.mediamanager.remote.IStopper;
+import fr.dush.mediamanager.remote.MediaManagerRMI;
+import lombok.Setter;
+import org.dozer.Mapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,59 +31,39 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.eventbus.EventBus;
-
-import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
-import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.business.scanner.IScanRegister;
-import fr.dush.mediamanager.domain.configuration.Field;
-import fr.dush.mediamanager.domain.media.MediaType;
-import fr.dush.mediamanager.domain.scan.ScanStatus;
-import fr.dush.mediamanager.events.scan.ScanRequestEvent;
-import fr.dush.mediamanager.exceptions.ConfigurationException;
-import fr.dush.mediamanager.launcher.Status;
-import fr.dush.mediamanager.remote.ConfigurationField;
-import fr.dush.mediamanager.remote.MediaManagerRMI;
-import fr.dush.mediamanager.remote.Stopper;
+import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Bean exposed by RMI : execute on server what is asked from command line.
- * 
+ *
  * @author Thomas Duchatelle
  */
 @SuppressWarnings("serial")
-@Named
+@Controller
 public class RemoteController extends UnicastRemoteObject implements MediaManagerRMI {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteController.class);
 
-    private static final String REMOTECONTROL_URL = "remotecontrol.url";
+    private static final String REMOTE_CONTROL_URL = "url";
 
-    @Inject
-    @Configuration(packageName = "daemon", definition = "configuration/rmi.json")
-//    @ConfigurationWithoutDatabase
+    @Config(id = "remotecontrol")
+    @Setter
     private ModuleConfiguration configuration;
 
     @Inject
-    private Stopper stopper;
+    private IStopper stopper;
 
     @Inject
     private EventBus eventBus;
 
     @Inject
-    private IConfigurationRegister configurationRegister;
-
+    private IConfigurationManager configurationManager;
     @Inject
     private IScanRegister scanRegister;
+
+    @Inject
+    private Mapper dozerMapper;
 
     public RemoteController() throws RemoteException {
         super();
@@ -75,10 +75,10 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
         try {
             startRegistry();
 
-            LOGGER.debug("Bind RMI controller to url : {}", configuration.readValue(REMOTECONTROL_URL));
-            Naming.rebind(configuration.readValue(REMOTECONTROL_URL), this);
-        }
-        catch (Exception e) {
+            String url = configuration.readValue(REMOTE_CONTROL_URL);
+            LOGGER.debug("Bind RMI controller to url : {}", url);
+            Naming.rebind(url, this);
+        } catch (Exception e) {
             throw new ConfigurationException("Can't register RMI implementation.", e);
         }
     }
@@ -111,18 +111,15 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
                 throw new RemoteException(
                         "No response received... Execute 'status' command to know if process has been started.");
 
-            }
-            else if (response.hasFailed()) {
+            } else if (response.hasFailed()) {
                 LOGGER.error("Failed to scan %s", response.getException());
                 throw new RemoteException(response.getMessage() + " [on " + absolutePath + "]");
             }
 
-        }
-        catch (RemoteException e) {
+        } catch (RemoteException e) {
             throw e;
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Start scanning failed", e);
             throw new RemoteException("Can't start scan : " + e.getMessage());
         }
@@ -131,13 +128,11 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
     @Override
     public List<ScanStatus> getInprogressScanning() throws RemoteException {
         try {
-            final List<ScanStatus> list = scanRegister.getInprogressScans();
-            return newArrayList(list);
+            return scanRegister.getInprogressScans();
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("getInprogressScanning failed", e);
-            throw new RemoteException("Can't get Inprogress list : " + e.getMessage());
+            throw new RemoteException("Can't get Inprogress list : " + e.getMessage(), e);
         }
     }
 
@@ -146,13 +141,10 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
         try {
             List<ConfigurationField> list = newArrayList();
 
-            for (ModuleConfiguration m : configurationRegister.findAll()) {
-                for (Field f : m.getAllFields()) {
-                    ConfigurationField field = new ConfigurationField();
-                    field.setFullname(m.getPackageName() + "." + f.getKey());
-                    field.setValue(m.getValue(f.getKey()));
-                    field.setDefaultValue(f.isDefaultValue());
-                    field.setDescription(f.getDescription());
+            for (FieldSet fieldSet : configurationManager.getAllConfigurations()) {
+                for (Field f : fieldSet.getFields()) {
+                    ConfigurationField field = dozerMapper.map(f, ConfigurationField.class);
+                    field.setKey(fieldSet.getConfigId() + "." + f.getKey());
 
                     list.add(field);
                 }
@@ -160,8 +152,7 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
             Collections.sort(list);
             return list;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("getFullConfiguration failed", e);
             throw new RemoteException("Can't get configuration : " + e.getMessage());
         }
@@ -169,17 +160,14 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
     /**
      * Create dynamic registry, if necessary...
-     * 
-     * @throws RemoteException
      */
     private Registry startRegistry() throws RemoteException {
-        final Integer port = configuration.readValueAsInt("remotecontrol.port");
+        final Integer port = configuration.readValueAsInt("port");
 
-        if (configuration.readValueAsBoolean("remotecontrol.createregistry")) {
+        if (configuration.readValueAsBoolean("createregistry")) {
             return LocateRegistry.createRegistry(port);
 
-        }
-        else {
+        } else {
             return LocateRegistry.getRegistry(port);
         }
 

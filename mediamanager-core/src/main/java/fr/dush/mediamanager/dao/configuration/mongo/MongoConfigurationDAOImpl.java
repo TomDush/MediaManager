@@ -38,12 +38,12 @@ public class MongoConfigurationDAOImpl implements IConfigurationDAO {
     @Override
     public void save(FieldSet configuration) {
         // Mapping object
-        DBObject obj = new BasicDBObject("_id", configuration.getPackageName());
+        DBObject obj = new BasicDBObject("_id", configuration.getConfigId());
         obj.put("name", configuration.getName());
 
         final BasicDBObject values = new BasicDBObject();
         obj.put("values", values);
-        for (Field f : configuration.getFields().values()) {
+        for (Field f : configuration.getFieldMap().values()) {
             values.put(f.getKey(), f.getValue());
         }
 

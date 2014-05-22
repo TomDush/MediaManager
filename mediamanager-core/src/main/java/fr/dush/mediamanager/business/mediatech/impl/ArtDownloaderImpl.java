@@ -1,7 +1,7 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
 import com.google.common.hash.Hashing;
-import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,34 +30,47 @@ public class ArtDownloaderImpl implements IArtDownloader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
 
-    @Inject
-    @Configuration(name = "Mediatech", definition = "configuration/mediatech.json")
+    @Config(id = "paths")
     private ModuleConfiguration configuration;
 
+    /** Temp file (where file are downloaded before to be moved) */
     private Path temp;
 
-    private Path imageRootPath;
+    private Path oldRootPath;
 
     /**
      * Read the configuration once.
      */
     @PostConstruct
     public void readConfiguration() {
-//        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
-//
-//        try {
-//            temp = Files.createTempDirectory("MM_Downloader");
-//        } catch (IOException e) {
-//            throw new ConfigurationException("Can't create new temporary directory.", e);
-//        }
+        // Create temp folder
+        try {
+            temp = Files.createTempDirectory("MM_Downloader");
+        } catch (IOException e) {
+            throw new ConfigurationException("Can't create new temporary directory.", e);
+        }
 
-        LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; temp = {}", imageRootPath, temp);
+        // Force creating path tree for images
+        LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; temp = {}", getImagePath(), temp);
 
-//        imageRootPath.toFile().mkdirs();
-//        for (ArtType t : ArtType.values()) {
-//            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
-//        }
-//        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
+    }
+
+    /** Get image path, create tree if necessary */
+    private Path getImagePath() {
+        Path imagesPath = Paths.get(configuration.readValue("imagespath"));
+        if (oldRootPath != null && oldRootPath.equals(imagesPath)) {
+            return oldRootPath;
+        }
+
+        // Else create tree
+        imagesPath.toFile().mkdirs();
+        for (ArtType t : ArtType.values()) {
+            imagesPath.resolve(getPath(t)).toFile().mkdirs();
+        }
+        imagesPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
+
+        oldRootPath = imagesPath;
+        return imagesPath;
     }
 
     @Override
@@ -86,10 +98,10 @@ public class ArtDownloaderImpl implements IArtDownloader {
                 if (artRepository.readImage(art.getRef(), quality, new FileOutputStream(tempFile.toFile()))) {
 
                     // Move to real directory if not already existing, rename it with hash
-                    final Path downloadedFile = imageRootPath.resolve(getPath(art.getType()))
-                                                             .resolve(newFinalName(tempFile.toFile(),
-                                                                                   escape(art.getShortDescription()),
-                                                                                   getFileExtension(art.getRef())));
+                    final Path downloadedFile = getImagePath().resolve(getPath(art.getType()))
+                                                              .resolve(newFinalName(tempFile.toFile(),
+                                                                                    escape(art.getShortDescription()),
+                                                                                    getFileExtension(art.getRef())));
 
                     if (!downloadedFile.toFile().exists()) {
                         LOGGER.debug("{} moved into {}", art.getRef(), downloadedFile);
@@ -111,7 +123,7 @@ public class ArtDownloaderImpl implements IArtDownloader {
         String fileName = art.getDownloadedFiles().get(artQuality);
 
         if (isNotEmpty(fileName)) {
-            Path path = imageRootPath.resolve(fileName);
+            Path path = getImagePath().resolve(fileName);
             if (path.toFile().isFile()) {
                 return path;
             }
@@ -121,7 +133,7 @@ public class ArtDownloaderImpl implements IArtDownloader {
     }
 
     private String getWebRelativeUrl(final Path downloadedFile) {
-        return imageRootPath.relativize(downloadedFile).toString().replace("\\", "/");
+        return getImagePath().relativize(downloadedFile).toString().replace("\\", "/");
     }
 
     /**

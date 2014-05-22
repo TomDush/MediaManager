@@ -84,7 +84,7 @@ public class WebUIModule implements MediaManagerLifeCycleService {
         final String content = readResource(Resources.getResource(fileName));
 
         // Use core resolver with values found in system and in properties file.
-        ModuleConfiguration conf = new ModuleConfiguration(null, new FieldSet("jetty"));
+        ModuleConfiguration conf = new ModuleConfiguration("mediamanager", new FieldSet("jetty"));
 
         final String resolved = conf.resolveProperties(content, props);
         LOGGER.debug("Jetty config : {}", resolved);

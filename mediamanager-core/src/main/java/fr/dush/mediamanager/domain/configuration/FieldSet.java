@@ -1,80 +1,83 @@
 package fr.dush.mediamanager.domain.configuration;
 
-import static com.google.common.collect.Maps.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import static com.google.common.collect.Maps.*;
 
 /**
  * Simple data object which group properties of each module.
  *
  * @author Thomas Duchatelle
- *
  */
-@Data
-@EqualsAndHashCode(of = "packageName")
+@ToString
+@EqualsAndHashCode(of = "configId")
 @NoArgsConstructor
 public class FieldSet {
 
-	/** Package name (configuration ID) */
-	private String packageName;
+    /** Module configuration identifier */
+    @Getter
+    @Setter
+    private String configId;
 
-	/** Module name */
-	private String name;
+    /** Module display name */
+    @Getter
+    @Setter
+    private String name;
 
-	/** Configuration's values key => value */
-	private Map<String, Field> fields = newHashMap();
+    /** Configuration's values key => value */
+    private Map<String, Field> fields = newHashMap();
 
-	public FieldSet(String packageName) {
-		this.packageName = packageName;
-	}
+    public FieldSet(String configId) {
+        this.configId = configId;
+    }
 
-	/**
-	 * Add or Set value
-	 *
-	 * @param key
-	 * @param value
-	 * @param defaultValue if this value is default value...
-	 */
-	public void addValue(String key, String value, boolean defaultValue) {
-		if (fields.containsKey(key)) {
-			final Field f = fields.get(key);
-			f.setValue(value);
-			f.setDefaultValue(defaultValue);
+    /**
+     * Add or Set value
+     *
+     * @param defaultValue if this value is default value...
+     */
+    public void addValue(String key, String value, boolean defaultValue) {
+        if (fields.containsKey(key)) {
+            final Field f = fields.get(key);
+            f.setValue(value);
+            f.setDefaultValue(defaultValue);
 
-		} else {
-			fields.put(key, new Field(key, value));
-		}
-	}
+        } else {
+            fields.put(key, new Field(key, value));
+        }
+    }
 
-	public void addAllFields(List<Field> fields, boolean b) {
-		for (Field f : fields) {
-			addField(f);
-			f.setDefaultValue(b);
-		}
-	}
+    public void addAllFields(Collection<Field> fields, boolean b) {
+        for (Field f : fields) {
+            addField(f);
+            f.setDefaultValue(b);
+        }
+    }
 
-	/**
-	 * Add field, replace existing one if any.
-	 *
-	 * @param f
-	 */
-	private void addField(Field f) {
-		fields.put(f.getKey(), f);
-	}
+    /**
+     * Add field, replace existing one if any.
+     */
+    private void addField(Field f) {
+        fields.put(f.getKey(), f);
+    }
 
-	@Override
-	public String toString() {
-		final Map<String, String> map = newHashMap();
-		for (Field f : fields.values()) {
-			map.put(f.getKey(), f.getValue());
-		}
+    @JsonIgnore
+    public Map<String, Field> getFieldMap() {
+        return fields;
+    }
 
-		return "FieldSet [packageName=" + packageName + ", name=" + name + ", fields=" + map + "]";
-	}
+    public List<Field> getFields() {
+        return new ArrayList<>(fields.values());
+    }
+
+    public void setFields(List<Field> fields) {
+        addAllFields(fields, true);
+    }
 
 }

@@ -1,33 +1,9 @@
 package fr.dush.mediamanager.remote.impl;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.rmi.RemoteException;
-import java.util.List;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import com.google.common.eventbus.EventBus;
-
-import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
+import fr.dush.mediamanager.business.configuration.IConfigurationManager;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
@@ -35,49 +11,64 @@ import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.ConfigurationFieldAssert;
-import fr.dush.mediamanager.remote.Stopper;
+import fr.dush.mediamanager.remote.IStopper;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+import java.rmi.RemoteException;
+import java.util.List;
+
+import static com.google.common.collect.Lists.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.*;
+
+@RunWith(MockitoJUnitRunner.class)
 public class RemoteControllerTest {
 
     @InjectMocks
     private RemoteController remoteController;
 
     @Mock
-    private Stopper stopper;
-
-    @Mock
-    private IRootDirectoryDAO rootDirectoryDAO;
+    private IStopper stopper;
 
     @Mock
     private EventBus eventBus;
 
     @Mock
-    private IConfigurationRegister configurationRegister;
-
+    private IConfigurationManager configurationManager;
     @Mock
     private IScanRegister scanRegister;
 
-    @Mock
-    private IMovieDAO movieDAO;
+    @Spy
+    private Mapper dozerMapper = new DozerBeanMapper();
 
     @Before
     public void initMock() {
-        MockitoAnnotations.initMocks(this);
+        remoteController.setConfiguration(new ModuleConfiguration("remotermi", new FieldSet("remotermi")));
     }
 
     @Test
     public void testGetFullConfiguration() throws Exception {
         final FieldSet f1 = new FieldSet("package1");
         f1.addValue("foobar", "foo", false);
-        f1.getFields().get("foobar").setDescription("Foobar desc");
+        f1.getFieldMap().get("foobar").setDescription("Foobar desc");
         f1.addValue("bar", "baz", false);
-        final ModuleConfiguration m1 = new ModuleConfiguration(null, f1);
 
         final FieldSet f2 = new FieldSet("package2");
         f2.addValue("bar", "toto", false);
-        final ModuleConfiguration m2 = new ModuleConfiguration(null, f2);
-        when(configurationRegister.findAll()).thenReturn(newArrayList(m1, m2));
+
+        when(configurationManager.getAllConfigurations()).thenReturn(newArrayList(f1, f2));
 
         // Exec
         final List<ConfigurationField> configs = remoteController.getFullConfiguration();
@@ -85,8 +76,10 @@ public class RemoteControllerTest {
         // Check
         assertThat(configs).hasSize(3);
         ConfigurationFieldAssert.assertThat(configs.get(0)).hasFullname("package1.bar").hasValue("baz");
-        ConfigurationFieldAssert.assertThat(configs.get(1)).hasFullname("package1.foobar").hasValue("foo")
-                .hasDescription("Foobar desc");
+        ConfigurationFieldAssert.assertThat(configs.get(1))
+                                .hasFullname("package1.foobar")
+                                .hasValue("foo")
+                                .hasDescription("Foobar desc");
         ConfigurationFieldAssert.assertThat(configs.get(2)).hasFullname("package2.bar").hasValue("toto");
     }
 
@@ -113,13 +106,15 @@ public class RemoteControllerTest {
 
         // Check
         verify(eventBus).post(argScanRequestEvent(MediaType.MOVIE, "movies", "imdb-enricher", "/media/movies"));
-        verify(scanRegister).waitResponseFor(
-                argScanRequestEvent(MediaType.MOVIE, "movies", "imdb-enricher", "/media/movies"));
+        verify(scanRegister).waitResponseFor(argScanRequestEvent(MediaType.MOVIE,
+                                                                 "movies",
+                                                                 "imdb-enricher",
+                                                                 "/media/movies"));
 
     }
 
     private final ScanRequestEvent argScanRequestEvent(final MediaType mediaType, final String name,
-            final String enricher, final String... paths) {
+                                                       final String enricher, final String... paths) {
         return argThat(new BaseMatcher<ScanRequestEvent>() {
 
             private String error = "";
@@ -134,8 +129,7 @@ public class RemoteControllerTest {
                         assertThat(event.getRootDirectory()).isEqualsToByComparingFields(rd);
 
                         return true;
-                    }
-                    catch (Error e) {
+                    } catch (Error e) {
                         error = e.getMessage();
                         return false;
                     }
@@ -159,8 +153,7 @@ public class RemoteControllerTest {
             remoteController.scan(MediaType.MOVIE, "/media/movies", "imdb-enricher");
             failBecauseExceptionWasNotThrown(RemoteException.class);
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             assertThat(e).isInstanceOf(RemoteException.class).hasMessageContaining("No response received");
         }
     }

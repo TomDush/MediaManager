@@ -1,0 +1,24 @@
+{
+    "name": "Connection (proxy)",
+    "fields": [
+        {
+            "key": "proxy.host",
+            "name": "Proxy host",
+            "description": "Proxy host name to http connection."
+        },
+        {
+            "key": "proxy.port",
+            "name": "Proxy port",
+            "description": "Proxy port name to http connection."
+        },
+        {
+            "key": "proxy.username",
+            "name": "Proxy username",
+            "description": "Proxy username if authentication is required."
+        },
+        {
+            "key": "proxy.password",
+            "name": "Proxy password",
+            "description": "Proxy password if authentication is required."
+        }
+    ]}

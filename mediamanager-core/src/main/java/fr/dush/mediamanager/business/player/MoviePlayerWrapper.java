@@ -13,7 +13,9 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 
+import javax.inject.Named;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -25,6 +27,8 @@ import static com.google.common.collect.Collections2.*;
 /**
  * This wrapper append meta data management to player and integration to CDI.
  */
+@Named
+@Scope("prototype")
 public class MoviePlayerWrapper extends AbstractMetaPlayer<Movie, VideoFile> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoviePlayerWrapper.class);

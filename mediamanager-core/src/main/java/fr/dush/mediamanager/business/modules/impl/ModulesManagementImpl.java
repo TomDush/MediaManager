@@ -110,7 +110,7 @@ public class ModulesManagementImpl implements IModulesManager {
     //
     //			@Override
     //			@Nonbinding
-    //			public String packageName() {
+    //			public String configId() {
     //				return "";
     //			}
     //

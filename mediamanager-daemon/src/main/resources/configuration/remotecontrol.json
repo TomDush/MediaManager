@@ -1,0 +1,22 @@
+{
+    "name": "RMI - Daemon Remote Control",
+    "fields": [
+        {
+            "key": "url",
+            "name": "Registry URL",
+            "value": "rmi://localhost:${port}/MediaManagerRMI",
+            "description": "URL where RMI controller will be registred."
+        },
+        {
+            "key": "port",
+            "name": "Registry port",
+            "value": 1099,
+            "description": "Registry port where is stored RMI Controller."
+        },
+        {
+            "key": "createregistry",
+            "name": "Create registry",
+            "value": "true",
+            "description": "True is registry must be created."
+        }
+    ]}
