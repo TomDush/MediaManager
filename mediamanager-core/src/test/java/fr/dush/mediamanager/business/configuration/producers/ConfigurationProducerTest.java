@@ -2,7 +2,7 @@ package fr.dush.mediamanager.business.configuration.producers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.domain.configuration.Field;
@@ -28,7 +28,7 @@ public class ConfigurationProducerTest extends SpringJUnitTest {
     private ObjectMapper mapper;
 
     @Inject
-    @Configuration(packageName = "fr.dush.mediamanager.business.foobar", definition = "configuration/config-test.json")
+    @Config(packageName = "fr.dush.mediamanager.business.foobar", definition = "configuration/config-test.json")
     private ModuleConfiguration config;
 
     @Test

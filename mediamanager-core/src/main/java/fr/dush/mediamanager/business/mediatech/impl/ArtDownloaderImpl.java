@@ -1,14 +1,13 @@
 package fr.dush.mediamanager.business.mediatech.impl;
 
 import com.google.common.hash.Hashing;
-import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.mediatech.ArtRepository;
 import fr.dush.mediamanager.business.mediatech.IArtDownloader;
 import fr.dush.mediamanager.domain.media.art.Art;
 import fr.dush.mediamanager.domain.media.art.ArtQuality;
 import fr.dush.mediamanager.domain.media.art.ArtType;
-import fr.dush.mediamanager.exceptions.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static com.google.common.io.Files.*;
 import static org.apache.commons.lang3.StringUtils.*;
@@ -32,7 +30,7 @@ public class ArtDownloaderImpl implements IArtDownloader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArtDownloaderImpl.class);
 
     @Inject
-    @Configuration(name = "Mediatech", definition = "configuration/mediatech.json")
+    @Config(name = "Mediatech", definition = "configuration/paths.json")
     private ModuleConfiguration configuration;
 
     private Path temp;

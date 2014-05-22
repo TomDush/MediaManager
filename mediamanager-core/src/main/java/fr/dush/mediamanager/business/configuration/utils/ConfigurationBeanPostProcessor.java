@@ -1,7 +1,8 @@
-package fr.dush.mediamanager.tools;
+package fr.dush.mediamanager.business.configuration.utils;
 
 import java.lang.reflect.Field;
 
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
 import lombok.Setter;
 
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 
 import javax.inject.Named;
@@ -30,7 +30,7 @@ public class ConfigurationBeanPostProcessor implements BeanPostProcessor, Applic
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         for (Field field : bean.getClass().getDeclaredFields()) {
             if (field.getType().isAssignableFrom(ModuleConfiguration.class)
-                    && field.isAnnotationPresent(Configuration.class)) {
+                    && field.isAnnotationPresent(Config.class)) {
 
                 LOGGER.warn("Should inject configuration into: {}", bean);
                 IConfigurationDAO configurationDAO = getConfigurationDAO();

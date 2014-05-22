@@ -6,7 +6,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import fr.dush.mediamanager.annotations.Configuration;
+import fr.dush.mediamanager.annotations.Config;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.modules.IModulesManager;
 import fr.dush.mediamanager.dao.media.IMovieDAO;
@@ -57,7 +57,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     private IMovieDAO movieDAO;
 
     @Inject
-    @Configuration(definition = "configuration/scanners.json", packageName = "fr.dush.mediamanager.business.scanner")
+    @Config(definition = "configuration/modules.json", packageName = "fr.dush.mediamanager.business.scanner")
     private ModuleConfiguration moduleConfiguration;
 
     /** Media enricher */

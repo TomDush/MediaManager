@@ -231,7 +231,7 @@ public class ModuleConfiguration {
     }
 
     public String getPackageName() {
-        return fieldSet.getPackageName();
+        return fieldSet.getConfigId();
     }
 
     /**

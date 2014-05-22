@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import fr.dush.mediamanager.annotations.Config;
 import lombok.Setter;
 
 import org.slf4j.Logger;
@@ -16,7 +17,6 @@ import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.tools.WebBrowser;
 
-import fr.dush.mediamanager.annotations.Configuration;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 import fr.dush.mediamanager.plugins.enrich.TheMovieDbEnricher;
@@ -28,7 +28,7 @@ public class TheMovieDBProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBProvider.class);
 
     @Inject
-    @Configuration(entryPoint = TheMovieDbEnricher.class)
+    @Config(entryPoint = TheMovieDbEnricher.class)
     @Setter
     private ModuleConfiguration configuration;
 

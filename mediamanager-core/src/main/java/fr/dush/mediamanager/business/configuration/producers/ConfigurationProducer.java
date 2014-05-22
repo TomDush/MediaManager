@@ -42,15 +42,15 @@ public class ConfigurationProducer {
     //	public void generateGenericModule() {
     //		try {
     //			generic = getModuleConfiguration("generic", "Media Manager Configuration",
-    // "configuration/generic.json");
+    // "configuration/connection.json");
     //		} catch (IOException e) {
     //			throw new ConfigurationException(e.getMessage(), e);
     //		}
     //	}
     //
-    //	public ModuleConfiguration getModuleConfiguration(String packageName, String configurationName,
+    //	public ModuleConfiguration getModuleConfiguration(String configId, String configurationName,
     // String definition) throws IOException {
-    //		return createConfiguration(configurationDAO, new SimpleConfigurationArguments(packageName,
+    //		return createConfiguration(configurationDAO, new SimpleConfigurationArguments(configId,
     // configurationName, definition));
     //	}
     //
@@ -173,7 +173,7 @@ public class ConfigurationProducer {
     //	@Getter
     //	@AllArgsConstructor
     //	public class SimpleConfigurationArguments implements IConfigurationArguments {
-    //		private String packageName;
+    //		private String configId;
     //
     //		private String name;
     //
@@ -181,7 +181,7 @@ public class ConfigurationProducer {
     //
     //		@Override
     //		public String getPackage() {
-    //			return getPackageName();
+    //			return getConfigId();
     //		}
     //	}
 

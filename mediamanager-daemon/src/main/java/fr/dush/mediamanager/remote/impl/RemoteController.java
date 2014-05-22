@@ -15,13 +15,12 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import fr.dush.mediamanager.annotations.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.EventBus;
 
-import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
 import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;
@@ -49,7 +48,7 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
     private static final String REMOTECONTROL_URL = "remotecontrol.url";
 
     @Inject
-    @Configuration(packageName = "daemon", definition = "configuration/rmi.json")
+    @Config(packageName = "daemon", definition = "configuration/rmi.json")
 //    @ConfigurationWithoutDatabase
     private ModuleConfiguration configuration;
 

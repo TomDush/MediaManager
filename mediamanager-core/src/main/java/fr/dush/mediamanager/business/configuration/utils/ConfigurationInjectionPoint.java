@@ -76,14 +76,14 @@ public class ConfigurationInjectionPoint implements IConfigurationArguments {
     //	@Override
     //	public String getPackage() {
     //		// package is overrided in configuration annotation
-    //		if (isNotEmpty(configurationAnnotation.packageName())) {
-    //			return configurationAnnotation.packageName();
+    //		if (isNotEmpty(configurationAnnotation.configId())) {
+    //			return configurationAnnotation.configId();
     //		}
     //
     //		// If module defined, get module package
     //		if (module != null) {
-    //			if (isNotEmpty(module.packageName())) {
-    //				return module.packageName();
+    //			if (isNotEmpty(module.configId())) {
+    //				return module.configId();
     //			}
     //
     //			return moduleClass.getPackage().getName();

@@ -15,7 +15,7 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
  * There is 2 modes to use this annotation :
  * <ul>
  * <li>Standalone : annotation must define {@link #packageName()}, configuration ID.</li>
- * <li>From Module : <code>packageName</code> is defined in {@link Module} annotation. This one is found implicitly on this class, on
+ * <li>From Module : <code>configId</code> is defined in {@link Module} annotation. This one is found implicitly on this class, on
  * explicitly on class {@link #entryPoint()}.
  * </ul>
  * </p>
@@ -26,10 +26,10 @@ import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
  */
 @Target({ PARAMETER, FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Configuration {
+public @interface Config {
 
     /** File description identifier */
-//    String id();
+    String id();
 
 	/** Module name, can be override by name in definition file. */
     @Deprecated
@@ -41,7 +41,7 @@ public @interface Configuration {
 
 	/** Module entry point, by default use class in which is injected configuration. */
     @Deprecated
-    Class<?> entryPoint() default Configuration.class;
+    Class<?> entryPoint() default Config.class;
 
 	/** URL to file containing meta information on each configuration parameter. This file must be in class path. */
     @Deprecated

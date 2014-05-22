@@ -27,11 +27,11 @@ public class ConfigurationDAOMock implements IConfigurationDAO {
 
     @Override
     public void save(FieldSet configuration) {
-        if (isBlank(configuration.getPackageName())) {
-            throw new IllegalArgumentException("ModuleConfiguration.packageName must not be null or blank.");
+        if (isBlank(configuration.getConfigId())) {
+            throw new IllegalArgumentException("ModuleConfiguration.configId must not be null or blank.");
         }
 
-        map.put(configuration.getPackageName(), configuration);
+        map.put(configuration.getConfigId(), configuration);
     }
 
 }
