@@ -20,6 +20,7 @@ import javax.inject.Qualifier;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Qualifier
+@Deprecated
 public @interface ConfigurationWithoutDatabase {
 
 }

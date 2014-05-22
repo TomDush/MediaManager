@@ -6,10 +6,12 @@ import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 
 import static com.google.common.collect.Lists.*;
 
+@Named
 public class MongoConfigurationDAOImpl implements IConfigurationDAO {
 
     private static final String COLLECTION_NAME = "Config";

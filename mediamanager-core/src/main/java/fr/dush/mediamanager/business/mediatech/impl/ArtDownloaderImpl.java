@@ -44,21 +44,21 @@ public class ArtDownloaderImpl implements IArtDownloader {
      */
     @PostConstruct
     public void readConfiguration() {
-        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
-
-        try {
-            temp = Files.createTempDirectory("MM_Downloader");
-        } catch (IOException e) {
-            throw new ConfigurationException("Can't create new temporary directory.", e);
-        }
+//        imageRootPath = Paths.get(configuration.readValue("downloader.imagespath"));
+//
+//        try {
+//            temp = Files.createTempDirectory("MM_Downloader");
+//        } catch (IOException e) {
+//            throw new ConfigurationException("Can't create new temporary directory.", e);
+//        }
 
         LOGGER.info("ArtDownloaderImpl is configured with : imagespath = {} ; temp = {}", imageRootPath, temp);
 
-        imageRootPath.toFile().mkdirs();
-        for (ArtType t : ArtType.values()) {
-            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
-        }
-        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
+//        imageRootPath.toFile().mkdirs();
+//        for (ArtType t : ArtType.values()) {
+//            imageRootPath.resolve(getPath(t)).toFile().mkdirs();
+//        }
+//        imageRootPath.resolve(getPath((ArtType) null)).toFile().mkdirs();
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -33,6 +34,7 @@ import static org.apache.commons.lang3.StringUtils.*;
  *
  * @author Thomas Duchatelle
  */
+@Named
 public class MovieDAOImpl extends AbstractDAO<Movie, ObjectId> implements IMovieDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieDAOImpl.class);

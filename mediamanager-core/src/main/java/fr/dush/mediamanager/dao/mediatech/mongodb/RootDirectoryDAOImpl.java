@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -19,11 +20,11 @@ import static com.google.common.collect.Lists.*;
  *
  * @author Thomas Duchatelle
  */
+@Named
 public class RootDirectoryDAOImpl extends AbstractDAO<RootDirectory, String> implements IRootDirectoryDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RootDirectoryDAOImpl.class);
 
-    @Inject
     public RootDirectoryDAOImpl() {
         super(RootDirectory.class);
     }

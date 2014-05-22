@@ -5,6 +5,7 @@ import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 
 import javax.inject.Named;
 import java.util.Collection;
+import java.util.HashSet;
 
 @Named
 public class ModulesManagementImpl implements IModulesManager {
@@ -13,7 +14,7 @@ public class ModulesManagementImpl implements IModulesManager {
 
     @Override
     public <T> Collection<T> findModuleByType(Class<? extends T> moduleClass) {
-        return null;
+        return new HashSet<>();
     }
 
     @Override

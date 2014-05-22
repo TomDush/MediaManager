@@ -31,7 +31,6 @@ import static org.apache.commons.lang3.StringUtils.*;
  *
  * @author Thomas Duchatelle
  */
-@Named
 public class FileConfigurationDAOImpl implements IConfigurationDAO {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileConfigurationDAOImpl.class);

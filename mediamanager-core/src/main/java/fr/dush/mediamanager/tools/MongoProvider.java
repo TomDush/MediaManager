@@ -1,35 +1,34 @@
-package fr.dush.mediamanager.dao.mongodb;
+package fr.dush.mediamanager.tools;
 
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import fr.dush.mediamanager.annotations.Configuration;
-import fr.dush.mediamanager.annotations.ConfigurationWithoutDatabase;
-import fr.dush.mediamanager.annotations.Module;
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import java.net.UnknownHostException;
+
+import javax.annotation.PreDestroy;
+
 import org.jongo.Jongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import java.net.UnknownHostException;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 
 /**
  * Provide configuration and utilities for MongoDB.
- *
+ * 
  * @author Thomas Duchatelle
  */
-@Module(id = "mongo-provider", name = "MongoDB Configurator", packageName = "persistence")
 @org.springframework.context.annotation.Configuration
 public class MongoProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);
 
-    @Inject
-    @ConfigurationWithoutDatabase
-    @Configuration(definition = "configuration/mongo-config.json")
-    private ModuleConfiguration configuration;
+    @Value("${mongodb.host}")
+    private String host;
+    @Value("${mongodb.port}")
+    private Integer port;
+    @Value("${mongodb.databaseName}")
+    private String dbname;
 
     private MongoClient mongoClient;
 
@@ -49,8 +48,7 @@ public class MongoProvider {
     public MongoClient producesMogoClient() throws UnknownHostException {
         LOGGER.debug("Instanciate new MongoClient");
         if (mongoClient == null) {
-            mongoClient = new MongoClient(configuration.readValue("mongodb.host"),
-                                          configuration.readValueAsInt("mongodb.port"));
+            mongoClient = new MongoClient(host, port);
         }
 
         return mongoClient;
@@ -60,7 +58,7 @@ public class MongoProvider {
     public DB producesMogoDB() throws UnknownHostException {
         if (db == null) {
             LOGGER.debug("Instanciate new MongoDB and connection");
-            db = producesMogoClient().getDB(configuration.readValue("mongodb.databaseName"));
+            db = producesMogoClient().getDB(dbname);
         }
 
         return db;

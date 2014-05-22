@@ -50,7 +50,7 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
 
     @Inject
     @Configuration(packageName = "daemon", definition = "configuration/rmi.json")
-    @ConfigurationWithoutDatabase
+//    @ConfigurationWithoutDatabase
     private ModuleConfiguration configuration;
 
     @Inject
