@@ -1,6 +1,7 @@
 package fr.dush.mediamanager.engine;
 
 import fr.dush.mediamanager.SpringConfiguration;
+import lombok.Getter;
 import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,6 +18,7 @@ public abstract class SpringJUnitTest extends SimpleJunitTest {
     }
 
     @Inject
+    @Getter
     protected ApplicationContext applicationContext;
 
 }

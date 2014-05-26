@@ -1,25 +1,23 @@
 package fr.dush.mediamanager.engine.mongodb;
 
-import static com.google.common.collect.Lists.*;
-import static org.apache.commons.lang3.StringUtils.*;
+import com.mongodb.BasicDBList;
+import com.mongodb.DB;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
+import fr.dush.mediamanager.dao.mongodb.EntityUtils;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
+import org.apache.commons.io.FileUtils;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.apache.commons.io.FileUtils;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
-
-import fr.dush.mediamanager.dao.mongodb.EntityUtils;
-import fr.dush.mediamanager.exceptions.ConfigurationException;
+import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Manage data sets in Mongo database.
@@ -27,6 +25,7 @@ import fr.dush.mediamanager.exceptions.ConfigurationException;
  * @author Thomas Duchatelle
  *
  */
+@Component
 public class MongoDBDatasetManager {
 
 	@Inject
