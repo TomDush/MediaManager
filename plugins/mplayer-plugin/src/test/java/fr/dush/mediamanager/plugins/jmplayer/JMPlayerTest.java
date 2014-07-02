@@ -1,12 +1,7 @@
 package fr.dush.mediamanager.plugins.jmplayer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.common.eventbus.EventBus;
+import fr.dush.mediamanager.events.play.PlayerEvent;
 import org.assertj.core.data.MapEntry;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,8 +15,12 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.eventbus.EventBus;
-import fr.dush.mediamanager.events.play.PlayerEvent;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.*;
 
 /**
  * @author Thomas Duchatelle
@@ -31,7 +30,8 @@ public class JMPlayerTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JMPlayerTest.class);
 
-    public static final String FILE = "/mnt/data/Films/Sagas/Transformers/Transformers.Dark.Of.The.Moon.2011.FRENCH.DVDRip.XviD-AYMO.CD1.avi";
+    public static final String FILE =
+            "/mnt/data/Movies/Sagas/Transformers/Transformers.Dark.Of.The.Moon.2011.FRENCH.DVDRip.XviD-AYMO.CD1.avi";
     //    public static final String FILE =
     //            "/mnt/unsafe/Movies/Riddick 2013 BRRip AC3 XviD-haяkš/Riddick 2013 BRRip AC3 XviD-haяkš.avi";
 

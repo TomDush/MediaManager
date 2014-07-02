@@ -1,21 +1,5 @@
 package fr.dush.mediamanager.plugins.enrich;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.Subscribe;
@@ -25,7 +9,6 @@ import com.omertron.themoviedbapi.model.CollectionInfo;
 import com.omertron.themoviedbapi.model.Genre;
 import com.omertron.themoviedbapi.model.MovieDb;
 import com.omertron.themoviedbapi.model.Trailer;
-
 import fr.dush.mediamanager.annotations.Module;
 import fr.dush.mediamanager.domain.media.Media;
 import fr.dush.mediamanager.domain.media.SourceId;
@@ -39,14 +22,31 @@ import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.modulesapi.enrich.EnrichException;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
 import fr.dush.mediamanager.modulesapi.enrich.IMoviesEnricher;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Find meta-data on movies and shows from <i>themoviesdb</i>.
- * 
+ *
  * @author Thomas Duchatelle
  */
 @Named
-@Module(name = "MoviesDB Plugin", id = "enricher-themoviesdb", description = "Find data on movies and shows with http://www.themoviedb.org/")
+@Module(name = "MoviesDB Plugin",
+        id = "enricher-themoviesdb",
+        description = "Find data on movies and shows with http://www.themoviedb.org/")
 public class TheMovieDbEnricher implements IMoviesEnricher {
 
     public static final String MOVIEDB_ID_TYPE = "themoviedb";
@@ -58,6 +58,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Inject
+    @Setter
     private TheMovieDbApi api;
 
     @Override
@@ -70,15 +71,15 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
         try {
             // Search in database
-            final List<MovieDb> foundMovies = api.searchMovie(filename.getMovieName(), filename.getYear(), "en", false,
-                    0).getResults();
+            final List<MovieDb> foundMovies =
+                    api.searchMovie(filename.getMovieName(), filename.getYear(), "en", false, 0).getResults();
 
             // Convert information
             return Lists.transform(foundMovies, converter);
-        }
-        catch (MovieDbException e) {
+        } catch (MovieDbException e) {
             throw new EnrichException(String.format("An error occurred when searching movie %s on TheMovieDb : %s",
-                    filename.getMovieName(), e.getMessage()), e);
+                                                    filename.getMovieName(),
+                                                    e.getMessage()), e);
         }
     }
 
@@ -98,14 +99,13 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
     }
 
     @Override
-    public List<fr.dush.mediamanager.domain.media.video.Trailer> findTrailers(Media media, String lang)
-            throws EnrichException {
+    public List<fr.dush.mediamanager.domain.media.video.Trailer> findTrailers(Media media,
+                                                                              String lang) throws EnrichException {
         try {
             final int id = getId(media.getMediaIds(), media.getTitle());
-            return Lists
-                    .transform(api.getMovieTrailers(id, isBlank(lang) ? "en" : lang).getResults(), trailerConverter);
-        }
-        catch (MovieDbException e) {
+            return Lists.transform(api.getMovieTrailers(id, isBlank(lang) ? "en" : lang).getResults(),
+                                   trailerConverter);
+        } catch (MovieDbException e) {
             throw new EnrichException(String.format("Can't find trailers for media %s.", media), e);
         }
     }
@@ -120,8 +120,8 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             // If it's movie and MoviesDB's id is known, research available trailers.
             if (event.getMedia() instanceof Movie) {
                 Movie movie = (Movie) event.getMedia();
-                final List<fr.dush.mediamanager.domain.media.video.Trailer> trailers = findTrailers(movie,
-                        event.getLang());
+                final List<fr.dush.mediamanager.domain.media.video.Trailer> trailers =
+                        findTrailers(movie, event.getLang());
 
                 if (movie.getTrailers() == null) {
                     movie.setTrailers(new Trailers());
@@ -132,8 +132,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
                     movie.getTrailers().addTrailer(t);
                 }
             }
-        }
-        catch (EnrichException e) {
+        } catch (EnrichException e) {
             LOGGER.info("Can find trailers for {} : {}", event.getMedia().getTitle(), e.getMessage());
         }
     }
@@ -141,26 +140,28 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
     @Override
     public MoviesCollection findCollection(BelongToCollection belongToCollection) throws EnrichException {
         try {
-            final CollectionInfo info = api.getCollectionInfo(
-                    getId(belongToCollection.getMediaIds(), belongToCollection.getTitle()), "en");
+            final CollectionInfo info =
+                    api.getCollectionInfo(getId(belongToCollection.getMediaIds(), belongToCollection.getTitle()), "en");
 
             // General collection's data
             MoviesCollection collection = new MoviesCollection();
             collection.getMediaIds().addId(createId(info.getId()));
             collection.setCreation(new Date());
-            collection
-                    .setPoster(generateArtUrl(ArtType.POSTER, info.getPosterPath(), collection.getTitle() + "_poster"));
-            collection.setBackdrop(generateArtUrl(ArtType.BACKDROP, info.getBackdropPath(), collection.getTitle()
-                    + "_backdrop"));
+            collection.setPoster(generateArtUrl(ArtType.POSTER,
+                                                info.getPosterPath(),
+                                                collection.getTitle() + "_poster"));
+            collection.setBackdrop(generateArtUrl(ArtType.BACKDROP,
+                                                  info.getBackdropPath(),
+                                                  collection.getTitle() + "_backdrop"));
 
             // List of movies
             collection.setMovies(Lists.transform(info.getParts(), movieCollectionConverter));
 
             return collection;
-        }
-        catch (MovieDbException e) {
+        } catch (MovieDbException e) {
             throw new EnrichException(String.format("Can't find data on collection %s (ids : %s)",
-                    belongToCollection.getTitle(), belongToCollection.getMediaIds()));
+                                                    belongToCollection.getTitle(),
+                                                    belongToCollection.getMediaIds()));
         }
     }
 
@@ -177,7 +178,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
     /**
      * Get and cast MovieDB ID.
-     * 
+     *
      * @param sourceIds Movie identifiers.
      * @return MovieDB id.
      */
@@ -185,7 +186,8 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
         final Collection<String> ids = sourceIds.getIds(MOVIEDB_ID_TYPE);
         if (ids.isEmpty()) {
             throw new EnrichException(String.format(
-                    "No id(s) provided for %s enricher for film %s. Can not process to enrichment.", MOVIEDB_ID_TYPE,
+                    "No id(s) provided for %s enricher for film %s. Can not process to enrichment.",
+                    MOVIEDB_ID_TYPE,
                     title));
         }
 
@@ -228,8 +230,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
 
                 movie.setCollection(movieCollection);
             }
-        }
-        catch (MovieDbException e) {
+        } catch (MovieDbException e) {
             throw new EnrichException(String.format("Can't enrich %s film : %s", movie.getTitle(), e.getMessage()));
         }
     }
@@ -254,8 +255,7 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             if (isNotBlank(movieDb.getReleaseDate())) {
                 try {
                     movie.setRelease(dateFormatter.parse(movieDb.getReleaseDate()));
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                     LOGGER.warn("Can't parse date {} : {}", movieDb.getReleaseDate(), e.getMessage());
                 }
             }
@@ -267,34 +267,34 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
         }
     };
 
-    private Function<com.omertron.themoviedbapi.model.Collection, Movie> movieCollectionConverter = new Function<com.omertron.themoviedbapi.model.Collection, Movie>() {
+    private Function<com.omertron.themoviedbapi.model.Collection, Movie> movieCollectionConverter =
+            new Function<com.omertron.themoviedbapi.model.Collection, Movie>() {
 
-        @Override
-        public Movie apply(com.omertron.themoviedbapi.model.Collection collection) {
+                @Override
+                public Movie apply(com.omertron.themoviedbapi.model.Collection collection) {
 
-            Movie movie = new Movie();
+                    Movie movie = new Movie();
 
-            // Ids
-            movie.getMediaIds().addId(createId(collection.getId()));
+                    // Ids
+                    movie.getMediaIds().addId(createId(collection.getId()));
 
-            // General information
-            movie.setCreation(new Date());
-            movie.setTitle(collection.getTitle());
-            if (isNotBlank(collection.getReleaseDate())) {
-                try {
-                    movie.setRelease(dateFormatter.parse(collection.getReleaseDate()));
+                    // General information
+                    movie.setCreation(new Date());
+                    movie.setTitle(collection.getTitle());
+                    if (isNotBlank(collection.getReleaseDate())) {
+                        try {
+                            movie.setRelease(dateFormatter.parse(collection.getReleaseDate()));
+                        } catch (ParseException e) {
+                            LOGGER.warn("Can't parse date {} : {}", collection.getReleaseDate(), e.getMessage());
+                        }
+                    }
+
+                    // Posters, ....
+                    movie.setPoster(generateArtUrl(ArtType.POSTER, collection.getPosterPath(), collection.getTitle()));
+
+                    return movie;
                 }
-                catch (ParseException e) {
-                    LOGGER.warn("Can't parse date {} : {}", collection.getReleaseDate(), e.getMessage());
-                }
-            }
-
-            // Posters, ....
-            movie.setPoster(generateArtUrl(ArtType.POSTER, collection.getPosterPath(), collection.getTitle()));
-
-            return movie;
-        }
-    };
+            };
 
     /**
      * Create MediaManager ID from MoviesDB ID.
@@ -303,27 +303,29 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
         return new SourceId(MOVIEDB_ID_TYPE, Integer.toString(id));
     }
 
-    private Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer> trailerConverter = new Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer>() {
+    private Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer> trailerConverter =
+            new Function<Trailer, fr.dush.mediamanager.domain.media.video.Trailer>() {
 
-        @Override
-        public fr.dush.mediamanager.domain.media.video.Trailer apply(Trailer movieDb) {
-            final fr.dush.mediamanager.domain.media.video.Trailer link = new fr.dush.mediamanager.domain.media.video.Trailer();
-            link.setTitle(movieDb.getName());
-            link.setQuality(movieDb.getSize());
-            link.setSource(movieDb.getWebsite());
+                @Override
+                public fr.dush.mediamanager.domain.media.video.Trailer apply(Trailer movieDb) {
+                    final fr.dush.mediamanager.domain.media.video.Trailer link =
+                            new fr.dush.mediamanager.domain.media.video.Trailer();
+                    link.setTitle(movieDb.getName());
+                    link.setQuality(movieDb.getSize());
+                    link.setSource(movieDb.getWebsite());
 
-            if ("youtube".equals(movieDb.getWebsite().toLowerCase())) {
-                // Generate URL for YOUTUBE
-                link.setUrl("http://www.youtube.com/watch?v=" + movieDb.getSource());
-            }
-            else {
-                // Website is unknown...
-                LOGGER.warn("Website {} is unkown, check configuration.");
-                link.setUrl(String.format("Can't generate URL for website %s (identifier id %s)", movieDb.getWebsite(),
-                        movieDb.getSource()));
-            }
+                    if ("youtube".equals(movieDb.getWebsite().toLowerCase())) {
+                        // Generate URL for YOUTUBE
+                        link.setUrl("http://www.youtube.com/watch?v=" + movieDb.getSource());
+                    } else {
+                        // Website is unknown...
+                        LOGGER.warn("Website {} is unkown, check configuration.");
+                        link.setUrl(String.format("Can't generate URL for website %s (identifier id %s)",
+                                                  movieDb.getWebsite(),
+                                                  movieDb.getSource()));
+                    }
 
-            return link;
-        }
-    };
+                    return link;
+                }
+            };
 }
