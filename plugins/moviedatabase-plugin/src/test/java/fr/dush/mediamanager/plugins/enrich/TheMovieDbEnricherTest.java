@@ -3,7 +3,6 @@ package fr.dush.mediamanager.plugins.enrich;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.domain.media.video.Movie;
 import fr.dush.mediamanager.domain.scan.MoviesParsedName;
 import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
@@ -13,14 +12,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TheMovieDbEnricherTest {
@@ -30,16 +34,30 @@ public class TheMovieDbEnricherTest {
     @InjectMocks
     private TheMovieDbEnricher enrichMedia;
 
-    @Spy
     private TheMovieDbApi api;
+
+    @Mock
+    private ModuleConfiguration moduleConfiguration;
 
     @Before
     public void initTest() throws MovieDbException {
-        final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
-        theMovieDBProvider.setConfiguration(new ModuleConfiguration("themoviedb", new FieldSet("themoviedb")));
-        api = theMovieDBProvider.provideTheMovieDbApi();
-
         MockitoAnnotations.initMocks(this);
+
+        // Module configuration behavior
+        when(moduleConfiguration.readValue(eq("key"), anyString())).then(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return invocation.getArguments()[1];
+            }
+        });
+
+        // Create API
+        final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
+        theMovieDBProvider.setConfiguration(moduleConfiguration);
+        api = spy(theMovieDBProvider.provideTheMovieDbApi());
+
+        // Set dependencies
+        enrichMedia.setApi(api);
 
     }
 

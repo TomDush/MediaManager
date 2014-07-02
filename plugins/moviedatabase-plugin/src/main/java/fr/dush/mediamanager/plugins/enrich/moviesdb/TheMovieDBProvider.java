@@ -33,12 +33,12 @@ public class TheMovieDBProvider {
                              "http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}",
                              new Properties()));
 
-        String host = configuration.readValue("proxy.host", (Properties) null);
+        String host = configuration.readValue("connection.proxy.host");
         if (isNotEmpty(host)) {
             WebBrowser.setProxyHost(host);
             WebBrowser.setProxyPort(configuration.readValueAsInt("connection.proxy.port"));
-            WebBrowser.setProxyUsername(configuration.readValue("connection.proxy.username", (Properties) null));
-            WebBrowser.setProxyPassword(configuration.readValue("connection.proxy.password", (Properties) null));
+            WebBrowser.setProxyUsername(configuration.readValue("connection.proxy.username"));
+            WebBrowser.setProxyPassword(configuration.readValue("connection.proxy.password"));
         }
 
         try {
