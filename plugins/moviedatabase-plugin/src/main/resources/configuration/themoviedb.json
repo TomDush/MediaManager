@@ -1,0 +1,10 @@
+{
+    "name": "The Movies DB",
+    "fields": [
+        {
+            "key": "key",
+            "name": "API Key",
+            "description": "Key used to access to TheMovieDB API"
+        }
+    ]
+}

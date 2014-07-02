@@ -80,9 +80,4 @@ public class FieldSet {
         addAllFields(fields, true);
     }
 
-    @Override
-    public String toString() {
-        return "FieldSet [configId=" + configId + ", name=" + name + ", fields=" + fields + "]";
-    }
-
 }

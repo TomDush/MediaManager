@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configure Guava Event Bus to get CDI event and broadcast them to it.
+ * Provide a Guava Event Bus to all Spring beans. Spring beans are registered in event bus automatically.
+ *
+ * @see fr.dush.mediamanager.business.configuration.producers.ConfigurationBeanPostProcessor
  */
 @Configuration
 public class GuavaEventBus {
@@ -16,14 +18,9 @@ public class GuavaEventBus {
 
     private static final EventBus eventBus = new EventBus();
 
-    @Bean
+    @Bean(name = "eventBus")
     public EventBus createGuavaEventBus() {
         return eventBus;
-    }
-
-    public static void register(Object bean) {
-        LOGGER.debug("Register bean: {}", bean);
-        eventBus.register(bean);
     }
 
     public static void unregister(Object bean) {

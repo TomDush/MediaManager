@@ -1,24 +1,23 @@
 package fr.dush.mediamanager.tools;
 
-import java.net.UnknownHostException;
-
-import javax.annotation.PreDestroy;
-
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import org.jongo.Jongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
+import javax.annotation.PreDestroy;
+import java.net.UnknownHostException;
 
 /**
  * Provide configuration and utilities for MongoDB.
- * 
+ *
  * @author Thomas Duchatelle
  */
-@org.springframework.context.annotation.Configuration
+@Configuration("mongoProvider")
 public class MongoProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoProvider.class);

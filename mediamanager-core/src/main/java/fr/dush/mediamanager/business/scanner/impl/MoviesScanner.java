@@ -56,10 +56,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     @Inject
     private IMovieDAO movieDAO;
 
-    @Inject
-    @Config(id = "modules",
-            definition = "configuration/modules.json",
-            packageName = "fr.dush.mediamanager.business.scanner")
+    @Config(id = "modules")
     private ModuleConfiguration moduleConfiguration;
 
     /** Media enricher */
@@ -91,7 +88,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
     public ScanStatus startScanning(RootDirectory rootDirectory) throws ScanException {
         String enricherName = rootDirectory.getEnricher();
         if (isBlank(enricherName)) {
-            enricherName = moduleConfiguration.readValue("movies.defaultenricher");
+            enricherName = moduleConfiguration.readValue("defaultenricher");
         }
 
         try {
@@ -141,8 +138,7 @@ public class MoviesScanner extends AbstractScanner<MoviesParsedName, Movie> {
 
                 // Download elements
                 if (isNotEmpty(chosenMovie.getPoster())) {
-                    addToDownloadList(chosenMovie.getPoster(),
-                                      new ArtQuality[]{ArtQuality.MINI, ArtQuality.THUMBS, ArtQuality.DISPLAY});
+                    addToDownloadList(chosenMovie.getPoster(), ArtQuality.MINI, ArtQuality.THUMBS, ArtQuality.DISPLAY);
                     for (Person p : chosenMovie.getMainActors()) {
                         addToDownloadList(p.getPicture(), ArtQuality.MINI);
                     }

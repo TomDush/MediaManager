@@ -3,11 +3,11 @@ package fr.dush.mediamanager.launcher;
 import fr.dush.mediamanager.SpringConfiguration;
 import fr.dush.mediamanager.exceptions.ModuleLoadingException;
 import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
-import fr.dush.mediamanager.remote.Stopper;
+import fr.dush.mediamanager.remote.IStopper;
+import fr.dush.mediamanager.remote.impl.StopperImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
@@ -28,10 +28,10 @@ import static com.google.common.collect.Lists.*;
 public class ContextLauncher extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContextLauncher.class);
-
     private Exception catchedException = null;
 
-    private Path configFile = null;
+    private final Path configFile;
+    private final int port;
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -50,18 +50,11 @@ public class ContextLauncher extends Thread {
     public ContextLauncher(Path configFile, int port) {
         super("mediamanagerDaemon");
         setDaemon(true);
-        this.configFile = configFile;
-        // TODO Create config file if it doesn't exist
 
-        String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        if (installPath.matches("^/[A-Z]:/.*$")) {
-            installPath = installPath.substring(1);
-        }
-        System.setProperty("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
-        if (configFile != null) {
-            System.setProperty("mediamanager.propertiesfile", pathToString(configFile));
-        }
-        System.setProperty("remotecontrol.port", String.valueOf(port));
+        // Config file
+        this.configFile = configFile;
+        this.port = port;
+
     }
 
     /** Get normalized absolute path. */
@@ -78,31 +71,36 @@ public class ContextLauncher extends Thread {
 
         try {
             fireStart(lifeCycleServices);
-            //            CDIUtils.bootCdiContainer();
 
+            // Generic properties (provided to Spring placeholder)
             Properties source = new Properties();
             source.put("mediamanager.propertiesfile", pathToString(configFile));
+            source.put("remotecontrol.port", String.valueOf(this.port));
 
-            // TODO Start SPRING context
-            AnnotationConfigApplicationContext app = new AnnotationConfigApplicationContext();
-            app.getEnvironment().getPropertySources().addFirst(new PropertiesPropertySource("config-files", source));
-            app.register(SpringConfiguration.class);
-            app.refresh();
+            // Directory where Medima binaries are
+            String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            if (installPath.matches("^/[A-Z]:/.*$")) {
+                installPath = installPath.substring(1);
+            }
+            source.put("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
 
-            //            ApplicationContext app = new GenericApplicationContext(SpringConfiguration.class);
-
-            ApplicationContext context = null;
+            // Start SPRING context - spring is configured by annotation in SpringConfiguration class
+            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+            context.getEnvironment()
+                   .getPropertySources()
+                   .addFirst(new PropertiesPropertySource("config-files", source));
+            context.register(SpringConfiguration.class);
+            context.refresh();
 
             // Wait application end...
-            final Stopper stopper = context.getBean(Stopper.class);
+            final IStopper stopper = context.getBean(StopperImpl.class);
             fireInitialized(stopper);
             LOGGER.info("Server started.");
             stopper.waitApplicationEnd();
 
-            // Stopping CDI
+            // Stopping DI Context
             LOGGER.info("Stopping server container.");
-            //            CDIUtils.stopCdiContainer();
-            // TODO Stop application context
+            context.stop();
 
             fireStop(lifeCycleServices);
 
@@ -119,6 +117,7 @@ public class ContextLauncher extends Thread {
         }
     }
 
+    /** Fire event before starting DI context- not used with Spring */
     private void fireStart(List<MediaManagerLifeCycleService> lifeCycleServices) throws ModuleLoadingException {
         for (MediaManagerLifeCycleService serv : lifeCycleServices) {
             serv.beforeStartCdi(configFile);
@@ -142,7 +141,7 @@ public class ContextLauncher extends Thread {
         return lifeCycleServices;
     }
 
-    private synchronized void fireInitialized(Stopper stopper) {
+    private synchronized void fireInitialized(IStopper stopper) {
         stopper.fireApplicationStarted(this);
 
         notifyAll();

@@ -1,6 +1,5 @@
 package fr.dush.mediamanager.engine.mongodb;
 
-import com.mongodb.DB;
 import com.mongodb.DBObject;
 import fr.dush.mediamanager.engine.MongoJunitTest;
 import org.junit.Test;
@@ -22,9 +21,6 @@ public class MongoDBDatasetManagerTest extends MongoJunitTest {
     @Inject
     private MongoDBDatasetManager manager;
 
-    @Inject
-    private DB db;
-
     @Test
     public void testLoading() throws Exception {
         // Clear
@@ -32,11 +28,11 @@ public class MongoDBDatasetManagerTest extends MongoJunitTest {
         assertThat(db.getCollection(COLLECTION_TEST).find().toArray()).isEmpty();
 
         // Load
-        manager.loadCollection(COLLECTION_TEST, newArrayList("configuration/config-test.json"));
+        manager.loadCollection(COLLECTION_TEST, newArrayList("configuration/foobar.json"));
 
         final List<DBObject> objs = db.getCollection(COLLECTION_TEST).find().toArray();
         LOGGER.debug("Loaded : {}", objs);
-        assertThat(objs).hasSize(2);
+        assertThat(objs).hasSize(1);
     }
 
 }

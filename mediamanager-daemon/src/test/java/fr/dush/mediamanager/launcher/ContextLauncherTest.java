@@ -1,18 +1,17 @@
 package fr.dush.mediamanager.launcher;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import fr.dush.mediamanager.remote.IStopper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.dush.mediamanager.remote.Stopper;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ContextLauncherTest implements UncaughtExceptionHandler {
@@ -38,7 +37,7 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
         }
 
         // TODO Stop application
-        final Stopper stopper = null;//CDIUtils.getBean(Stopper.class);
+        final IStopper stopper = null;//CDIUtils.getBean(Stopper.class);
         LOGGER.info("Try to stop application with stopper {}", stopper);
         stopper.stopApplication();
 

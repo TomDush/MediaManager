@@ -1,9 +1,13 @@
 package fr.dush.mediamanager.plugins.enrich;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
+import com.omertron.themoviedbapi.MovieDbException;
+import com.omertron.themoviedbapi.TheMovieDbApi;
+import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.domain.media.video.Movie;
+import fr.dush.mediamanager.domain.scan.MoviesParsedName;
+import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
+import fr.dush.mediamanager.plugins.enrich.moviesdb.TheMovieDBProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,15 +18,9 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.omertron.themoviedbapi.MovieDbException;
-import com.omertron.themoviedbapi.TheMovieDbApi;
+import java.util.List;
 
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.domain.configuration.FieldSet;
-import fr.dush.mediamanager.domain.media.video.Movie;
-import fr.dush.mediamanager.domain.scan.MoviesParsedName;
-import fr.dush.mediamanager.modulesapi.enrich.FindTrailersEvent;
-import fr.dush.mediamanager.plugins.enrich.moviesdb.TheMovieDBProvider;
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class TheMovieDbEnricherTest {
@@ -38,7 +36,7 @@ public class TheMovieDbEnricherTest {
     @Before
     public void initTest() throws MovieDbException {
         final TheMovieDBProvider theMovieDBProvider = new TheMovieDBProvider();
-        theMovieDBProvider.setConfiguration(new ModuleConfiguration(null, new FieldSet()));
+        theMovieDBProvider.setConfiguration(new ModuleConfiguration("themoviedb", new FieldSet("themoviedb")));
         api = theMovieDBProvider.provideTheMovieDbApi();
 
         MockitoAnnotations.initMocks(this);

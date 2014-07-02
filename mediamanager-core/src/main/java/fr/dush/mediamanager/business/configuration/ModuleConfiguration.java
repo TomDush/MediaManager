@@ -2,6 +2,9 @@ package fr.dush.mediamanager.business.configuration;
 
 import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.exceptions.ConfigurationException;
+import fr.dush.mediamanager.exceptions.PropertyUnresolvableException;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +17,10 @@ import java.util.regex.Pattern;
 import static org.apache.commons.lang3.StringUtils.*;
 
 /**
- * An <code>ModuleConfiguration</code> instance is created for each module. It initialized by properties file with
- * default values, and it saved into database or properties file to persist changes.
+ * Provide convenience methods to get property values and resolve variables in string.
+ * <p/>
+ * An <code>ModuleConfiguration</code> instance is created for each module to be injected. It wrap a FieldSet (list of
+ * key-value from database or config files).
  *
  * @author Thomas Duchatelle
  */
@@ -26,103 +31,139 @@ public class ModuleConfiguration {
     /** Pattern to detect values containing variables */
     private static Pattern pattern = Pattern.compile("\\$\\{([\\w\\._-]*)\\}");
 
-    /** If null, it's the generic ! */
-    private final ModuleConfiguration generic;
+    /** Configuration Manager is used to find value from other modules. */
+    @Setter
+    private IConfigurationManager configurationManager;
 
-    /** Wrapped field set */
+    /** Module ID, is also file name. */
+    private String id;
+
+    /** Wrapped field set (loaded from default value, database or config file */
     private FieldSet fieldSet;
 
-    public ModuleConfiguration(ModuleConfiguration generic, FieldSet fieldSet) {
-        this.generic = generic;
+    public ModuleConfiguration(String id, FieldSet fieldSet) {
+        this.id = id;
         this.fieldSet = fieldSet;
     }
 
     /**
-     * Get value for this key. See {@link #readValue(String, Properties, boolean)}.
+     * Get value for this property, resolve properties inside it (<code>${...}</code> template).
      *
-     * @return Null if not defined.
+     * @return Never null value
+     *
+     * @throws fr.dush.mediamanager.exceptions.PropertyUnresolvableException If property is not defined.
+     * @see #readValue(String, Properties)
      */
     public String readValue(String key) {
         return readValue(key, new Properties());
     }
 
     /**
-     * Get value for this key, or default value. See {@link #readValue(String, Properties, boolean)}.
+     * Get and resolve value for this property.
      *
      * @param defaultValue returned value if expected value is empty or default
+     * @return Value found or defaultValue if no value has been defined.
+     *
+     * @see #readValue(String, Properties)
      */
     public String readValue(String key, String defaultValue) {
         Properties props = new Properties();
         props.put(key, defaultValue);
+        props.put(id + "." + key, defaultValue);
 
         return readValue(key, props);
-    }
-
-    public String readValue(String key, Properties defaultProperties) {
-        return readValue(key, defaultProperties, true);
     }
 
     /**
      * Read property is this order : <ul> <li>Module specific value (value set in database, or property file)</li>
      * <li>Global generic value : defined for all application</li> <li>System properties</li> <li>Given default
      * properties</li> <li>Default module specific value</li> <li>Default generic value</li> </ul>
-     *
-     * @param acceptDefault Accept default values (from property file, module or global)
      */
-    public String readValue(String key, Properties defaultProperties, boolean acceptDefault) {
-        String value = getValue(key, defaultProperties, acceptDefault);
+    public String readValue(String key, Properties defaultProperties) {
+        String value = getValue(key, defaultProperties);
 
         return resolveProperties(value, defaultProperties);
     }
 
-    /** Get value but do not resolve it ! */
+    /** Get value as it is stored: may contains reference on other properties. */
     public String getValue(String key) {
-        return getValue(key, new Properties(), true);
+        return getValue(key, new Properties());
     }
 
-    /** Get value, don't resolve it */
-    private String getValue(String key, Properties defaultProperties, boolean acceptDefault) {
-        Field field = fieldSet.getFieldMap().get(key);
+    /**
+     * Get value as it is stored: may contains reference on other properties.
+     *
+     * @param key               Property key, can be prefixed by module name, (optional)
+     * @param defaultProperties Properties to use instead of default (in file) or instead of null value.
+     * @return Never null, but can be empty.
+     */
+    private String getValue(String key, Properties defaultProperties) {
+        // Key can start by module name
+        String relativeKey = key;
+        boolean prefixed = false;
+        if (isPrefixed(relativeKey)) {
+            relativeKey = relativeKey.substring(id.length() + 1);
+            prefixed = true;
+        }
 
-        // Find value in this field set...
+        // Try to read value in this fieldSet
+        Field field = fieldSet.getFieldMap().get(relativeKey);
         String value = null;
         if (field != null) {
             value = field.getValue();
-        }
 
-        final boolean isDefault = field != null && field.isDefaultValue();
-        if (isEmpty(value) || isDefault) {
+            // If value hasn't be defined (or is default), use value given in argument
+            if (value == null || field.isDefaultValue()) {
 
-            if (generic != null) {
-                // Search in generic if value not found.
-                value = defaultIfEmpty(generic.getValue(key, defaultProperties, !isDefault), value);
-
-            } else {
-                // It's the generic, find in System properties and default properties
-                String globalValue = System.getProperty(key);
-
-                if (isEmpty(globalValue)) {
-                    globalValue = defaultProperties.getProperty(key);
-                }
-
-                if (isNotEmpty(globalValue)) {
-                    value = globalValue;
-                } else if (isDefault && !acceptDefault) {
-                    value = null;
+                String otherDefault = defaultProperties.getProperty(prefixed ? key : id + "." + key);
+                if (isNotBlank(otherDefault)) {
+                    value = otherDefault;
                 }
             }
+        }
+
+        // If not found in field set, try to find it in other modules (if key is compatible)
+        if (value == null && !prefixed && key.contains(".")) {
+            value = getValueFromOtherModules(key, defaultProperties);
+        }
+
+        // If value still null, try to find in system properties
+        if (value == null && System.getProperties().containsKey(key)) {
+            value = System.getProperty(key);
+        }
+
+        // If value is null, there are a configuration error.
+        if (value == null) {
+            throw new PropertyUnresolvableException(
+                    "Property '%s' hasn't be defined. Even without value, it must be defined in JSON file.",
+                    relativeKey);
         }
 
         return value;
     }
 
+    private boolean isPrefixed(String relativeKey) {
+        return relativeKey.startsWith(id + ".");
+    }
+
     /**
-     * Get value for this key
+     * Read value from other modules (by configurationManager)
      *
-     * @return Null if not defined.
+     * @return NULL if not found.
      */
+    private String getValueFromOtherModules(String key, Properties defaultProperties) {
+        try {
+            return configurationManager.getModuleConfiguration(key.substring(0, key.indexOf(".")))
+                                       .getValue(key, defaultProperties);
+
+        } catch (ConfigurationException | NullPointerException e) {
+            return null;
+        }
+    }
+
+    /** Read value and cast it into integer. */
     public Integer readValueAsInt(String key) throws NumberFormatException {
-        final String value = readDeepValue(key, null);
+        final String value = readValue(key);
         if (isEmpty(value)) {
             return null;
         }
@@ -130,26 +171,14 @@ public class ModuleConfiguration {
         return Integer.valueOf(value);
     }
 
+    /** Read value and cast it to boolean. */
     public boolean readValueAsBoolean(String key) {
-        final String value = readDeepValue(key, null);
+        final String value = readValue(key);
         if (isEmpty(value)) {
             return false;
         }
 
         return Boolean.valueOf(value);
-    }
-
-    /**
-     * Resolve value against all available properties (generic, value, ...).
-     */
-    public String readDeepValue(String key, Properties props) {
-        String value = resolveProperties("${" + key + "}", props == null ? new Properties() : props);
-
-        if (isEmpty(value) || value.matches("^\\$\\{.*\\}$")) {
-            return null;
-        }
-
-        return value;
     }
 
     /**
@@ -181,9 +210,7 @@ public class ModuleConfiguration {
         return result;
     }
 
-    /**
-     * Add field, or override existing
-     */
+    /** Add field, or override existing */
     public void addField(Field field) {
         if (fieldSet.getFieldMap().containsKey(field.getKey())) {
             fieldSet.getFieldMap().get(field.getKey()).merge(field);

@@ -1,60 +1,69 @@
 package fr.dush.mediamanager.domain.configuration;
 
-import static org.apache.commons.lang3.StringUtils.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Configuration field
  *
  * @author Thomas Duchatelle
- *
  */
 @Data
 @NoArgsConstructor
 public class Field {
 
-	private String key;
+    private String key;
 
-	private String value;
+    private String value;
 
-	private String name;
+    private String name;
 
-	private String description;
+    private String description;
 
-	private boolean defaultValue = false;
+    /** Value defined in Json property file */
+    private boolean defaultValue = true;
 
-	/** Create field with NON-default value */
-	public Field(String key, String value) {
-		this(key, value, false);
-	}
+    /**
+     * When value come from application properties, or is read by placeholder (application first initialisation), it
+     * can't be override
+     */
+    private boolean staticField = false;
 
-	public Field(String key, String value, boolean defaultValue) {
-		this.key = key;
-		this.value = value;
-		this.defaultValue = defaultValue;
-	}
+    /** Create field with NON-default value */
+    public Field(String key, String value) {
+        this(key, value, false);
+    }
 
-	/**
-	 * Update this object with other field. Override key and value. Other attribute are updated is there are not empty.
-	 *
-	 * @param field
-	 */
-	public void merge(Field field) {
-		key = field.key;
-		value = field.value;
-		defaultValue = field.defaultValue;
+    public Field(String key, String value, boolean defaultValue) {
+        this.key = key;
+        this.value = value;
+        this.defaultValue = defaultValue;
+    }
 
-		updateDisplayable(field.name, field.description);
-	}
+    /**
+     * Update this object with other field. Override key and value. Other attribute are updated is there are not empty.
+     */
+    public void merge(Field field) {
+        key = field.key;
+        value = field.value;
+        defaultValue = field.defaultValue;
 
-	public void updateDisplayable(String newName, String newDescription) {
-		if (isNotEmpty(newName)) name = newName;
-		if (isNotEmpty(newDescription)) description = newDescription;
-	}
+        updateDisplayable(field.name, field.description);
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-		this.defaultValue = false;
-	}
+    public void updateDisplayable(String newName, String newDescription) {
+        if (isNotEmpty(newName)) {
+            name = newName;
+        }
+        if (isNotEmpty(newDescription)) {
+            description = newDescription;
+        }
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+        this.defaultValue = false;
+    }
 }

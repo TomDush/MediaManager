@@ -1,11 +1,9 @@
 package fr.dush.mediamanager.remote.impl;
 
 import com.google.common.eventbus.EventBus;
-import fr.dush.mediamanager.business.configuration.IConfigurationRegister;
+import fr.dush.mediamanager.business.configuration.IConfigurationManager;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.business.scanner.IScanRegister;
-import fr.dush.mediamanager.dao.media.IMovieDAO;
-import fr.dush.mediamanager.dao.mediatech.IRootDirectoryDAO;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
 import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
@@ -13,16 +11,18 @@ import fr.dush.mediamanager.domain.tree.RootDirectory;
 import fr.dush.mediamanager.events.scan.ScanRequestEvent;
 import fr.dush.mediamanager.remote.ConfigurationField;
 import fr.dush.mediamanager.remote.ConfigurationFieldAssert;
-import fr.dush.mediamanager.remote.Stopper;
+import fr.dush.mediamanager.remote.IStopper;
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -33,33 +33,29 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RemoteControllerTest {
 
     @InjectMocks
     private RemoteController remoteController;
 
     @Mock
-    private Stopper stopper;
-
-    @Mock
-    private IRootDirectoryDAO rootDirectoryDAO;
+    private IStopper stopper;
 
     @Mock
     private EventBus eventBus;
 
     @Mock
-    private IConfigurationRegister configurationRegister;
-
+    private IConfigurationManager configurationManager;
     @Mock
     private IScanRegister scanRegister;
 
-    @Mock
-    private IMovieDAO movieDAO;
+    @Spy
+    private Mapper dozerMapper = new DozerBeanMapper();
 
     @Before
     public void initMock() {
-        MockitoAnnotations.initMocks(this);
+        remoteController.setConfiguration(new ModuleConfiguration("remotermi", new FieldSet("remotermi")));
     }
 
     @Test
@@ -68,12 +64,11 @@ public class RemoteControllerTest {
         f1.addValue("foobar", "foo", false);
         f1.getFieldMap().get("foobar").setDescription("Foobar desc");
         f1.addValue("bar", "baz", false);
-        final ModuleConfiguration m1 = new ModuleConfiguration(null, f1);
 
         final FieldSet f2 = new FieldSet("package2");
         f2.addValue("bar", "toto", false);
-        final ModuleConfiguration m2 = new ModuleConfiguration(null, f2);
-        when(configurationRegister.findAll()).thenReturn(newArrayList(m1, m2));
+
+        when(configurationManager.getAllConfigurations()).thenReturn(newArrayList(f1, f2));
 
         // Exec
         final List<ConfigurationField> configs = remoteController.getFullConfiguration();

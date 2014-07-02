@@ -1,25 +1,34 @@
 package fr.dush.mediamanager.remote;
 
-import java.io.Serializable;
-
 import lombok.Data;
 
+import java.io.Serializable;
+
+/** Field DTO like. Maybe REST service will need it to. */
 @SuppressWarnings("serial")
 @Data
 public class ConfigurationField implements Serializable, Comparable<ConfigurationField> {
 
-	/** Package + name */
-	private String fullname;
+    /** Absolute key: fieldSet id + field id */
+    private String key;
 
-	/** Resolved value */
-	private String value;
+    private String value;
 
-	private boolean defaultValue = false;
+    private String name;
 
-	private String description;
+    private String description;
 
-	@Override
-	public int compareTo(ConfigurationField arg0) {
-		return fullname.compareTo(arg0.getFullname());
-	}
+    /** Value defined in Json property file */
+    private boolean defaultValue = true;
+
+    /**
+     * When value come from application properties, or is read by placeholder (application first initialisation), it
+     * can't be override
+     */
+    private boolean staticField = false;
+
+    @Override
+    public int compareTo(ConfigurationField arg0) {
+        return key.compareTo(this.getKey());
+    }
 }
