@@ -41,7 +41,8 @@ public class ModuleConfiguration {
     /** Wrapped field set (loaded from default value, database or config file */
     private FieldSet fieldSet;
 
-    public ModuleConfiguration(String id, FieldSet fieldSet) {
+    public ModuleConfiguration(IConfigurationManager configurationManager, String id, FieldSet fieldSet) {
+        this.configurationManager = configurationManager;
         this.id = id;
         this.fieldSet = fieldSet;
     }
@@ -108,9 +109,9 @@ public class ModuleConfiguration {
 
         // Try to read value in this fieldSet
         Field field = fieldSet.getFieldMap().get(relativeKey);
-        String value = null;
         if (field != null) {
-            value = field.getValue();
+            // If value is in this field set, use it (even if it null or empty)
+            String value = field.getValue();
 
             // If value hasn't be defined (or is default), use value given in argument
             if (value == null || field.isDefaultValue()) {
@@ -120,26 +121,17 @@ public class ModuleConfiguration {
                     value = otherDefault;
                 }
             }
-        }
 
-        // If not found in field set, try to find it in other modules (if key is compatible)
-        if (value == null && !prefixed && key.contains(".")) {
-            value = getValueFromOtherModules(key, defaultProperties);
-        }
+            return value;
 
-        // If value still null, try to find in system properties
-        if (value == null && System.getProperties().containsKey(key)) {
-            value = System.getProperty(key);
-        }
+        } else if (prefixed) {
+            // It's in system properties or there are an error.
+            return getFromSystemProperties(key);
 
-        // If value is null, there are a configuration error.
-        if (value == null) {
-            throw new PropertyUnresolvableException(
-                    "Property '%s' hasn't be defined. Even without value, it must be defined in JSON file.",
-                    relativeKey);
+        } else {
+            // Else, try to find it somewhere else: other module or system properties.
+            return getValueSomewhereElse(key, defaultProperties, prefixed);
         }
-
-        return value;
     }
 
     private boolean isPrefixed(String relativeKey) {
@@ -147,18 +139,40 @@ public class ModuleConfiguration {
     }
 
     /**
-     * Read value from other modules (by configurationManager)
+     * Read value from other modules (by configurationManager), or from system properties.
      *
      * @return NULL if not found.
      */
-    private String getValueFromOtherModules(String key, Properties defaultProperties) {
-        try {
-            return configurationManager.getModuleConfiguration(key.substring(0, key.indexOf(".")))
-                                       .getValue(key, defaultProperties);
+    private String getValueSomewhereElse(String key, Properties defaultProperties, boolean prefixed) {
+        // If value can be in another module, get it from there
+        if (configurationManager != null && !prefixed && key.contains(".")) {
+            String otherModule = key.substring(0, key.indexOf("."));
 
-        } catch (ConfigurationException | NullPointerException e) {
-            return null;
+            try {
+                ModuleConfiguration moduleConfiguration = configurationManager.getModuleConfiguration(otherModule);
+                // A module exist, so it should be aware of this properties! (else, it will throw an exception)
+                return moduleConfiguration.readValue(key, defaultProperties);
+
+            } catch (ConfigurationException e) {
+                // Module doesn't exist
+                LOGGER.info("Could not get value of {} in other module: {}}. [moduleId={}]", key, e.getMessage(), id);
+            }
         }
+
+        return getFromSystemProperties(key);
+    }
+
+    /** Get a value from system properties, or throw an exception */
+    private String getFromSystemProperties(String key) {
+        // Else, try in system configuration
+        if (System.getProperties().containsKey(key)) {
+            return System.getProperty(key);
+        }
+
+        // Else, we can't do anything... This properties just doesn't exist!
+        throw new PropertyUnresolvableException(
+                "Property '%s' hasn't be defined. Even without value, it must be defined in JSON file.",
+                key);
     }
 
     /** Read value and cast it into integer. */

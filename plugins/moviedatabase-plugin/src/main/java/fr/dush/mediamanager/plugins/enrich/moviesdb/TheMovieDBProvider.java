@@ -3,7 +3,7 @@ package fr.dush.mediamanager.plugins.enrich.moviesdb;
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.tools.WebBrowser;
-import fr.dush.mediamanager.annotations.Config;
+import fr.dush.mediamanager.business.configuration.IConfigurationManager;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
 import fr.dush.mediamanager.tools.RetryApi;
@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.util.Properties;
 
 import static org.apache.commons.lang3.StringUtils.*;
@@ -22,15 +24,23 @@ public class TheMovieDBProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TheMovieDBProvider.class);
 
-    @Config(id = "themoviedb")
+    @Inject
+    private IConfigurationManager configurationManager;
+
     @Setter
     private ModuleConfiguration configuration;
+
+    @PostConstruct
+    public void initConfig() {
+        configuration = configurationManager.getModuleConfiguration("themoviedb");
+    }
 
     @Bean
     public TheMovieDbApi provideTheMovieDbApi() throws MovieDbException {
         LOGGER.debug("Create TheMovieDbApi instance with proxy args : {}.",
                      configuration.resolveProperties(
-                             "http://${proxy.username}:${proxy.password}@${proxy.host}:${proxy.port}",
+                             "http://${connection.proxy.username}:${connection.proxy.password}@${connection.proxy" +
+                             ".host}:${connection.proxy.port}",
                              new Properties()));
 
         String host = configuration.readValue("connection.proxy.host");

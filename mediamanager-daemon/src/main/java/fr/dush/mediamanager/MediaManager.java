@@ -400,7 +400,7 @@ public class MediaManager {
                 props.put(REMOTECONTROL_PORT, String.valueOf(port));
                 props.put(REMOTECONTROL_URL, readRmiUrl());
 
-                String url = new ModuleConfiguration("remotecontrol", new FieldSet("remotecontrol")).readValue(
+                String url = new ModuleConfiguration(null, "remotecontrol", new FieldSet("remotecontrol")).readValue(
                         REMOTECONTROL_URL,
                         props);
                 LOGGER.debug("Get RMI controller with url : {}", url);

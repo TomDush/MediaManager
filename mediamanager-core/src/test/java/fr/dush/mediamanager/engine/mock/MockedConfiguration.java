@@ -12,7 +12,7 @@ public class MockedConfiguration extends ModuleConfiguration {
      * @param keyValue Impair arguments are keys, pairs are values.
      */
     public MockedConfiguration(String... keyValue) {
-        super("foo", new FieldSet());
+        super(null, "foo", new FieldSet());
         if (keyValue.length % 2 != 0) {
             throw new IllegalArgumentException("keyValue must have pair elements.");
         }

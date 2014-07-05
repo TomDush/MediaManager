@@ -78,11 +78,12 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
         try {
             Resource resource = applicationContext.getResource(filePath);
             FieldSet fieldSet = mapper.readValue(resource.getInputStream(), FieldSet.class);
+            fieldSet.setConfigId(fileName);
             overrideWithEnvironmentVariables(fieldSet);
 
             return fieldSet;
         } catch (IOException e) {
-            throw new ConfigurationException("Configuration file %s doesn't exist in classpath.", filePath);
+            throw new ConfigurationException("Configuration file %s doesn't exist in classpath.", filePath, e);
         }
     }
 
@@ -106,7 +107,7 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
     @Override
     public ModuleConfiguration getModuleConfiguration(String id) {
-        return new ModuleConfiguration(id, getFieldSet(id));
+        return new ModuleConfiguration(this, id, getFieldSet(id));
     }
 
     @Override

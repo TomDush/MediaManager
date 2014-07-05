@@ -1,24 +1,18 @@
 package fr.dush.mediamanager.launcher;
 
 import fr.dush.mediamanager.SpringConfiguration;
-import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
 import fr.dush.mediamanager.remote.IStopper;
-import fr.dush.mediamanager.remote.impl.StopperImpl;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.ServiceLoader;
-
-import static com.google.common.collect.Lists.*;
 
 /**
  * Create and configure CDI context (Apache DeltaSpike), and start application.
@@ -28,10 +22,15 @@ import static com.google.common.collect.Lists.*;
 public class ContextLauncher extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContextLauncher.class);
+
+    @Getter
     private Exception catchedException = null;
 
     private final Path configFile;
     private final int port;
+
+    @Getter
+    private ApplicationContext applicationContext;
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -66,12 +65,7 @@ public class ContextLauncher extends Thread {
     public void run() {
         LOGGER.info("Server starting...");
 
-        // Find services...
-        final List<MediaManagerLifeCycleService> lifeCycleServices = findLifecycleListeners();
-
         try {
-            fireStart(lifeCycleServices);
-
             // Generic properties (provided to Spring placeholder)
             Properties source = new Properties();
             source.put("mediamanager.propertiesfile", pathToString(configFile));
@@ -93,62 +87,37 @@ public class ContextLauncher extends Thread {
             context.refresh();
 
             // Wait application end...
-            final IStopper stopper = context.getBean(StopperImpl.class);
-            fireInitialized(stopper);
+            final IStopper stopper = fireApplicationStarted(context);
+
             LOGGER.info("Server started.");
             stopper.waitApplicationEnd();
 
             // Stopping DI Context
-            LOGGER.info("Stopping server container.");
+            LOGGER.info("Stopping server container...");
             context.stop();
-
-            fireStop(lifeCycleServices);
 
             LOGGER.info("Server stopped.");
 
+        } catch (RuntimeException e) {
+            catchedException = e;
+            throw e;
+
         } catch (Exception e) {
             catchedException = e;
-
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
-            }
-
             throw new RuntimeException(e);
         }
     }
 
-    /** Fire event before starting DI context- not used with Spring */
-    private void fireStart(List<MediaManagerLifeCycleService> lifeCycleServices) throws ModuleLoadingException {
-        for (MediaManagerLifeCycleService serv : lifeCycleServices) {
-            serv.beforeStartCdi(configFile);
-        }
-    }
+    private synchronized IStopper fireApplicationStarted(AnnotationConfigApplicationContext context) {
+        LOGGER.info("Fire application is started! context={}", context);
+        applicationContext = context;
 
-    private void fireStop(List<MediaManagerLifeCycleService> lifeCycleServices) {
-        for (MediaManagerLifeCycleService serv : lifeCycleServices) {
-            serv.afterStopCdi();
-        }
-    }
-
-    private List<MediaManagerLifeCycleService> findLifecycleListeners() {
-        List<MediaManagerLifeCycleService> lifeCycleServices = newArrayList();
-
-        final ServiceLoader<MediaManagerLifeCycleService> services =
-                ServiceLoader.load(MediaManagerLifeCycleService.class);
-        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext(); ) {
-            lifeCycleServices.add(it.next());
-        }
-        return lifeCycleServices;
-    }
-
-    private synchronized void fireInitialized(IStopper stopper) {
+        final IStopper stopper = context.getBean(IStopper.class);
         stopper.fireApplicationStarted(this);
 
         notifyAll();
-    }
 
-    protected Exception getCatchedException() {
-        return catchedException;
+        return stopper;
     }
 
 }

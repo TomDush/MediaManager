@@ -33,11 +33,11 @@ public class ContextLauncherTest implements UncaughtExceptionHandler {
             launcher.start();
 
             // Wait is started...
-            launcher.wait(5000);
+            launcher.wait(10000);
         }
 
         // TODO Stop application
-        final IStopper stopper = null;//CDIUtils.getBean(Stopper.class);
+        final IStopper stopper = launcher.getApplicationContext().getBean(IStopper.class);
         LOGGER.info("Try to stop application with stopper {}", stopper);
         stopper.stopApplication();
 

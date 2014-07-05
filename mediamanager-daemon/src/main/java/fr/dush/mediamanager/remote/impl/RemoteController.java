@@ -28,10 +28,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.collect.Lists.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 /**
@@ -139,7 +139,7 @@ public class RemoteController extends UnicastRemoteObject implements MediaManage
     @Override
     public List<ConfigurationField> getFullConfiguration() throws RemoteException {
         try {
-            List<ConfigurationField> list = newArrayList();
+            List<ConfigurationField> list = new ArrayList<>();
 
             for (FieldSet fieldSet : configurationManager.getAllConfigurations()) {
                 for (Field f : fieldSet.getFields()) {

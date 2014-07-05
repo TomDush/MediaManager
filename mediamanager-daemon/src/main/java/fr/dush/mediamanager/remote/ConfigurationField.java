@@ -29,6 +29,6 @@ public class ConfigurationField implements Serializable, Comparable<Configuratio
 
     @Override
     public int compareTo(ConfigurationField arg0) {
-        return key.compareTo(this.getKey());
+        return key.compareTo(arg0.getKey());
     }
 }
