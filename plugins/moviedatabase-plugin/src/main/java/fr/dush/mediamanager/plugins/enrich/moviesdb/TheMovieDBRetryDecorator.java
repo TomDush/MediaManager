@@ -1,7 +1,5 @@
 package fr.dush.mediamanager.plugins.enrich.moviesdb;
 
-import javax.inject.Named;
-
 import com.omertron.themoviedbapi.MovieDbException;
 import com.omertron.themoviedbapi.TheMovieDbApi;
 import com.omertron.themoviedbapi.model.*;
@@ -12,7 +10,6 @@ import fr.dush.mediamanager.tools.RetryApi;
  * If you have a bad internet connection, like me, this decorator retry some times each request before giving up.<br/>
  * TODO Using interceptor (AOP) should be a better choice...
  */
-@Named
 public class TheMovieDBRetryDecorator extends TheMovieDbApi {
 
     private TheMovieDbApi theMovieDbApi;
@@ -27,8 +24,8 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public MovieDb getMovieInfo(final int movieId, final String language, final String... appendToResponse)
-            throws MovieDbException {
+    public MovieDb getMovieInfo(final int movieId, final String language, final String... appendToResponse) throws
+            MovieDbException {
 
         return RetryApi.retry(new RetryApi.MethodWithReturn<MovieDb>() {
 
@@ -52,8 +49,8 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<AlternativeTitle> getMovieAlternativeTitles(final int movieId, final String country,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<AlternativeTitle> getMovieAlternativeTitles(final int movieId, final String country, final
+    String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<AlternativeTitle>>() {
 
             @Override
@@ -64,8 +61,8 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Person> getMovieCasts(final int movieId, final String... appendToResponse)
-            throws MovieDbException {
+    public TmdbResultsList<Person> getMovieCasts(final int movieId, final String... appendToResponse) throws
+            MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Person>>() {
 
             @Override
@@ -76,8 +73,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Artwork> getMovieImages(final int movieId, final String language,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<Artwork> getMovieImages(final int movieId, final String language, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Artwork>>() {
 
             @Override
@@ -88,8 +84,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Keyword> getMovieKeywords(final int movieId, final String... appendToResponse)
-            throws MovieDbException {
+    public TmdbResultsList<Keyword> getMovieKeywords(final int movieId, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Keyword>>() {
 
             @Override
@@ -100,8 +95,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<ReleaseInfo> getMovieReleaseInfo(final int movieId, final String language,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<ReleaseInfo> getMovieReleaseInfo(final int movieId, final String language, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<ReleaseInfo>>() {
 
             @Override
@@ -112,8 +106,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Trailer> getMovieTrailers(final int movieId, final String language,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<Trailer> getMovieTrailers(final int movieId, final String language, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Trailer>>() {
 
             @Override
@@ -136,8 +129,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<MovieDb> getSimilarMovies(final int movieId, final String language, final int page,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<MovieDb> getSimilarMovies(final int movieId, final String language, final int page, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieDb>>() {
 
             @Override
@@ -148,8 +140,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<MovieList> getMovieLists(final int movieId, final String language, final int page,
-            final String... appendToResponse) throws MovieDbException {
+    public TmdbResultsList<MovieList> getMovieLists(final int movieId, final String language, final int page, final String... appendToResponse) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieList>>() {
 
             @Override
@@ -182,8 +173,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Artwork> getCollectionImages(final int collectionId, final String language)
-            throws MovieDbException {
+    public TmdbResultsList<Artwork> getCollectionImages(final int collectionId, final String language) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Artwork>>() {
 
             @Override
@@ -216,8 +206,7 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<MovieDb> searchMovie(final String movieName, final int searchYear, final String language,
-            final boolean includeAdult, final int page) throws MovieDbException {
+    public TmdbResultsList<MovieDb> searchMovie(final String movieName, final int searchYear, final String language, final boolean includeAdult, final int page) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<MovieDb>>() {
 
             @Override
@@ -228,8 +217,8 @@ public class TheMovieDBRetryDecorator extends TheMovieDbApi {
     }
 
     @Override
-    public TmdbResultsList<Collection> searchCollection(final String query, final String language, final int page)
-            throws MovieDbException {
+    public TmdbResultsList<Collection> searchCollection(final String query, final String language,
+                                                        final int page) throws MovieDbException {
         return RetryApi.retry(new RetryApi.MethodWithReturn<TmdbResultsList<Collection>>() {
 
             @Override

@@ -1,37 +1,36 @@
 package fr.dush.mediamanager.launcher;
 
 import fr.dush.mediamanager.SpringConfiguration;
-import fr.dush.mediamanager.exceptions.ModuleLoadingException;
-import fr.dush.mediamanager.modulesapi.lifecycle.MediaManagerLifeCycleService;
-import fr.dush.mediamanager.remote.IStopper;
-import fr.dush.mediamanager.remote.impl.StopperImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.ContextStoppedEvent;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-import java.util.ServiceLoader;
-
-import static com.google.common.collect.Lists.*;
 
 /**
  * Create and configure CDI context (Apache DeltaSpike), and start application.
  *
  * @author Thomas Duchatelle
  */
-public class ContextLauncher extends Thread {
+public class ContextLauncher extends Thread implements ApplicationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContextLauncher.class);
-    private Exception catchedException = null;
 
     private final Path configFile;
-    private final int port;
+    private final Integer port;
+
+    private ApplicationContext applicationContext;
+
+    private boolean stopped = false;
 
     static {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -47,8 +46,8 @@ public class ContextLauncher extends Thread {
         });
     }
 
-    public ContextLauncher(Path configFile, int port) {
-        super("mediamanagerDaemon");
+    public ContextLauncher(Path configFile, Integer port) {
+        super("daemon");
         setDaemon(true);
 
         // Config file
@@ -64,91 +63,85 @@ public class ContextLauncher extends Thread {
 
     @Override
     public void run() {
-        LOGGER.info("Server starting...");
+        LOGGER.info("Medima is starting...");
 
-        // Find services...
-        final List<MediaManagerLifeCycleService> lifeCycleServices = findLifecycleListeners();
-
-        try {
-            fireStart(lifeCycleServices);
-
-            // Generic properties (provided to Spring placeholder)
-            Properties source = new Properties();
-            source.put("mediamanager.propertiesfile", pathToString(configFile));
+        // Generic properties (provided to Spring placeholder)
+        Properties source = new Properties();
+        source.put("mediamanager.propertiesfile", pathToString(configFile));
+        source.put("staticFiles", "remotecontrol");
+        if (port != null) {
             source.put("remotecontrol.port", String.valueOf(this.port));
+        }
 
-            // Directory where Medima binaries are
-            String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            if (installPath.matches("^/[A-Z]:/.*$")) {
-                installPath = installPath.substring(1);
-            }
-            source.put("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
+        // Directory where Medima binaries are
+        String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        if (installPath.matches("^/[A-Z]:/.*$")) {
+            installPath = installPath.substring(1);
+        }
+        source.put("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
 
-            // Start SPRING context - spring is configured by annotation in SpringConfiguration class
-            AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-            context.getEnvironment()
-                   .getPropertySources()
-                   .addFirst(new PropertiesPropertySource("config-files", source));
-            context.register(SpringConfiguration.class);
-            context.refresh();
+        // Start SPRING context - spring is configured by annotation in SpringConfiguration class
+        LOGGER.debug("Starting Spring with properties: {}", source);
 
-            // Wait application end...
-            final IStopper stopper = context.getBean(StopperImpl.class);
-            fireInitialized(stopper);
-            LOGGER.info("Server started.");
-            stopper.waitApplicationEnd();
+        // Start Spring context
+        new SpringApplicationBuilder(SpringConfiguration.class).properties(source)
+                                                               .showBanner(false)
+                                                               .listeners(this)
+                                                               .run();
+        LOGGER.info("Medima started.");
 
-            // Stopping DI Context
-            LOGGER.info("Stopping server container.");
-            context.stop();
+        // We'll arrived here only when application will be stopped.
+        waitApplicationStopped();
 
-            fireStop(lifeCycleServices);
+        LOGGER.info("Medima stopped.");
+    }
 
-            LOGGER.info("Server stopped.");
-
-        } catch (Exception e) {
-            catchedException = e;
-
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
+    private synchronized void waitApplicationStopped() {
+        try {
+            while (!stopped) {
+                wait();
+                LOGGER.debug("Waiter application stopped has been awaken. Application context={}", applicationContext);
             }
 
-            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            LOGGER.warn("Application has been interrupted...", e);
         }
     }
 
-    /** Fire event before starting DI context- not used with Spring */
-    private void fireStart(List<MediaManagerLifeCycleService> lifeCycleServices) throws ModuleLoadingException {
-        for (MediaManagerLifeCycleService serv : lifeCycleServices) {
-            serv.beforeStartCdi(configFile);
+    public synchronized ApplicationContext waitApplicationStarted() {
+        if (applicationContext == null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                LOGGER.warn("Application has been interrupted...", e);
+            }
+        }
+
+        return applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationEvent event) {
+        LOGGER.debug("Receive event: {}", event);
+        if (event instanceof ContextStartedEvent) {
+            fireApplicationStarted(((ContextStartedEvent) event).getApplicationContext());
+        } else if (event instanceof ContextRefreshedEvent) {
+            fireApplicationStarted(((ContextRefreshedEvent) event).getApplicationContext());
+
+        } else if (event instanceof ContextStoppedEvent) {
+            fireApplicationStopped();
         }
     }
 
-    private void fireStop(List<MediaManagerLifeCycleService> lifeCycleServices) {
-        for (MediaManagerLifeCycleService serv : lifeCycleServices) {
-            serv.afterStopCdi();
-        }
-    }
-
-    private List<MediaManagerLifeCycleService> findLifecycleListeners() {
-        List<MediaManagerLifeCycleService> lifeCycleServices = newArrayList();
-
-        final ServiceLoader<MediaManagerLifeCycleService> services =
-                ServiceLoader.load(MediaManagerLifeCycleService.class);
-        for (Iterator<MediaManagerLifeCycleService> it = services.iterator(); it.hasNext(); ) {
-            lifeCycleServices.add(it.next());
-        }
-        return lifeCycleServices;
-    }
-
-    private synchronized void fireInitialized(IStopper stopper) {
-        stopper.fireApplicationStarted(this);
-
+    private synchronized void fireApplicationStopped() {
+        LOGGER.debug("Fire application stopped!");
+        stopped = true;
         notifyAll();
     }
 
-    protected Exception getCatchedException() {
-        return catchedException;
+    private synchronized void fireApplicationStarted(ApplicationContext context) {
+        applicationContext = context;
+        notifyAll();
     }
 
 }

@@ -1,8 +1,7 @@
 package fr.dush.mediamanager;
 
 import com.google.common.io.Files;
-import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
-import fr.dush.mediamanager.domain.configuration.FieldSet;
+import fr.dush.mediamanager.config.ClientConfiguration;
 import fr.dush.mediamanager.domain.media.MediaType;
 import fr.dush.mediamanager.domain.scan.ScanStatus;
 import fr.dush.mediamanager.exceptions.ConfigurationException;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -25,7 +23,6 @@ import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Properties;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -38,10 +35,6 @@ public class MediaManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MediaManager.class);
 
-    private static final String REMOTECONTROL_PORT = "remotecontrol.port";
-
-    private static final String REMOTECONTROL_URL = "remotecontrol.url";
-
     private static final int DEFAULT_WIDTH = 800;
 
     /** Command line options (parser) */
@@ -51,35 +44,27 @@ public class MediaManager {
     private static final Path DEFAULT_CONFIG_PATH =
             Paths.get(System.getProperty("user.home"), ".mediamanager", "mediamanager.properties");
 
-    /**
-     * Port's default value, it can be override by command args, or in configuration file.
-     */
-    private static final int DEFAULT_REGISTRY_PORT = 1099;
-
     private final CommandLine args;
 
-    private final Path configFile;
-
-    private final int port;
+    private final ClientConfiguration clientConfig;
 
     private MediaManagerRMI remoteInterface;
 
-    public static void main(String[] argsArray) {
-
+    public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
 
         try {
-            final CommandLine args = parser.parse(OPTIONS, argsArray);
+            final CommandLine parsed = parser.parse(OPTIONS, args);
 
             // "Meta" commands
-            if (args.hasOption('h')) {
+            if (parsed.hasOption('h')) {
                 printHelp(System.out);
 
-            } else if (args.hasOption('v')) {
+            } else if (parsed.hasOption('v')) {
                 printVersion();
 
             } else {
-                final MediaManager mediaManager = new MediaManager(args);
+                final MediaManager mediaManager = new MediaManager(parsed);
                 mediaManager.execute();
 
             }
@@ -124,10 +109,7 @@ public class MediaManager {
         options.addOption("v", "version", false, "print version");
 
         // Configuration
-        options.addOption("p",
-                          "port",
-                          true,
-                          "port used to communicate with daemon, default is " + DEFAULT_REGISTRY_PORT);
+        options.addOption("p", "port", true, "port used to communicate with daemon.");
         options.addOption(OptionBuilder.withDescription("configuration file, default is " + DEFAULT_CONFIG_PATH)
                                        .hasArg()
                                        .withLongOpt("config")
@@ -168,25 +150,20 @@ public class MediaManager {
     public MediaManager(CommandLine args) {
         this.args = args;
 
+        // Resolve config file
+        Path configFile = DEFAULT_CONFIG_PATH;
         if (args.hasOption('c')) {
             configFile = Paths.get(args.getOptionValue('c'));
             if (!configFile.toFile().exists()) {
                 throw new ConfigurationException("Configuration file %s doesn't exist.", configFile);
             }
-        } else {
-            configFile = DEFAULT_CONFIG_PATH;
         }
 
         // Create configuration if it doesn't exist
         createConfigurationFile(configFile);
 
-        if (args.hasOption('p')) {
-            port = castPort(args.getOptionValue('p'));
-        } else if (configFile != null) {
-            port = readPort(configFile);
-        } else {
-            port = DEFAULT_REGISTRY_PORT;
-        }
+        clientConfig =
+                new ClientConfiguration(configFile, args.hasOption('p') ? castPort(args.getOptionValue('p')) : null);
     }
 
     /** Create configuration file with some comments. */
@@ -216,7 +193,7 @@ public class MediaManager {
 
     private boolean controlDaemon() {
         boolean executed = true;
-        if (args.hasOption("start") || args.getOptions().length == 0) {
+        if (args.hasOption("start")) {
             final boolean started = start();
 
             if (!started) {
@@ -349,7 +326,7 @@ public class MediaManager {
     }
 
     /**
-     * If server isn't start, this process will be the server.
+     * If server isn't started, start it and wait until it's closed.
      *
      * @return TRUE if server is started. FALSE if there is another server started.
      */
@@ -361,16 +338,18 @@ public class MediaManager {
         }
 
         try {
-            final ContextLauncher launcher = new ContextLauncher(configFile, port);
-            synchronized (launcher) {
-                launcher.start();
+            LOGGER.info("Starting application...");
 
-                launcher.wait();
-            }
+            final ContextLauncher launcher =
+                    new ContextLauncher(clientConfig.getConfigFile(), clientConfig.getPortGivenInArgument());
 
-            detachProcess();
+            // Start application and detach process from consoles (close input/output streams)
+            launcher.start();
 
             // Wait program end...
+            launcher.waitApplicationStarted();
+            detachProcess();
+
             launcher.join();
 
         } catch (InterruptedException e) {
@@ -383,7 +362,7 @@ public class MediaManager {
     /**
      * Detach process from shell closing input and output stream.
      */
-    private void detachProcess() {
+    private static void detachProcess() {
         try {
             System.out.close();
             System.err.close();
@@ -394,16 +373,11 @@ public class MediaManager {
     }
 
     private MediaManagerRMI getRemoteInterface() {
+        // TODO have it aware of real configuration.
         if (remoteInterface == null) {
             try {
-                Properties props = new Properties();
-                props.put(REMOTECONTROL_PORT, String.valueOf(port));
-                props.put(REMOTECONTROL_URL, readRmiUrl());
-
-                String url = new ModuleConfiguration("remotecontrol", new FieldSet("remotecontrol")).readValue(
-                        REMOTECONTROL_URL,
-                        props);
-                LOGGER.debug("Get RMI controller with url : {}", url);
+                String url = String.format("rmi://localhost:%s/MediaManagerRMI",
+                                           clientConfig.getValue("remotecontrol.port"));
                 remoteInterface = (MediaManagerRMI) Naming.lookup(url);
 
             } catch (Exception e) {
@@ -415,46 +389,7 @@ public class MediaManager {
         return remoteInterface;
     }
 
-    private String readRmiUrl() {
-        String url = "rmi://localhost:${remotecontrol.port}/MediaManagerRMI";
-
-        if (configFile != null && configFile.toFile().exists()) {
-            try {
-                Properties p = new Properties();
-                p.load(new FileInputStream(configFile.toFile()));
-
-                url = p.getProperty(REMOTECONTROL_URL, url);
-
-            } catch (IOException e) {
-                LOGGER.warn("Can't read {} from file {} : {}", REMOTECONTROL_URL, configFile, e.getMessage());
-            }
-        }
-
-        return url;
-    }
-
-    /**
-     * Read defined port (in config file), or return default.
-     */
-    private static int readPort(Path configFile) {
-        final File file = configFile.toFile();
-        if (!file.exists()) {
-            return DEFAULT_REGISTRY_PORT;
-        }
-
-        try {
-            Properties props = new Properties();
-            props.load(new FileInputStream(file));
-
-            String p = props.getProperty(REMOTECONTROL_PORT, String.valueOf(DEFAULT_REGISTRY_PORT));
-            return castPort(props.getProperty("daemon." + REMOTECONTROL_PORT, p));
-
-        } catch (IOException e) {
-            LOGGER.warn("Can't read configuration file {} : {}", configFile, e.getMessage());
-            return DEFAULT_REGISTRY_PORT;
-        }
-    }
-
+    /** Read port from command line and cast it to int */
     private static int castPort(final String optionValue) {
         try {
             return Integer.parseInt(optionValue);

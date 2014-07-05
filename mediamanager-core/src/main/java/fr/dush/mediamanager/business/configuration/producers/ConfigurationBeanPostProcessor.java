@@ -36,7 +36,7 @@ public class ConfigurationBeanPostProcessor implements BeanPostProcessor, Applic
 
                 Config config = field.getAnnotation(Config.class);
 
-                LOGGER.warn("Should inject configuration into: {}", bean);
+                LOGGER.debug("Should inject configuration into: {}", bean);
                 IConfigurationManager configurationManager = getConfigurationManager();
                 ModuleConfiguration moduleConfiguration = configurationManager.getModuleConfiguration(config.id());
 

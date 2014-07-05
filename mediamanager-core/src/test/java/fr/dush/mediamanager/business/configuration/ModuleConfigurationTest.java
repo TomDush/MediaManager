@@ -28,8 +28,8 @@ public class ModuleConfigurationTest {
         when(configurationManager.getModuleConfiguration("somewhereElse")).thenThrow(new ConfigurationException(
                 "Expected exception"));
 
-        final ModuleConfiguration generic = new ModuleConfiguration("mediamanager", new FieldSet("mediamanager"));
-        generic.setConfigurationManager(configurationManager);
+        final ModuleConfiguration generic =
+                new ModuleConfiguration(configurationManager, "mediamanager", new FieldSet("mediamanager"));
         generic.addField(new Field("host", "localhost", false));
         generic.addField(new Field("port", "80", true));
         generic.addField(new Field("local", "true", false));
@@ -47,14 +47,9 @@ public class ModuleConfigurationTest {
         assertThat(generic.readValue("server", "foobar")).isEqualTo("foobar");
 
         assertThat(generic.readValue("secret", "foobar")).isEqualTo("foobar");
+        assertThat(generic.readValue("secret")).isNull();
 
         // Failures...
-        try {
-            generic.readValue("secret"); // Hasn't value
-            failBecauseExceptionWasNotThrown(PropertyUnresolvableException.class);
-        } catch (Exception e) {
-            assertThat(e).isInstanceOf(PropertyUnresolvableException.class);
-        }
         try {
             generic.readValue("toto"); // Is not defined
             failBecauseExceptionWasNotThrown(PropertyUnresolvableException.class);
@@ -65,8 +60,7 @@ public class ModuleConfigurationTest {
         // ** Test with another module
         when(configurationManager.getModuleConfiguration("mediamanager")).thenReturn(generic);
 
-        ModuleConfiguration config = new ModuleConfiguration("proxy", new FieldSet("proxy"));
-        config.setConfigurationManager(configurationManager);
+        ModuleConfiguration config = new ModuleConfiguration(configurationManager, "proxy", new FieldSet("proxy"));
         config.addField(new Field("port", "80", true));
         config.addField(new Field("rootpath", null, true));
 

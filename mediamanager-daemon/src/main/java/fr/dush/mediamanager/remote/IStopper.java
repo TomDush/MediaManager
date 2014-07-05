@@ -1,13 +1,11 @@
 package fr.dush.mediamanager.remote;
 
 /**
- * @author Thomas Duchatelle
+ * Control application lifecycle.
  */
 public interface IStopper {
 
+    /** Stop application */
     void stopApplication();
 
-    void waitApplicationEnd() throws InterruptedException;
-
-    void fireApplicationStarted(Object source);
 }

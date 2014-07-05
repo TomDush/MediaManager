@@ -3,6 +3,9 @@ package fr.dush.mediamanager.plugins.webui.rest.controllers;
 import fr.dush.mediamanager.dao.media.IMediaDAO;
 import fr.dush.mediamanager.dao.mediatech.IRecoveryDAO;
 import fr.dush.mediamanager.domain.media.Recovery;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -17,7 +20,9 @@ import java.util.Set;
  *
  * @author Thomas Duchatelle
  */
-@Path("/medias")
+@Controller
+
+@RequestMapping("/medias")
 public class MediaController {
 
     @Inject
@@ -27,9 +32,9 @@ public class MediaController {
     private IRecoveryDAO recoveryDAO;
 
     /** Get dynamically list of know genres */
-    @GET
-    @Path("/genres.json")
-    @Produces(MediaType.APPLICATION_JSON)
+
+    @RequestMapping("/genres.json")
+    @ResponseBody
     public Set<String> findAllGenres() {
         return mediaDAO.findAllGenres();
     }

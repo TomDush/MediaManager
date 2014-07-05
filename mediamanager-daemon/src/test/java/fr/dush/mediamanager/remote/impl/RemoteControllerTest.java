@@ -23,6 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -35,6 +37,8 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RemoteControllerTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteControllerTest.class);
 
     @InjectMocks
     private RemoteController remoteController;
@@ -55,7 +59,7 @@ public class RemoteControllerTest {
 
     @Before
     public void initMock() {
-        remoteController.setConfiguration(new ModuleConfiguration("remotermi", new FieldSet("remotermi")));
+        remoteController.setConfiguration(new ModuleConfiguration(null, "remotermi", new FieldSet("remotermi")));
     }
 
     @Test
@@ -74,6 +78,7 @@ public class RemoteControllerTest {
         final List<ConfigurationField> configs = remoteController.getFullConfiguration();
 
         // Check
+        LOGGER.info("Configs: {}", configs);
         assertThat(configs).hasSize(3);
         ConfigurationFieldAssert.assertThat(configs.get(0)).hasFullname("package1.bar").hasValue("baz");
         ConfigurationFieldAssert.assertThat(configs.get(1))

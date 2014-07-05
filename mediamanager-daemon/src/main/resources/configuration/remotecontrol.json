@@ -5,7 +5,7 @@
             "key": "url",
             "name": "Registry URL",
             "value": "rmi://localhost:${port}/MediaManagerRMI",
-            "description": "URL where RMI controller will be registred."
+            "description": "URL where RMI controller will be registered."
         },
         {
             "key": "port",
