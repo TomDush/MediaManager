@@ -80,4 +80,11 @@ public class FieldSet {
         addAllFields(fields, true);
     }
 
+    /** Load given map with values from this field set. */
+    public void loadMap(Map<Object, Object> props) {
+        for (Field field : getFields()) {
+            // Fields are set with absolute path
+            props.put(getConfigId() + "." + field.getKey(), field.getValue());
+        }
+    }
 }

@@ -1,25 +1,23 @@
 package fr.dush.mediamanager.business.configuration.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import fr.dush.mediamanager.business.configuration.IConfigurationManager;
 import fr.dush.mediamanager.business.configuration.ModuleConfiguration;
+import fr.dush.mediamanager.business.configuration.SimpleConfiguration;
 import fr.dush.mediamanager.dao.configuration.IConfigurationDAO;
 import fr.dush.mediamanager.domain.configuration.Field;
 import fr.dush.mediamanager.domain.configuration.FieldSet;
-import fr.dush.mediamanager.exceptions.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.*;
-
-import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Provide configuration on all application, implementation must be a {@link ModuleConfiguration} producer !
@@ -36,16 +34,17 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationManagerImpl.class);
 
     @Inject
-    private ApplicationContext applicationContext;
-
-    @Inject
     private IConfigurationDAO configurationDAO;
     @Inject
     private ObjectMapper objectMapper;
 
+    @Inject
+    @Named("staticConfiguration")
+    private Properties staticConfiguration;
+
     /** JSON default config file used to initialised Spring placeholder */
     @Value("${staticFiles}")
-    private Set<String> staticFiles;
+    private String staticFiles;
 
     /** Local cache of all loaded field sets */
     private Map<String, FieldSet> fieldSets = new HashMap<>();
@@ -55,52 +54,15 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
      */
     @PostConstruct
     public void loadStaticConfiguration() throws IOException {
-        for (String f : staticFiles) {
+        LOGGER.debug("Static properties: {}", staticConfiguration);
+
+        // Fix properties statically loaded with final values, and mark as static.
+        for (String f : Splitter.on(",").split(staticFiles)) {
             FieldSet fieldSet = getFieldSet(f);
             // Mark all its fields as static - means could not be changed without editing manually properties file
             for (Field field : fieldSet.getFields()) {
+                field.setValue(staticConfiguration.getProperty(fieldSet.getConfigId() + "." + field.getKey()));
                 field.setStaticField(true);
-            }
-        }
-    }
-
-    /**
-     * Read field set from JSON file and override it with environment variables
-     *
-     * @param mapper   JSON Mapper to deserialise file
-     * @param fileName File name, without repertory or extension.
-     */
-    public static FieldSet readFieldSetFile(ApplicationContext applicationContext, ObjectMapper mapper,
-                                            String fileName) {
-
-        String filePath = "configuration/" + fileName + ".json";
-
-        try {
-            Resource resource = applicationContext.getResource(filePath);
-            FieldSet fieldSet = mapper.readValue(resource.getInputStream(), FieldSet.class);
-            fieldSet.setConfigId(fileName);
-            overrideWithEnvironmentVariables(fieldSet);
-
-            return fieldSet;
-        } catch (IOException e) {
-            throw new ConfigurationException("Configuration file %s doesn't exist in classpath.", filePath, e);
-        }
-    }
-
-    /** Override all values with those set in System environment. */
-    private static void overrideWithEnvironmentVariables(FieldSet fieldSet) {
-        Map<String, String> env = System.getenv();
-
-        for (Field f : fieldSet.getFields()) {
-            final String propKey = fieldSet.getConfigId() + "." + f.getKey();
-
-            String value = env.get(propKey);
-            if (isEmpty(value)) {
-                value = System.getProperties().getProperty(propKey);
-            }
-
-            if (isNotEmpty(value)) {
-                f.setValue(value);
             }
         }
     }
@@ -125,12 +87,22 @@ public class ConfigurationManagerImpl implements IConfigurationManager {
 
         if (fieldSet == null) {
             // Load default value and displayable data (meta data)...
-            fieldSet = readFieldSetFile(applicationContext, objectMapper, id);
+            fieldSet = SimpleConfiguration.readFieldSetFile(objectMapper, id);
 
-            // Override with user preference (saved in database)
+            // Override with user preference (saved in database) and placeholder properties
             List<Field> fields = configurationDAO.findByPackage(id);
             for (Field f : fields) {
                 fieldSet.addValue(f.getKey(), f.getValue(), false);
+            }
+
+            // Override by properties placeholder
+            for (Field field : fieldSet.getFields()) {
+                if (staticConfiguration.containsKey(field.getKey())) {
+                    Object value = staticConfiguration.get(field.getKey());
+                    field.setValue(value == null ? null : value.toString());
+
+                    field.setStaticField(true);
+                }
             }
 
             fieldSets.put(id, fieldSet);

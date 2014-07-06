@@ -1,10 +1,7 @@
 package fr.dush.mediamanager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import fr.dush.mediamanager.business.configuration.impl.ConfigurationManagerImpl;
-import fr.dush.mediamanager.domain.configuration.Field;
-import fr.dush.mediamanager.domain.configuration.FieldSet;
+import com.google.common.base.Splitter;
+import fr.dush.mediamanager.business.configuration.SimpleConfiguration;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +12,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
+import org.springframework.core.env.Environment;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static com.google.common.collect.Lists.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 /**
  * Spring Java Based Configuration for Medima application. Provide a property place holder based on application
@@ -31,51 +36,64 @@ public class SpringConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfiguration.class);
 
-    private static SpringPropertyPlaceholderConfigurer placeholderConfigurer;
+    private static final String STATIC_FILES_PROP = "staticFiles";
+    public static final String PORT_PROP = "remotecontrol.port";
 
     /**
-     * Configure a place holder based on application.properties file, system and envrionment variables and some JSON
-     * default variables.
+     * Placeholder is used for static configuration: config which is needed to start application and which can not be
+     * override in database.
+     * <p/>
+     * It based on application properties, system and env variables, and some internal JSON files.
      */
     @Bean
-    public static PropertyPlaceholderConfigurer placeholder(ApplicationContext applicationContext) throws IOException {
+    @Inject
+    public static PropertyPlaceholderConfigurer placeholder(@Named(
+            "staticConfiguration") Properties staticConfiguration) throws IOException {
 
-        placeholderConfigurer = new SpringPropertyPlaceholderConfigurer();
-
-        // Let Spring placeholder read property file for us (it has first priority)
-        if (applicationContext.getEnvironment().containsProperty("mediamanager.propertiesfile")) {
-            String propertyFile = applicationContext.getEnvironment()
-                                                    .resolveRequiredPlaceholders("file:${mediamanager.propertiesfile}");
-            placeholderConfigurer.setLocations(new Resource[]{applicationContext.getResource(propertyFile)});
-        }
-
-        // Then, load required properties from default configuration (JSON files)
-        placeholderConfigurer.setProperties(loadPropertiesFromJson(applicationContext, "mongodb"/*, "remotecontrol"*/));
+        // Configure placeholder with this static configuration
+        SpringPropertyPlaceholderConfigurer placeholderConfigurer = new SpringPropertyPlaceholderConfigurer();
+        placeholderConfigurer.setProperties(staticConfiguration);
 
         return placeholderConfigurer;
-
     }
 
-    /** Load properties value from JSON files. */
-    private static Properties loadPropertiesFromJson(ApplicationContext applicationContext,
-                                                     String... files) throws IOException {
-        Properties props = new Properties();
+    /**
+     * This static configuration is based on some JSON files, then application properties and values given as arguments
+     */
+    @Bean(name = "staticConfiguration")
+    private static Properties readStaticConfiguration(ApplicationContext applicationContext) {
+        // Read static configuration
+        Environment env = applicationContext.getEnvironment();
 
-        props.setProperty("staticFiles", Joiner.on(",").join(files));
+        String propertyFile = env.getRequiredProperty("mediamanager.propertiesfile");
+        LOGGER.debug("Populate static configuration from value: propertiesfile={} ; staticFiles={} ; port={}",
+                     propertyFile,
+                     env.getProperty(STATIC_FILES_PROP),
+                     env.getProperty(PORT_PROP));
 
-        for (String file : files) {
-            ObjectMapper mapper = new ObjectMapper();
+        List<String> staticFiles = newArrayList("mongodb");
+        staticFiles.addAll(getStaticFiles(applicationContext));
 
-            FieldSet fieldSet = ConfigurationManagerImpl.readFieldSetFile(applicationContext, mapper, file);
+        SimpleConfiguration config = new SimpleConfiguration(Paths.get(propertyFile),
+                                                             readPort(env),
+                                                             staticFiles.toArray(new String[staticFiles.size()]));
+        return config.getProperties();
+    }
 
-            for (Field field : fieldSet.getFields()) {
-                // Fields are set with absolute path
-                props.put(file + "." + field.getKey(), field.getValue());
-            }
+    /** Read port in env, return NULL if not set. */
+    private static Integer readPort(Environment env) {
+        String value = env.getProperty(PORT_PROP);
+        return isNumeric(value) ? Integer.valueOf(value) : null;
+    }
+
+    /** Get name of JSON files to be loaded statically */
+    private static ArrayList<String> getStaticFiles(ApplicationContext applicationContext) {
+        String fileIds = applicationContext.getEnvironment().getProperty(STATIC_FILES_PROP);
+        if (isNotEmpty(fileIds)) {
+            return newArrayList(Splitter.on(",").split(fileIds));
+        } else {
+            return new ArrayList<>();
         }
-
-        LOGGER.debug("Load properties: {}", props);
-        return props;
     }
 
     /**

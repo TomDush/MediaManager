@@ -27,7 +27,7 @@ public class ContextLauncher extends Thread {
     private Exception catchedException = null;
 
     private final Path configFile;
-    private final int port;
+    private final Integer port;
 
     @Getter
     private ApplicationContext applicationContext;
@@ -46,7 +46,7 @@ public class ContextLauncher extends Thread {
         });
     }
 
-    public ContextLauncher(Path configFile, int port) {
+    public ContextLauncher(Path configFile, Integer port) {
         super("mediamanagerDaemon");
         setDaemon(true);
 
@@ -69,7 +69,10 @@ public class ContextLauncher extends Thread {
             // Generic properties (provided to Spring placeholder)
             Properties source = new Properties();
             source.put("mediamanager.propertiesfile", pathToString(configFile));
-            source.put("remotecontrol.port", String.valueOf(this.port));
+            source.put("staticFiles", "remotecontrol");
+            if (port != null) {
+                source.put("remotecontrol.port", String.valueOf(this.port));
+            }
 
             // Directory where Medima binaries are
             String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -79,6 +82,7 @@ public class ContextLauncher extends Thread {
             source.put("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
 
             // Start SPRING context - spring is configured by annotation in SpringConfiguration class
+            LOGGER.debug("Starting Spring with properties: {}", source);
             AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
             context.getEnvironment()
                    .getPropertySources()
@@ -109,7 +113,7 @@ public class ContextLauncher extends Thread {
     }
 
     private synchronized IStopper fireApplicationStarted(AnnotationConfigApplicationContext context) {
-        LOGGER.info("Fire application is started! context={}", context);
+        LOGGER.debug("Fire application is started! context={}", context);
         applicationContext = context;
 
         final IStopper stopper = context.getBean(IStopper.class);
