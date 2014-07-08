@@ -29,8 +29,8 @@ import fr.dush.mediamanager.plugins.webui.rest.dto.PlayerInfo;
 // - /players/playing -> players currently playing something
 // - /players/ctrl/<playerId>/<action>?value=<actionValue>
 
-@Named
-@Path("/players")
+//@Named
+//@Path("/players")
 public class PlayerController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerController.class);

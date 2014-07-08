@@ -1,33 +1,33 @@
 <web-app>
-    <display-name>MediaManager</display-name>
+    <display-name>Medima</display-name>
 
-    <init-param>
-        <param-name>development</param-name>
-        <param-value>true</param-value>
-    </init-param>
-    <context-param>
-        <param-name>resteasy.servlet.mapping.prefix</param-name>
-        <param-value>/api</param-value>
-    </context-param>
-    <context-param>
-        <param-name>resteasy.scan</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>javax.ws.rs.Application</param-name>
-        <param-value>fr.dush.mediamanager.plugins.webui.rest.WebUiApplication</param-value>
-    </context-param>
-    <context-param>
-        <param-name>resteasy.injector.factory</param-name>
-        <param-value>org.jboss.resteasy.cdi.CdiInjectorFactory</param-value>
-    </context-param>
+    <!--<init-param>-->
+        <!--<param-name>development</param-name>-->
+        <!--<param-value>true</param-value>-->
+    <!--</init-param>-->
+    <!--<context-param>-->
+        <!--<param-name>resteasy.servlet.mapping.prefix</param-name>-->
+        <!--<param-value>/api</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+        <!--<param-name>resteasy.scan</param-name>-->
+        <!--<param-value>false</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+        <!--<param-name>javax.ws.rs.Application</param-name>-->
+        <!--<param-value>fr.dush.mediamanager.plugins.webui.rest.WebUiApplication</param-value>-->
+    <!--</context-param>-->
+    <!--<context-param>-->
+        <!--<param-name>resteasy.injector.factory</param-name>-->
+        <!--<param-value>org.jboss.resteasy.cdi.CdiInjectorFactory</param-value>-->
+    <!--</context-param>-->
 
-    <listener>
-        <listener-class>org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener</listener-class>
-    </listener>
-    <listener>
-        <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
-    </listener>
+    <!--<listener>-->
+        <!--<listener-class>org.jboss.weld.environment.servlet.BeanManagerResourceBindingListener</listener-class>-->
+    <!--</listener>-->
+    <!--<listener>-->
+        <!--<listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>-->
+    <!--</listener>-->
 
     <!-- Welcome page -->
     <welcome-file-list>
@@ -35,64 +35,74 @@
         <welcome-file>index_static.html</welcome-file>
     </welcome-file-list>
 
-    <!-- Static resources servlet -->
-    <servlet>
-        <servlet-name>StaticServlet</servlet-name>
-        <jsp-file>/singlePage.jsp</jsp-file>
-    </servlet>
+    <!--< Static resources servlet -->
+    <!--<servlet>-->
+        <!--<servlet-name>StaticServlet</servlet-name>-->
+        <!--<jsp-file>/singlePage.jsp</jsp-file>-->
+    <!--</servlet>-->
 
-    <servlet-mapping>
-        <servlet-name>StaticServlet</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>StaticServlet</servlet-name>-->
+        <!--<url-pattern>/</url-pattern>-->
+    <!--</servlet-mapping>-->
 
-    <servlet-mapping>
-        <servlet-name>default</servlet-name>
-        <url-pattern>*.js</url-pattern>
-        <url-pattern>*.css</url-pattern>
-        <url-pattern>*.ico</url-pattern>
-        <url-pattern>*.png</url-pattern>
-        <url-pattern>*.jpg</url-pattern>
-        <url-pattern>*.htc</url-pattern>
-        <url-pattern>*.gif</url-pattern>
-        <url-pattern>*.html</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>default</servlet-name>-->
+        <!--<url-pattern>*.js</url-pattern>-->
+        <!--<url-pattern>*.css</url-pattern>-->
+        <!--<url-pattern>*.ico</url-pattern>-->
+        <!--<url-pattern>*.png</url-pattern>-->
+        <!--<url-pattern>*.jpg</url-pattern>-->
+        <!--<url-pattern>*.htc</url-pattern>-->
+        <!--<url-pattern>*.gif</url-pattern>-->
+        <!--<url-pattern>*.html</url-pattern>-->
+    <!--</servlet-mapping>-->
 
     <!-- Images Servlet -->
+    <!--<servlet>-->
+        <!--<servlet-name>ImagesServlet</servlet-name>-->
+        <!--<servlet-class>fr.dush.mediamanager.plugins.webui.servlets.ImagesServlet</servlet-class>-->
+        <!--<load-on-startup>1</load-on-startup>-->
+    <!--</servlet>-->
+
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>ImagesServlet</servlet-name>-->
+        <!--<url-pattern>/poster/*</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>ImagesServlet</servlet-name>-->
+        <!--<url-pattern>/backdrop/*</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>ImagesServlet</servlet-name>-->
+        <!--<url-pattern>/actor/*</url-pattern>-->
+    <!--</servlet-mapping>-->
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>ImagesServlet</servlet-name>-->
+        <!--<url-pattern>/other/*</url-pattern>-->
+    <!--</servlet-mapping>-->
+
+
+    <!-- Service REST servlet (Spring MVC) -->
     <servlet>
-        <servlet-name>ImagesServlet</servlet-name>
-        <servlet-class>fr.dush.mediamanager.plugins.webui.servlets.ImagesServlet</servlet-class>
+        <servlet-name>springapp</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/poster/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/backdrop/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/actor/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ImagesServlet</servlet-name>
-        <url-pattern>/other/*</url-pattern>
-    </servlet-mapping>
-
-
-    <!-- Service REST servlet (Resteasy) -->
-    <servlet>
-        <servlet-name>Resteasy</servlet-name>
-        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Resteasy</servlet-name>
+        <servlet-name>springapp</servlet-name>
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
+    <!--<servlet>-->
+        <!--<servlet-name>Resteasy</servlet-name>-->
+        <!--<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>-->
+        <!--<load-on-startup>1</load-on-startup>-->
+    <!--</servlet>-->
+
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>Resteasy</servlet-name>-->
+        <!--<url-pattern>/api/*</url-pattern>-->
+    <!--</servlet-mapping>-->
 
 </web-app>

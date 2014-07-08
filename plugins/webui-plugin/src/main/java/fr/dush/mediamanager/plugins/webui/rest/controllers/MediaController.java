@@ -17,7 +17,7 @@ import java.util.Set;
  *
  * @author Thomas Duchatelle
  */
-@Path("/medias")
+//@Path("/medias")
 public class MediaController {
 
     @Inject

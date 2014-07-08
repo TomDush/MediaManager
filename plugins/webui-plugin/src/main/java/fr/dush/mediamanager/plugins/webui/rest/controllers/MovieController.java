@@ -31,8 +31,8 @@ import fr.dush.mediamanager.plugins.webui.rest.dto.MovieDTO;
 import fr.dush.mediamanager.plugins.webui.rest.dto.RecoveryDTO;
 import fr.dush.mediamanager.plugins.webui.rest.dto.RequestFilter;
 
-@Named
-@Path("/")
+//@Named
+//@Path("/")
 public class MovieController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MovieController.class);

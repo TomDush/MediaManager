@@ -17,8 +17,8 @@ import fr.dush.mediamanager.events.mediatech.MovieAdminEvent;
 import fr.dush.mediamanager.events.mediatech.Operation;
 
 /** Forward admin request to CDI event bus. */
-@Named
-@Path("/admin")
+//@Named
+//@Path("/admin")
 public class AdminController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminController.class);
