@@ -13,7 +13,6 @@ import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -72,13 +71,6 @@ public class ContextLauncher extends Thread implements ApplicationListener {
         if (port != null) {
             source.put("remotecontrol.port", String.valueOf(this.port));
         }
-
-        // Directory where Medima binaries are
-        String installPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        if (installPath.matches("^/[A-Z]:/.*$")) {
-            installPath = installPath.substring(1);
-        }
-        source.put("mediamanager.install", pathToString(Paths.get(installPath).getParent()));
 
         // Start SPRING context - spring is configured by annotation in SpringConfiguration class
         LOGGER.debug("Starting Spring with properties: {}", source);

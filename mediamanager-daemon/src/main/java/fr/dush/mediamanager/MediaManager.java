@@ -33,7 +33,7 @@ import static org.apache.commons.lang3.StringUtils.*;
  */
 public class MediaManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MediaManager.class);
+    private static final Logger LOGGER;
 
     private static final int DEFAULT_WIDTH = 800;
 
@@ -49,6 +49,25 @@ public class MediaManager {
     private final ClientConfiguration clientConfig;
 
     private MediaManagerRMI remoteInterface;
+
+    /** Key in system directory defining where is the install dir. */
+    public static final String INSTALL_DIR_KEY = "mediamanager.install";
+
+    static {
+        // Initialise LOG4J parameters: directory where Medima binaries are
+        if (isEmpty(System.getProperty(INSTALL_DIR_KEY)) && isEmpty(System.getenv(INSTALL_DIR_KEY))) {
+            String classPath = ContextLauncher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            if (classPath.contains(":")) {
+                classPath = classPath.substring(classPath.indexOf(":") + 1, classPath.length());
+            }
+            // Parent is directory where JAR is (bin directory), parent of this one is install dir.
+            System.setProperty(INSTALL_DIR_KEY,
+                               Paths.get(classPath).getParent().getParent().toAbsolutePath().toString());
+        }
+
+        // Only after, create logger
+        LOGGER = LoggerFactory.getLogger(MediaManager.class);
+    }
 
     public static void main(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
