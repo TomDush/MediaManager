@@ -10,11 +10,11 @@ body {
 }
 
 /* HEADER */
-.brand {
+.navbar-brand {
     font-variant: small-caps;
 }
 
-.brand .first {
+.navbar-brand .first {
     color: red;
     font-variant: normal;
     font-weight: bold;
