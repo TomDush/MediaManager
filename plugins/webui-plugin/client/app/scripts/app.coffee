@@ -16,6 +16,7 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch'
+    'mediaServices'
   ])
 .config ($routeProvider, $locationProvider) ->
   $locationProvider.html5Mode true

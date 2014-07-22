@@ -1,0 +1,190 @@
+//@import "../../bower_components/bootstrap/less/bootstrap";
+@import "../../bower_components/bootstrap/less/bootstrap.less";
+@icon-font-path: "../bower_components/bootstrap/dist/fonts/";
+
+body {
+  background: #fafafa;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #333;
+  margin-bottom: 100px;
+}
+
+.content {
+  margin-top: 60px;
+}
+
+/* HEADER */
+.navbar-brand {
+  font-variant: small-caps;
+
+  .first {
+    color: red;
+    font-variant: normal;
+    font-weight: bold;
+  }
+}
+
+/* HOME PAGE */
+.jumbotron {
+  h1 {
+    font-size: 5em;
+    line-height: 1;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+
+    &:FIRST-LETTER {
+      color: #A00;
+      font-size: 1.2em;
+    }
+  }
+
+  ul {
+    list-style-type: none;
+    font-size: 1.2em;
+  }
+}
+
+/* MEDIA SEARCH */
+form.media-search .genre {
+  width: 40%;
+  margin-left: 10px;
+}
+
+.check-control {
+  text-align: right;
+}
+
+.check-control i {
+  cursor: pointer;
+}
+
+/* MEDIA LIST */
+.media-icon {
+  width: 10%;
+  cursor: pointer;
+}
+
+.media-body {
+  cursor: pointer;
+}
+
+.media-body-without-poster {
+  margin-left: 10%;
+}
+
+.pagination {
+  text-align: center;
+}
+
+.pagination a {
+  cursor: pointer;
+}
+
+/* MEDIA VIEW */
+.child-hover {
+  display: none;
+}
+
+.parent-hover:hover .child-hover {
+  display: inline-block;
+}
+
+.loading-text, .notfound-text {
+  margin: 100px auto;
+  font-size: 1.3em;
+  text-align: center;
+}
+
+.loading-text img {
+  width: 20px;
+}
+
+.crew-list li {
+  float: left;
+  margin: 1%;
+  width: 30%;
+}
+
+.crew-list img {
+  height: 2.1em;
+  float: left;
+}
+
+.crew-list span {
+  padding-left: 5px;
+}
+
+.sheet h1 {
+  border-bottom: solid 1px black;
+}
+
+.sheet .span8 {
+  margin-left: 0px;
+}
+
+.sheet .span8 h1, .sheet .span8 ul {
+  padding-left: 10px;
+}
+
+.sheet .span8 ul {
+  margin-top: 15px;
+}
+
+.sheet .title-date {
+  font-size: 0.5em;
+}
+
+.sheet .actionsButton {
+  text-align: center;
+}
+
+.sheet .tagline {
+  font-size: 1.1em;
+  font-style: italic;
+  text-align: center;
+}
+
+.sheet .poster {
+  border: solid 1px black;
+  padding: 5px;
+}
+
+.sheet .crewList img {
+  width: 20%;
+}
+
+.sheet .crewList span.crew {
+  margin-top: 10px;
+}
+
+.sheet .crewList span.crewName {
+  padding-left: 10px;
+}
+
+/* PLAYER */
+.player .progress {
+  width: 400px;
+  margin: 10px;
+}
+
+.player .progress span {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+
+.player .brand {
+  max-width: 400px;
+}
+
+.player .ctrl {
+  margin-left: 140px;
+}
+
+.player-tagline {
+  margin-top: 5px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  font-size: 12px;
+  font-style: italic;
+}

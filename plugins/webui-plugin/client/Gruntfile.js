@@ -1,7 +1,7 @@
 // Generated on 2014-07-19 using generator-angular 0.9.5
 'use strict';
 
-//var modRewrite = require('connect-modrewrite');
+var modRewrite = require('connect-modrewrite');
 
 // # Globbing
 // for performance reasons we're only matching one level down:
@@ -39,6 +39,10 @@ module.exports = function (grunt) {
                 files: ['<%= yeoman.app %>/scripts/{,*/}*.{coffee,litcoffee,coffee.md}'],
                 tasks: ['newer:coffee:dist']
             },
+            less: {
+                files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
+                tasks: ['newer:less']
+            },
             coffeeTest: {
                 files: ['test/spec/{,*/}*.{coffee,litcoffee,coffee.md}'],
                 tasks: ['newer:coffee:test', 'karma']
@@ -68,7 +72,8 @@ module.exports = function (grunt) {
             options: {
                 port: 9000,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost',
+//                hostname: 'localhost',
+                hostname: '0.0.0.0',
                 livereload: 35729
             },
             livereload: {
@@ -76,20 +81,16 @@ module.exports = function (grunt) {
                     open: true,
                     middleware: function (connect) {
                         return [
-//                            lrSnippet,
-//                            modRewrite([
-//                                '!^/.*\\.(html|css|json|js|png|jpeg|jpg|gif)(\\?.*)*$ /index.html'
-//                                //'^/.*$ /index.html'
-//                            ]),
-//                            mountFolder(connect, 'restmock'),
-//                            mountFolder(connect, '.tmp'),
-//                            mountFolder(connect, yeomanConfig.app)
+                            modRewrite([
+                                '!^/.*\\.(html|css|json|js|png|jpeg|jpg|gif|woff|ttf|svg)(\\?.*)*$ /index.html'
+                                //'^/.*$ /index.html'
+                            ]),
+
                             connect.static('restmock'),
 
                             connect.static('.tmp'),
                             connect().use(
                                 '/bower_components',
-//                                '/restmock',
                                 connect.static('./bower_components')
                             ),
                             connect.static(appConfig.app)
@@ -206,6 +207,15 @@ module.exports = function (grunt) {
                         ext: '.js'
                     }
                 ]
+            }
+        },
+
+        // Compile LESS files
+        less: {
+            dist: {
+                files: {
+                    '.tmp/styles/mediamanager.css': ['<%= yeoman.app %>/styles/mediamanager.less']
+                }
             }
         },
 
@@ -388,14 +398,17 @@ module.exports = function (grunt) {
         concurrent: {
             server: [
                 'coffee:dist',
-                'copy:styles'
+                'copy:styles',
+                'less'
             ],
             test: [
                 'coffee',
-                'copy:styles'
+                'copy:styles',
+                'less'
             ],
             dist: [
                 'coffee',
+                'less',
                 'copy:styles',
                 'imagemin',
                 'svgmin'
