@@ -62,6 +62,8 @@ public class Movie extends Media {
     /** Trailers (downloaded, and not). Null if not initialized... */
     private Trailers trailers = null;
 
+    // TODO Add movie length
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(getTitle());
