@@ -1,0 +1,14 @@
+<div class="btn-group dropup">
+    <button class="btn btn-primary dropdown-toggle" ng-class="{'btn-xs': btnSize=='xs'}">
+        <i class="glyphicon glyphicon-play"></i> Play </span>
+    </button>
+    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" ng-show="media.videoFiles.length > 1"><span
+            class="caret"></span></button>
+    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+        <li ng-repeat="v in media.videoFiles">
+            <a> <span class="pull-right badge" ng-show="v.quality">{{v.quality}}</span> <span class="badge"
+                                                                                              ng-show="v.lang">{{v.lang}}</span>
+                {{v.file |basename}} </a>
+        </li>
+    </ul>
+</div>

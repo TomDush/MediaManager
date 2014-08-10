@@ -1,14 +1,14 @@
 package fr.dush.mediamanager.domain.media.video;
 
-import static com.google.common.collect.Lists.*;
+import fr.dush.mediamanager.domain.media.MediaFile;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import fr.dush.mediamanager.domain.media.MediaFile;
+import static com.google.common.collect.Lists.*;
 
 /**
  * Video file.
@@ -23,6 +23,8 @@ public class VideoFile extends MediaFile {
 
 	/** Video quality */
 	private Quality quality;
+
+    // TODO Fill quality and add version
 
 	/** Next files if video is split between multiple part. */
 	private List<String> nextParts = newArrayList();

@@ -23,7 +23,7 @@
 
 angular.module 'mediaServices', [ 'ngResource' ]
 .factory 'Movie', ($resource) ->
-  $resource 'api/:destination/:ctrl:id.json', {destination: "movies"}, {
+  $resource '/api/:destination/:ctrl:id.json', {destination: "movies"}, {
     last: { method: 'GET', params: { ctrl: 'last', size: '@size' } },
     random: { method: 'GET', params: { ctrl: 'random', size: '@size' } },
     list: { method: 'GET', params: { ctrl: 'list', size: '@size' } },
@@ -31,7 +31,7 @@ angular.module 'mediaServices', [ 'ngResource' ]
   }
 
 .factory 'Player', ($resource) ->
-  $resource 'api/players/:cmd/:type:playerId/:mediaId:action/:path', {}, {
+  $resource '/api/players/:cmd/:type:playerId/:mediaId:action/:path', {}, {
     play: { method: 'GET', params: { cmd: "play"}}
     resume: { method: 'GET', params: { cmd: "resume"}}
     playing: { method: 'GET', params: { cmd: "playing.json"}, isArray: true}
@@ -39,11 +39,11 @@ angular.module 'mediaServices', [ 'ngResource' ]
   }
 
 .factory 'Media', ($resource) ->
-  $resource 'api/medias/:request.json', {}, {
+  $resource '/api/medias/:request.json', {}, {
     inProgress: { method: 'GET', params: { request: "inProgress"}, isArray: true}
   }
 
 .factory 'Admin', ($resource) ->
-  $resource 'api/admin/:type/:id/:action', {}, {
+  $resource '/api/admin/:type/:id/:action', {}, {
     ctrl: { method: 'GET'}
   }

@@ -1,12 +1,11 @@
-<div class="jumbotron">
+<div id="homeheader" class="homeheader">
     <div class="container">
-        <div class="row hidden-xs">
+        <div class="row">
             <h1 class="col-xs-6">Medima</h1>
 
             <div class="col-xs-5 col-xs-offset-1">
                 <ul class="unstyled">
-                    <li ng-repeat="e in menu"><a ng-href="{{e.href}}">
-                        <i ng-class="icon(e.icon)"/> {{e.name}}</a>
+                    <li ng-repeat="e in menu"><a ng-href="{{e.href}}"> <i ng-class="icon(e.icon)" /> {{e.name}}</a>
                     </li>
                 </ul>
             </div>
@@ -15,53 +14,106 @@
 </div>
 
 <div class="container-fluid">
-    <!-- TODO Use LESS to control how many poster are visible, depending on viewport size (and restore 15px margin)-->
-    <!-- Create mock extractor? (groovy) -->
-    <div class="row hidden-xs" style="margin-left: 15px; margin-right: 15px;">
-        <div style="width: 10%; overflow: hidden" class="pull-left"
-             ng-repeat="m in random.elements | filter:{poster:'!!'} |limitTo:9">
-            <a ui-sref="sheet.movie({movieId : m.id})" title="{{m.title}} ({{m.release |date:'yyyy'}})">
-                <img style="width: 100%" alt="{{m.title}}" ng-src="{{m.poster}}?size=THUMBS"
-                     err-src="/img/no-poster-w185.jpg"/>
+    <!-- Random posters -->
+    <div class="row hidden-xs">
+        <div class="random-item" ng-repeat="m in random.elements | filter:{poster:'!!'} |limitTo:displayablePoster">
+            <a title="{{m | mediatitle}}" ng-click="setRandomFocus(m)">
+                <poster url="{{m.poster}}" size="THUMBS" alt="{{m.title}}"></poster>
             </a>
         </div>
-        <div style="width: 10%;" class="text-center pull-left">
-        <span ng-click="refreshRandom()" class="btn btn-default" style="margin-top: 30px">
-            <i class="glyphicon glyphicon-refresh"></i> Refresh
-        </span>
+        <div class="random-item more">
+            <a ng-click="refreshRandom()"> <img alt="More..." src="/img/more.png" /> </a>
         </div>
     </div>
+    <div class="arrow-up" ng-style="getArrowPosition(movieFocused.id)"
+         ng-class="{'arrow-show': movieFocused && isFocused, 'arrow-hide':!movieFocused || !isFocused}"></div>
+    <div class="randomFocus" ng-class="{focusclosed : !movieFocused || !isFocused}">
+        <div class="content">
+            <div class="backdrops col-xs-5" ng-show="movieFocused.backdrops[0]">
+                <img src="{{movieFocused.backdrops[0]}}?size=DISPLAY" class="pull-left" />
+            </div>
+            <div class="backdrops col-xs-5" ng-hide="movieFocused.backdrops[0]">
+                <img src="{{movieFocused.poster}}?size=DISPLAY" class="pull-left" />
+            </div>
+
+            <div class="description col-xs-7">
+                <i class="close-cross" ng-click="isFocused = false"></i>
+
+                <h3>{{movieFocused | mediatitle}}</h3>
+                <tags media="movieFocused"></tags>
+
+                <p class="tagline">{{movieFocused.tagline}}</p>
+
+                <p>{{movieFocused.overview | cut:true:450}} </p>
+
+                <p>
+                    Director: {{movieFocused.directors| limitTo:1 | person}} ; Actors: {{movieFocused.mainActors
+                    |limitTo:3 | person}} </p>
+
+                <div>
+                    <a class="btn btn-primary" href="/movies/{{movieFocused.id}}"><i
+                            class="glyphicon glyphicon-info-sign"></i> Detail</a>
+                    <play-button media="movieFocused"></play-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
+        <!-- In progress movies -->
         <div class="col-md-4" ng-show="inProgress.length">
             <h2>In Progress</h2>
 
             <div ng-repeat="recovery in inProgress" class="media">
-                <a ui-sref="sheet.movie({movieId : recovery.mediaSummary.id})" class="media-icon pull-left">
-                    <poster url="{{recovery.mediaSummary.poster}}" size="MINI"/>
+                <a ng-href="movie/{{recovery.mediaSummary.id}}" class="pull-left">
+                    <poster url="{{recovery.mediaSummary.poster}}" size="MINI" class="media-object"></poster>
                 </a>
 
                 <div class="media-body">
-                    <a class="pull-right btn btn-info btn-sm" ng-click="resume(recovery)"><i
-                            class="glyphicon glyphicon-play icon-white"></i> </a>
-                    <h4 class="media-heading" ui-sref="sheet.movie({movieId : recovery.mediaSummary.id})">
-                        <mediatitle media="recovery.mediaSummary"/>
-                    </h4>
+                    <a class="media-heading" ng-href="movie/{{recovery.mediaSummary.id}}"> {{recovery.mediaSummary |
+                        mediatitle}} </a>
 
-                    <div class="span6">
-                        <timeprogressbar status="recovery"/>
+                    <div class="group-with-btn">
+                        <div class="btn-group pull-right">
+                            <a class="btn btn-default btn-sm" ng-click="forget(recovery)"><i
+                                    class="glyphicon glyphicon-remove icon-white"></i> </a> <a
+                                class="btn btn-info btn-sm" ng-click="resume(recovery)"><i
+                                class="glyphicon glyphicon-play icon-white"></i> </a>
+                        </div>
+                        <timeprogressbar status="recovery" />
                     </div>
                 </div>
             </div>
-
         </div>
+
+        <!-- Last elements -->
         <div class="col-md-4" ng-show="lastMovies.elements.length">
             <h2>Last {{lastMovies.elements.length}} unseen movies</h2>
 
-            <ul>
-                <li ng-repeat="m in lastMovies.elements">
-                    <a ui-sref="sheet.movie({movieId : m.id})" title="{{m.title}}">{{m.title}} ({{m.release
-                        |date:'yyyy'}})</a>
-                    <!-- TODO Display more information on "title" (small popup) -->
+            <ul class="last-movies">
+                <li ng-repeat="m in lastMovies.elements"
+                    ng-class="{'selected': isLastSelected(m), 'no-poster': hasPoster(m)}">
+                    <i class="close-cross" ng-click="setLastSelected(null)"></i>
+
+                    <div class="poster">
+                        <poster url="{{m.poster}}" size="THUMBS" class="media-object"></poster>
+                    </div>
+                    <a class="last-title" ng-click="setLastSelected(m)" title="{{m | mediatitle}}">{{m |
+                        mediatitle}}</a>
+
+                    <div class="details"> <!--ng-show="isLastSelected(m)"-->
+                        <tags media="m"></tags>
+                        <p class="tagline"> {{m.tagline}}</p>
+
+                        <div class="text-center">
+                            <button class="btn btn-xs" ng-show="isNotIdentified(m)"><i
+                                    class="glyphicon glyphicon-barcode"></i> Identify
+                            </button>
+                            <a class="btn btn-xs" href="/movies/{{m.id}}"><i class="glyphicon glyphicon-info-sign"></i>
+                                Detail</a>
+                            <play-button media="m" btn-size="'xs'"></play-button>
+                        </div>
+                    </div>
                 </li>
             </ul>
             <p><a ui-sref="medias.list({type : ['movies'], order:'last', seen: false})">{{lastMovies.size}} movie(s)

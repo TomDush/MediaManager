@@ -28,6 +28,9 @@ angular
   .when '/movies',
     templateUrl: 'views/medias.html'
     controller: 'HomeCtrl'
+  .when '/movies/:movieId',
+    templateUrl: '/views/movie.html'
+    controller: 'MovieCtrl'
   .otherwise
       redirectTo: '/'
 

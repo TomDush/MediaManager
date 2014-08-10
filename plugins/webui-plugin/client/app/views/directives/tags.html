@@ -1,0 +1,3 @@
+<!--<span class="quality" ng-repeat="v in media.videoFiles | filter: {'quality': '!!'}">{{v.quality}}|{{v.lang}}</span>-->
+<span ng-bind-html="media.videoFiles | videoTags:' - '"></span><span class="length" ng-show="media.length">{{media.length * 60 | time}} - </span>
+<span ng-repeat="g in media.genres">{{g}}<span ng-hide="$last"> | </span></span>
