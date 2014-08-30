@@ -206,11 +206,13 @@ public class TheMovieDbEnricher implements IMoviesEnricher {
             }
             movie.setTagline(movieDb.getTagline());
             movie.setOverview(movieDb.getOverview());
+            // Get all backdrops - but don't download all of them
             movie.getBackdrops().add(generateArtUrl(ArtType.BACKDROP, movieDb.getBackdropPath(), movieDb.getTitle()));
             movie.setVoteAverage(movieDb.getVoteAverage() / 10);
 
             // Find main actors...
             PersonParser parser = new PersonParser(this, api.getMovieCasts(id));
+            // TODO Get all casting and link with their character
             movie.setMainActors(parser.getCasting(CASTING_SIZE));
             movie.setDirectors(parser.getDirectors());
 

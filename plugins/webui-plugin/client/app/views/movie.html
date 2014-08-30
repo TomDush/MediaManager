@@ -1,48 +1,45 @@
 <div ng-show="!loaded" class="loading-text">
-<img src="/img/loading.gif" /> Loading ...
+    <img src="/img/loading.gif" /> Loading ...
 </div>
 <div ng-show="loaded && !movie" class="notfound-text">
-<p>Movies with id <i>{{movieId}}</i> wasn't found...</p>
+    <p>Movies with id <i>{{movieId}}</i> wasn't found...</p>
 </div>
 
 <div class="container-fluid sheet" ng-show="movie.title">
     <div class="row">
-        <div class="poster" ng-show="movie.poster">
-        <a href="/{{movie.poster}}?size=ORIGINAL" target="_blank"> <img alt="{{movie.title}}"
-                                                                            ng-src="/{{movie.poster}}?size=THUMBS" />
-            </a>
-        </div>
-        <div class="details">
-            <h1><span class="pull-right title-date">{{movie.release |date:'dd/MM/yyyy'}}</span>{{movie.title}}</h1>
+        <poster class="poster" url="movie.poster" size="DISPLAY" alt="{{m.title}}" ng-show="movie.poster"></poster>
+        <div class="details" ng-class="{'with-poster': movie.poster}">
+            <h1>
+                <span class="pull-right title-date">{{movie.release |date:'dd/MM/yyyy'}}</span> <span
+                    class="pull-left btn btn-success" ng-hide="movie.seen">NEW</span> {{movie.title}} </h1>
 
-            <div class="tagline">{{movie.tagline}}</div>
+            <tags media="movie"></tags>
 
             <ul class="unstyled">
-                <li class="parent-hover">Genres :
-                    <genres genres="movie.genres"></genres>
+                <li>
+                    Director(s) :
+                    <person-list persons="movie.directors" with-link="true"></person-list>
+                </li>
+                <li>
+                    Stars :
+                    <person-list persons="movie.mainActors" with-link="true" limit="3"></person-list>
                 </li>
                 <li>Note : {{movie.voteAverage |rate:movie.voteNumber}}</li>
-                <li>Director(s) : <span ng-repeat="d in movie.directors"><a
-                        href="/search/crew/{{d.name}}">{{d.name}}</a> </span></li>
                 <li ng-hide="movie.seen">Seen: <i>never</i></li>
                 <li ng-show="movie.seen == 1">Seen: <i>once</i></li>
                 <li ng-show="movie.seen > 1">Seen: <i>{{movie.seen}} times</i></li>
+                <li>Added: {{movie.creation | date:'dd/MM/yyyy hh:mm'}}</i></li>
             </ul>
 
-            <div>
-                <h2>Overview</h2>
-
-                <p>{{movie.overview}}</p>
-            </div>
+            <div class="tagline">{{movie.tagline}}</div>
+            <p>{{movie.overview}}</p>
 
             <!-- Action buttons -->
             <div class="actionsButton">
                 <button ng-click="resume()" class="btn btn-primary btn-lg" ng-show="movie.recovery.position">
                     <i class="glyphicon glyphicon-film icon-white"></i> Resume
                 </button>
-                <button ng-click="play()" class="btn btn-primary btn-lg">
-                    <i class="glyphicon glyphicon-play icon-white"></i> Play
-                </button>
+                <play-button media="movie" btn-size="lg"></play-button>
 
                 <div class="btn-group">
                     <button class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
@@ -66,32 +63,40 @@
         </div>
     </div>
 
-    <h2>Cast</h2>
 
-    <div class="row-fluid">
-        <div class="span2" ng-repeat="c in movie.mainActors">
-            <div class="thumbnail">
-                <img ng-src="/{{resolveProfile(c.picture)}}?size=MINI" err-src="{{noProfile}}" alt="{{c.name}}" />
+    <div class="row">
 
-                <div class="caption">
-                    {{c.name}}
+
+        <div class="col-md-8 medias">
+            <h2>Medias</h2>
+            <carousel-bs ng-show="movie.backdrops && movie.backdrops.length > 1">
+                <slide-bs ng-repeat="backdrop in movie.backdrops">
+                    <a href="/{{backdrop}}?size=ORIGINAL" target="_blanc"><img ng-src="/{{backdrop}}?size=MINI"></a>
+                </slide-bs>
+            </carousel-bs>
+
+            <a href="/{{movie.backdrops[0]}}?size=ORIGINAL" target="_blanc"><img
+                    ng-src="/{{movie.backdrops[0]}}?size=MINI" ng-show="movie.backdrops.length == 1"></a>
+        </div>
+
+        <div class="col-md-4 cast">
+            <h2>Cast</h2>
+
+            <!-- Idea: on click, open in big size portrait and get where this actor played -->
+            <div class="media" ng-repeat="c in movie.mainActors">
+                <div class="media-icon pull-left">
+                    <img ng-src="/{{resolveProfile(c.picture)}}?size=MINI" err-src="{{noProfile}}" alt="{{c.name}}" />
+                </div>
+
+                <div class="media-body">
+                    <h4 class="media-heading">
+                        {{c.name}} </h4>
+
+                    <p ng-show="c.character">As {{c.character}}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <h2 ng-show="movie.trailers.trailers">Trailers</h2>
-
-    <ul>
-        <li ng-repeat="t in movie.trailers.trailers"><a href="{{t.url}}">{{t.title}} [{{t.quality}}]</a></li>
-    </ul>
-
-    <h2>Backdrops</h2>
-
-    <div class="row-fluid">
-        <a href="/{{backdrop}}?size=ORIGINAL" ng-repeat="backdrop in movie.backdrops" target="_blank"> <img
-                ng-src="/{{backdrop}}?size=MINI" style="text-align: center;" /> </a>
-    </div>
 
 </div>
-

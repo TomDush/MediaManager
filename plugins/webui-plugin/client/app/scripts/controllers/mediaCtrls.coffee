@@ -41,6 +41,20 @@ angular.module('mediamanager')
     if request.action == 'REMOVE_RESUME'
       $scope.movie.recovery = null;
 
+.controller 'CarouselDemoCtrl', ($scope) ->
+  $scope.myInterval = 5000
+  slides = $scope.slides = []
+
+  $scope.addSlide = ->
+    newWidth = 300 + slides.length
+    slides.push
+      image: 'http://placekitten.com/' + newWidth + '/300'
+      text: ['More', 'Extra', 'Lots of', 'Surplus'][slides.length % 4] + ' ' + ['Cats', 'Kittys', 'Felines',
+                                                                                'Cutes'][slides.length % 4]
+
+  for i in [0..2]
+    $scope.addSlide()
+
 ## Object is null or empty (no attribute), or array is empty
 isEmpty = (obj) ->
   if obj then true else false

@@ -50,7 +50,7 @@ angular.module('mediamanager')
   restrict: 'E'
   scope:
     media: '='
-  templateUrl: 'views/directives/tags.html'
+  templateUrl: '/views/directives/tags.html'
 
 # Video tag: quality
 .filter 'videoTags', ->
@@ -70,8 +70,8 @@ angular.module('mediamanager')
   restrict: 'E'
   scope:
     media: '='
-    btnSize: '='
-  templateUrl: 'views/directives/play.html'
+    btnSize: '@'
+  templateUrl: '/views/directives/play.html'
 
 ## Direct display of some media properties
 
@@ -85,31 +85,73 @@ angular.module('mediamanager')
 
 # List of person name
 .filter 'person', ->
-  (input) ->
+  (input, withLink) ->
     res = ""
     if input?.length > 0
       for p in input
         if res.length > 0
           res += ", "
+        if withLink
+          res += "<a href='/search/crew/#{p.id}'>"
         res += "#{p.name}"
+        if withLink
+          res += "</a>"
 
     res
 
+.directive 'personList', ->
+  restrict: 'E'
+  template: '<span class="persons" ng-bind-html="persons | limitTo:getLimit() | person:withLink"></span>'
+  scope:
+    persons: '='
+    withLink: '@'
+    limit: '@'
+  link: ($scope)->
+    $scope.getLimit = ->
+      if $scope.limit then $scope.limit else $scope.persons?.length
+
+
 # Img element for poster, if any, else choose no poster img with width 92 or 185.
 .directive 'poster', ['$interval', 'dateFilter', ($interval, dateFilter) ->
-  # return
   restrict: 'E'
-  template: '<img ng-src="{{poster}}?size={{size}}" err-src="{{noPoster}}" />'
-  link: (scope, element, attrs) ->
-    scope.size = attrs.size
-
+  template: '<img ng-src="/{{poster()}}?size={{size}}" err-src="{{noPoster}}" />'
+  scope:
+    url: '='
+    size: '@'
+  link: ($scope) ->
     # If poster isn't defined
-    width = if scope.size == "MINI" then "92" else "185"
-    scope.noPoster = "/img/no-poster-w#{width}.jpg"
+    width = if $scope.size == "MINI" then "92" else "185"
+    $scope.noPoster = "img/no-poster-w#{width}.jpg"
 
     # Poster url
-    scope.poster = if attrs.url? then attrs.url else scope.noPoster
+    $scope.poster = ->
+      if $scope.url? then $scope.url else $scope.noPoster
 ]
+#.directive 'poster', ['$interval', 'dateFilter', ($interval, dateFilter) ->
+#  # return
+#  restrict: 'E'
+#  template: '<img ng-src="/{{poster(url, size}}?size={{size}}" err-src="{{noPoster}}" />'
+#  scope:
+#    url: '='
+#    size: '='
+#    noPoster: (size) ->
+#      width = 185
+#      if size == "MINI"
+#        width = 92
+#      else if size == "DISPLAY"
+#        width = 342
+#
+#      "/img/no-poster-w#{width}.jpg"
+#
+#    poster: (url, size) ->
+#      console.log "URl=#{url}"
+#      #    scope.size = attrs.size
+#
+#      # If poster isn't defined
+#      width = if scope.size == "MINI" then "92" else "185"
+#
+#      # Poster url
+#      scope.poster = if scope.url? then scope.url else scope.noPoster
 
 
 .directive 'checkList', ->
@@ -140,7 +182,6 @@ angular.module('mediamanager')
   link = (scope, element, attrs) ->
     # Functions...
     updateProgression = ->
-      console.log "Length=" + scope.length + " ; position=" + scope.position + " ; player=" + JSON.stringify(scope.player)
       scope.progression = Math.round(100 * scope.position / scope.length);
 
     scope.$watch attrs.position, (value) ->
@@ -148,7 +189,6 @@ angular.module('mediamanager')
       updateProgression()
 
     scope.$watch attrs.player, (value) ->
-      console.log "player=" + JSON.stringify(scope.player)
       scope.player = value
 
     # Set values from attributes
@@ -166,7 +206,7 @@ angular.module('mediamanager')
   template: '<div class="progress" ng-show="status.length">' +
 #    '       <span style="position:absolute">{{status.position | time}} / {{status.length | time}}</span>' +
     '<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" style="width: {{status.position | progress:status.length}}%;"
-      aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
+              aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
     '</div>'
   }
 

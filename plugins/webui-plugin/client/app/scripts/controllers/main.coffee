@@ -13,7 +13,10 @@ angular.module('mediamanager')
 .controller 'TopMenuCtrl', ($scope, $location) ->
   $scope.pageTitle = "Medima - Manage yours medias !"
   $scope.active = (path) ->
-    return "active" if path == $location.path()
+    if path == '/'
+      $location.path() == '/'
+    else
+      path == $location.path() || $location.path().indexOf(path) == 0
 
   $scope.entries = menu
 

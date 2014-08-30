@@ -18,7 +18,7 @@
     <div class="row hidden-xs">
         <div class="random-item" ng-repeat="m in random.elements | filter:{poster:'!!'} |limitTo:displayablePoster">
             <a title="{{m | mediatitle}}" ng-click="setRandomFocus(m)">
-                <poster url="{{m.poster}}" size="THUMBS" alt="{{m.title}}"></poster>
+                <poster url="m.poster" size="THUMBS" alt="{{m.title}}"></poster>
             </a>
         </div>
         <div class="random-item more">
@@ -33,7 +33,7 @@
                 <img src="{{movieFocused.backdrops[0]}}?size=DISPLAY" class="pull-left" />
             </div>
             <div class="backdrops col-xs-5" ng-hide="movieFocused.backdrops[0]">
-                <img src="{{movieFocused.poster}}?size=DISPLAY" class="pull-left" />
+                <img src="movieFocused.poster?size=DISPLAY" class="pull-left" />
             </div>
 
             <div class="description col-xs-7">
@@ -66,7 +66,7 @@
 
             <div ng-repeat="recovery in inProgress" class="media">
                 <a ng-href="movie/{{recovery.mediaSummary.id}}" class="pull-left">
-                    <poster url="{{recovery.mediaSummary.poster}}" size="MINI" class="media-object"></poster>
+                    <poster url="recovery.mediaSummary.poster" size="MINI" class="media-object"></poster>
                 </a>
 
                 <div class="media-body">
@@ -96,7 +96,7 @@
                     <i class="close-cross" ng-click="setLastSelected(null)"></i>
 
                     <div class="poster">
-                        <poster url="{{m.poster}}" size="THUMBS" class="media-object"></poster>
+                        <poster url="m.poster" size="THUMBS" class="media-object"></poster>
                     </div>
                     <a class="last-title" ng-click="setLastSelected(m)" title="{{m | mediatitle}}">{{m |
                         mediatitle}}</a>
@@ -111,7 +111,7 @@
                             </button>
                             <a class="btn btn-xs" href="/movies/{{m.id}}"><i class="glyphicon glyphicon-info-sign"></i>
                                 Detail</a>
-                            <play-button media="m" btn-size="'xs'"></play-button>
+                            <play-button media="m" btn-size="xs"></play-button>
                         </div>
                     </div>
                 </li>

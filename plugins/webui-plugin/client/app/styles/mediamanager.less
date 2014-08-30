@@ -10,7 +10,7 @@ body {
   margin-bottom: 100px;
 }
 
-a {
+a, .link {
   cursor: pointer;
 }
 
@@ -427,22 +427,41 @@ form.media-search .genre {
   h1 {
     border-bottom: solid 1px black;
     text-align: center;
+
+    .btn-success {
+      margin-left: 40px;
+      font-weight: bold;
+      cursor: default;
+    }
   }
-  .span8 {
+
+  .details {
     margin-left: 0px;
 
-    h1, ul {
-      padding-left: 10px;
+    &.with-poster {
+      padding-left: 352px;
+    }
+
+    ul, p {
+      padding: 0px 30px;
     }
     ul {
-      margin-top: 15px;
+      list-style-type: none;
+      margin-top: 30px;
+    }
+
+    p {
+      text-align: justify;
     }
   }
 
   .title-date {
     font-size: 0.5em;
+    margin-right: 20px;
+    padding-top: 8px;
   }
   .actionsButton {
+    margin-top: 40px;
     text-align: center;
   }
   .tagline {
@@ -452,24 +471,39 @@ form.media-search .genre {
   }
   .poster {
     float: left;
-    max-width: 33%;
+    width: 352px; // 342 + 2x5
     border: solid 1px black;
     padding: 5px;
   }
-  .details {
-    //    float: left;
+
+  .cast {
+    border: solid 1px black;
+    padding-bottom: 20px;
+  }
+  .medias {
+    padding-right: 0px;
+    a > img {
+      margin: auto;
+      display: block;
+    }
+    h2 {
+      border-bottom: solid 1px black;
+    }
+  }
+  .profile {
+    &:extend(.col-sm-2);
+  }
+  .media-icon {
+    width: 45px;
+    img {
+      max-width: 100%;
+    }
   }
 
-  .crewList {
-    img {
-      width: 20%;
-    }
-    span.crew {
-      margin-top: 10px;
-    }
-    span.crewName {
-      padding-left: 10px;
-    }
+  // Carousel
+  .carousel {
+    width: 780px;
+    margin: auto;
   }
 }
 

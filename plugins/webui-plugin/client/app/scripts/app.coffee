@@ -10,16 +10,20 @@
 ###
 angular
 .module('mediamanager', [
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
-    'ngRoute',
-    'ngSanitize',
+    'ngAnimate'
+    'ngCookies'
+    'ngResource'
+    'ngRoute'
+    'ngSanitize'
     'ngTouch'
+#    'ui.bootstrap'
+#    'ui.bootstrap.carousel'
     'mediaServices'
+    'mediamanager.carousel'
   ])
 .config ($routeProvider, $locationProvider) ->
   $locationProvider.html5Mode true
+  $locationProvider.hashPrefix '!'
 
   $routeProvider
   .when '/',
