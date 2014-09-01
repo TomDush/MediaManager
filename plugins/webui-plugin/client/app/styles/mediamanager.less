@@ -235,9 +235,10 @@ tags {
 }
 
 // LAST MOVIES
-.last-movies {
-  ul {
-    list-style: disc;
+ul.last-movies {
+  @media (max-width: @screen-xs-max) {
+    padding: 0;
+    list-style-type: none;
   }
   li {
     position: relative;
@@ -297,6 +298,10 @@ tags {
     .border-left-radius(10px);
 
     &.no-poster {
+      .border-right-radius(10px);
+    }
+    @media (max-width: @screen-xs-max) {
+      // Poster is hidden on XS devices
       .border-right-radius(10px);
     }
 
@@ -425,8 +430,11 @@ form.media-search .genre {
 
 .sheet {
   h1 {
-    border-bottom: solid 1px black;
     text-align: center;
+    // Simple
+    @media (max-width: @screen-xs-max) {
+      margin: 5px;
+    }
 
     .btn-success {
       margin-left: 40px;
@@ -436,11 +444,6 @@ form.media-search .genre {
   }
 
   .details {
-    margin-left: 0px;
-
-    &.with-poster {
-      padding-left: 352px;
-    }
 
     ul, p {
       padding: 0px 30px;
@@ -469,25 +472,19 @@ form.media-search .genre {
     font-style: italic;
     text-align: center;
   }
-  .poster {
-    float: left;
-    width: 352px; // 342 + 2x5
-    border: solid 1px black;
-    padding: 5px;
-  }
 
   .cast {
-    border: solid 1px black;
     padding-bottom: 20px;
   }
   .medias {
     padding-right: 0px;
+
     a > img {
       margin: auto;
       display: block;
     }
-    h2 {
-      border-bottom: solid 1px black;
+    .carousel, a, img {
+      max-width: 98%;
     }
   }
   .profile {
@@ -504,6 +501,50 @@ form.media-search .genre {
   .carousel {
     width: 780px;
     margin: auto;
+  }
+
+  // ** Line and box design - medium device
+  @media (min-width: @screen-sm-min) {
+    h1 {
+      border-bottom: solid 1px black;
+    }
+
+    .details {
+      margin-left: 0px;
+
+      &.with-poster {
+        padding-left: 352px;
+      }
+    }
+
+    .poster {
+      float: left;
+      width: 352px; // 342 + 2x5
+      border: solid 1px black;
+      padding: 5px;
+    }
+  }
+  // ** Line and box design - small device
+  @media (min-width: @screen-md-min) {
+
+    .cast {
+      border: solid 1px black;
+    }
+
+    .medias {
+      h2 {
+        border-bottom: solid 1px black;
+        margin-left: -15px;
+        padding-left: 15px;
+      }
+    }
+  }
+  // ** Specific XS device: all in column
+  @media (max-width: @screen-xs-max) {
+    .poster img {
+      margin: 5px 0.5%;
+      width: 99%;
+    }
   }
 }
 

@@ -61,8 +61,8 @@
 
     <div class="row">
         <!-- In progress movies -->
-        <div class="col-md-4" ng-show="inProgress.length">
-            <h2>In Progress</h2>
+        <div class="col-sm-4" ng-show="inProgress.length">
+        <h2>In Progress</h2>
 
             <div ng-repeat="recovery in inProgress" class="media">
                 <a ng-href="movie/{{recovery.mediaSummary.id}}" class="pull-left">
@@ -87,7 +87,7 @@
         </div>
 
         <!-- Last elements -->
-        <div class="col-md-4" ng-show="lastMovies.elements.length">
+        <div class="col-sm-4" ng-show="lastMovies.elements.length">
             <h2>Last {{lastMovies.elements.length}} unseen movies</h2>
 
             <ul class="last-movies">
@@ -95,14 +95,14 @@
                     ng-class="{'selected': isLastSelected(m), 'no-poster': hasPoster(m)}">
                     <i class="close-cross" ng-click="setLastSelected(null)"></i>
 
-                    <div class="poster">
-                        <poster url="m.poster" size="THUMBS" class="media-object"></poster>
+                    <div class="poster hidden-xs">
+                    <poster url="m.poster" size="THUMBS" class="media-object"></poster>
                     </div>
                     <a class="last-title" ng-click="setLastSelected(m)" title="{{m | mediatitle}}">{{m |
                         mediatitle}}</a>
 
-                    <div class="details"> <!--ng-show="isLastSelected(m)"-->
-                        <tags media="m"></tags>
+                    <div class="details">
+                    <tags media="m"></tags>
                         <p class="tagline"> {{m.tagline}}</p>
 
                         <div class="text-center">
