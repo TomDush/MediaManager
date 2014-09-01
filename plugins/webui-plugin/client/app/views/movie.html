@@ -6,14 +6,18 @@
 </div>
 
 <div class="container-fluid sheet" ng-show="movie.title">
+    <div class="row visible-xs">
+        <h1>{{movie | mediatitle}}</h1>
+        <tags media="movie"></tags>
+    </div>
     <div class="row">
         <poster class="poster" url="movie.poster" size="DISPLAY" alt="{{m.title}}" ng-show="movie.poster"></poster>
         <div class="details" ng-class="{'with-poster': movie.poster}">
-            <h1>
-                <span class="pull-right title-date">{{movie.release |date:'dd/MM/yyyy'}}</span> <span
+            <h1 class="hidden-xs">
+            <span class="pull-right title-date">{{movie.release |date:'dd/MM/yyyy'}}</span> <span
                     class="pull-left btn btn-success" ng-hide="movie.seen">NEW</span> {{movie.title}} </h1>
 
-            <tags media="movie"></tags>
+            <tags media="movie" class="hidden-xs"></tags>
 
             <ul class="unstyled">
                 <li>
@@ -68,24 +72,12 @@
     <div class="row">
 
 
-        <div class="col-md-8 medias">
-            <h2>Medias</h2>
-            <carousel-bs ng-show="movie.backdrops && movie.backdrops.length > 1">
-                <slide-bs ng-repeat="backdrop in movie.backdrops">
-                    <a href="/{{backdrop}}?size=ORIGINAL" target="_blanc"><img ng-src="/{{backdrop}}?size=MINI"></a>
-                </slide-bs>
-            </carousel-bs>
-
-            <a href="/{{movie.backdrops[0]}}?size=ORIGINAL" target="_blanc"><img
-                    ng-src="/{{movie.backdrops[0]}}?size=MINI" ng-show="movie.backdrops.length == 1"></a>
-        </div>
-
-        <div class="col-md-4 cast">
+        <div class="cast col-md-4 col-md-push-8">
             <h2>Cast</h2>
 
             <!-- Idea: on click, open in big size portrait and get where this actor played -->
-            <div class="media" ng-repeat="c in movie.mainActors">
-                <div class="media-icon pull-left">
+            <div class="media col-sm-6 col-md-12" ng-repeat-start="c in movie.mainActors">
+            <div class="media-icon pull-left">
                     <img ng-src="/{{resolveProfile(c.picture)}}?size=MINI" err-src="{{noProfile}}" alt="{{c.name}}" />
                 </div>
 
@@ -96,6 +88,21 @@
                     <p ng-show="c.character">As {{c.character}}</p>
                 </div>
             </div>
+            <div class="clearfix" ng-repeat-end
+                 ng-class="{'visible-sm': $index % 2 != 0, 'hidden': $index % 2 == 0}"></div>
+        </div>
+        <div class="clearfix visible-sm"></div>
+
+        <div class="medias col-md-8 col-md-pull-4">
+            <h2>Medias</h2>
+            <carousel-bs ng-show="movie.backdrops && movie.backdrops.length > 1">
+                <slide-bs ng-repeat="backdrop in movie.backdrops">
+                    <a href="/{{backdrop}}?size=ORIGINAL" target="_blanc"><img ng-src="/{{backdrop}}?size=MINI"></a>
+                </slide-bs>
+            </carousel-bs>
+
+            <a href="/{{movie.backdrops[0]}}?size=ORIGINAL" target="_blanc"><img
+                    ng-src="/{{movie.backdrops[0]}}?size=MINI" ng-show="movie.backdrops.length == 1"></a>
         </div>
     </div>
 
