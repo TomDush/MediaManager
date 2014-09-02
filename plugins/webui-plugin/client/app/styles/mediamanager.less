@@ -18,7 +18,9 @@ a, .link {
   margin-top: 60px;
 }
 
+/**********/
 /* HEADER */
+/**********/
 .navbar-brand {
   font-variant: small-caps;
 
@@ -50,7 +52,9 @@ tags {
 
 }
 
+/*************/
 /* HOME PAGE */
+/*************/
 .homeheader {
   &:extend(.jumbotron);
   &:extend(.hidden-xs);
@@ -356,42 +360,6 @@ ul.last-movies {
   white-space: nowrap;
 }
 
-/* MEDIA SEARCH */
-form.media-search .genre {
-  width: 40%;
-  margin-left: 10px;
-}
-
-.check-control {
-  text-align: right;
-}
-
-.check-control i {
-  cursor: pointer;
-}
-
-/* MEDIA LIST */
-//.media-icon {
-//  width: 10%;
-//  cursor: pointer;
-//}
-//
-//.media-body {
-//  cursor: pointer;
-//}
-//
-//.media-body-without-poster {
-//  margin-left: 10%;
-//}
-
-.pagination {
-  text-align: center;
-}
-
-.pagination a {
-  cursor: pointer;
-}
-
 /**************/
 /* MEDIA VIEW */
 /**************/
@@ -546,6 +514,173 @@ form.media-search .genre {
       width: 99%;
     }
   }
+}
+
+/*****************/
+/* SETTINGS PAGE */
+/*****************/
+
+@settings-width: 150px;
+@link-height: 60px;
+.settings-nav {
+  // Position
+  position: absolute;
+  top: 50px;
+  width: @settings-width;
+
+  padding: 0px;
+
+  // Color and Background
+  color: @gray-lighter;
+  font-weight: bold;
+  background: linear-gradient(to bottom, #555f66 0, #22252c 100%);
+  .border-bottom-radius(5px);
+
+  ul {
+    width: @settings-width - 10px;
+    padding: 5px 0px;
+    margin: 5px 0px 0px 10px;
+
+    text-align: center;
+    color: rgb(51, 51, 51);
+
+    list-style-type: none;
+
+    background: rgba(255, 255, 255, 0.2) none scroll;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border-top: 1px solid rgb(170, 170, 170);
+    border-bottom: 1px solid rgb(85, 85, 85);
+    border-left: 1px solid rgb(136, 136, 136);
+    box-shadow: rgba(0, 0, 0, 0.498039) -1px 3px 10px 0px;
+  }
+
+  li {
+    width: @settings-width - 15px;
+    margin: -1px 0px 0px 3px;
+    padding: 5px 0px;
+
+    height: @link-height + 10px;
+    line-height: @link-height - 5px;
+
+    text-align: center;
+
+    &.active {
+      background: rgba(255, 255, 255, 0.498039) none scroll;
+      border-bottom-left-radius: 5px;
+      border-top-left-radius: 5px;
+      border-top: 1px solid rgb(221, 221, 221);
+      box-shadow: rgba(0, 0, 0, 0.498039) 0px 2px 5px 0px;
+    }
+  }
+
+  a {
+    width: @settings-width - 25px;
+    margin: -1px 7px 1px 5px;
+    padding: 0px;
+
+    display: block;
+    height: @link-height;
+
+    color: rgb(221, 221, 221);
+    text-shadow: rgb(0, 0, 0) 0px -1px 2px;
+
+    background: rgb(0, 0, 0) none scroll;
+    border-radius: 5px;
+    border: 1px solid rgb(0, 0, 0);
+    box-shadow: rgba(195, 225, 255, 0.4) 0px -5px 70px 10px inset, rgba(0, 0, 0, 0.670588) 0px 1px 5px 0px;
+  }
+
+  //  a {
+  //    color: @gray-lighter;
+  //
+  //    background: #000;
+  //    box-shadow: inset 0 -5px 70px 10px rgba(195,225,255,.4),0 1px 5px rgba(0,0,0,.67);
+  //    border: 1px solid #000;
+  //
+  //    display: block;
+  //    width: 5em;
+  //    text-shadow: 0 -1px 2px #000;
+  //    float: none;
+  //    min-height: 5em;
+  //    margin: -1px 7px 1px 5px;
+  //    border-radius: 5px;
+  //    box-shadow: 0 2px 15px 1px rgba(0,0,0,.67);
+  //    text-decoration: none;
+  //    border: 1px solid #222;
+  //    border-top: 1px solid #333;
+  //    border-bottom: 1px solid #000;
+  //  }
+  //
+  //  li, a {
+  //    width: 100%;
+  //    margin: 0px;
+  //  }
+  //  .nav {
+  //    a {
+  //      padding-left: 30px;
+  //    }
+  //
+  //    a:hover, a:active, .active > a:hover {
+  //      background-color: @gray;
+  ////      color: black;
+  //    }
+  //
+  //    .active {
+  //      a {
+  //        background: @gray-dark;
+  //      }
+  //    }
+  //  }
+}
+
+.settings-content {
+  padding-left: @settings-width + 10px;
+
+  th.icons {
+    width: 70px;
+  }
+}
+
+.settings-ctrl {
+  margin: 20px 0px;
+  text-align: center;
+}
+
+/* MEDIA SEARCH */
+form.media-search .genre {
+  width: 40%;
+  margin-left: 10px;
+}
+
+.check-control {
+  text-align: right;
+}
+
+.check-control i {
+  cursor: pointer;
+}
+
+/* MEDIA LIST */
+//.media-icon {
+//  width: 10%;
+//  cursor: pointer;
+//}
+//
+//.media-body {
+//  cursor: pointer;
+//}
+//
+//.media-body-without-poster {
+//  margin-left: 10%;
+//}
+
+.pagination {
+  text-align: center;
+}
+
+.pagination a {
+  cursor: pointer;
 }
 
 /* PLAYER */

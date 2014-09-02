@@ -1,0 +1,110 @@
+<div foobar></div>
+<div class="settings-nav col-sm-3" full-height>
+    <ul>
+        <li ng-class="{active: tab == t.id}" ng-repeat="t in tabs">
+            <a ng-click="setTab(t.id)">{{t.name}}</a>
+        </li>
+    </ul>
+
+</div>
+
+<div class="settings-content container-fluid">
+    <div class="row" ng-show="tab == 'repo'">
+        <div class="col-xs-12">
+            <h1>Repositories</h1>
+
+            <div class="settings-ctrl">
+                <div class="btn-group">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#edit-directory"
+                            ng-click="setNewDirectory()">
+                        <i class="glyphicon glyphicon-plus"></i> New repository
+                    </button>
+                    <button class="btn btn-default"><i class="glyphicon glyphicon-refresh"></i> Refresh all</button>
+                </div>
+            </div>
+            <table class="table table-striped table-bordered table-bordered table-hover table-condensed">
+                <tr>
+                    <th class="icons"></th>
+                    <th>Name</th>
+                    <th>Refreshed</th>
+                    <th>Type</th>
+                    <th>Lang</th>
+                </tr>
+                <tbody>
+                <tr ng-repeat="d in directories | orderBy:'name'">
+                    <td>
+                        <i class="glyphicon glyphicon-edit link" ng-click="setDirectory(d)" data-toggle="modal"
+                           data-target="#edit-directory"></i>
+                        <i class="glyphicon glyphicon-remove"></i>
+                        <i class="glyphicon glyphicon-refresh"></i>
+                    </td>
+                    <td>
+                        <span class="pull-right badge">{{d.size}}</span>
+                        {{d.name}}
+                    </td>
+                    <td>{{d.lastRefresh | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td><span ng-bind-html="d.mediaType | mediaType:types"></span></td>
+                    <td>{{d.lang}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row" ng-show="tab == 'param'">
+        <div class="col-xs-12">
+            <h1>Parameters</h1>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL WINDOW -->
+<div id="edit-directory" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4>{{directory.name}}</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="name" class="col-sm-2 control-label">Name</label>
+
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="name" ng-model="directory.name"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lang" class="col-sm-2 control-label">Lang</label>
+
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="lang" ng-model="directory.lang"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Type</label>
+
+                        <div class="col-sm-10">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <span ng-bind-html="directory.mediaType | mediaType:types"></span>
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li ng-repeat="t in types" ng-click="directory.mediaType = t.value" ng-class="link">
+                                        <i ng-class="getIconClass(t.icon)"></i> {{t.name}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" ng-click="saveUpdate()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

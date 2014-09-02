@@ -104,6 +104,59 @@ angular.module('mediamanager')
       type: recovery.mediaSummary.mediaType
       mediaId: recovery.mediaSummary.id
 
+.controller 'SettingsCtrl', ($scope, $route, $rootScope, $location, $routeParams, RootDirectory) ->
+  $scope.tabs = [
+    {id: 'repo', name: 'Repositories'}
+    {id: 'param', name: 'Parameters'}
+  ]
+  $scope.types = [
+    {value: 'MOVIES', icon: 'film', name: 'Movies'}
+    {value: 'SHOWS', icon: 'camera', name: 'Shows'}
+  ]
+
+  # Control URL for sub-page
+  lastRoute = $route.current;
+  $scope.$on '$locationChangeSuccess', ->
+    console.log "Change location from " + $route.current.$$route.controller
+    if $route.current.$$route.controller == 'SettingsCtrl'
+      $route.current = lastRoute
+
+  $scope.$watch 'tab', (newTab) ->
+    console.log "New tab=#{newTab}"
+    $location.url "/settings/#{newTab}"
+
+  # Default tab
+  ids = $scope.tabs.map (e) ->
+    e.id
+  $scope.tab = if $routeParams.tab? && $routeParams.tab in ids then $routeParams.tab else 'repo'
+
+  $scope.setTab = (t) ->
+    $scope.tab = t
+
+  # Loading data
+  $scope.directories = RootDirectory.list()
+
+  ## Control on selected directory
+  $scope.setDirectory = (dir) ->
+    $scope.directory = angular.copy dir
+    $scope.directory.orig = dir
+
+  $scope.setNewDirectory = ->
+    $scope.directory =
+      name: 'New Directory'
+      mediaType: $scope.types[0].value
+
+  $scope.getIconClass = (icon) ->
+    return "glyphicon glyphicon-#{icon}"
+
+  $scope.saveUpdate = ->
+    # Call back of successful update on server
+    if $scope.directory.orig
+      angular.copy  $scope.directory, $scope.directory.orig
+    else
+      $scope.directories.push $scope.directory
+
+
 
 ## UTILITIES
 mergeObjs = (obj1, obj2) ->

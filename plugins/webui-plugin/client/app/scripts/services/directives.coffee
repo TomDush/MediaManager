@@ -127,32 +127,6 @@ angular.module('mediamanager')
     $scope.poster = ->
       if $scope.url? then $scope.url else $scope.noPoster
 ]
-#.directive 'poster', ['$interval', 'dateFilter', ($interval, dateFilter) ->
-#  # return
-#  restrict: 'E'
-#  template: '<img ng-src="/{{poster(url, size}}?size={{size}}" err-src="{{noPoster}}" />'
-#  scope:
-#    url: '='
-#    size: '='
-#    noPoster: (size) ->
-#      width = 185
-#      if size == "MINI"
-#        width = 92
-#      else if size == "DISPLAY"
-#        width = 342
-#
-#      "/img/no-poster-w#{width}.jpg"
-#
-#    poster: (url, size) ->
-#      console.log "URl=#{url}"
-#      #    scope.size = attrs.size
-#
-#      # If poster isn't defined
-#      width = if scope.size == "MINI" then "92" else "185"
-#
-#      # Poster url
-#      scope.poster = if scope.url? then scope.url else scope.noPoster
-
 
 .directive 'checkList', ->
   #return
@@ -184,12 +158,13 @@ angular.module('mediamanager')
     updateProgression = ->
       scope.progression = Math.round(100 * scope.position / scope.length);
 
-    scope.$watch attrs.position, (value) ->
-      scope.position = value;
-      updateProgression()
+      # TODO Reenable this...
+#    scope.$watch attrs.position, (value) ->
+#      scope.position = value;
+#      updateProgression()
 
-    scope.$watch attrs.player, (value) ->
-      scope.player = value
+#    scope.$watch attrs.player, (value) ->
+#      scope.player = value
 
     # Set values from attributes
     scope.length = attrs.length;
@@ -209,6 +184,14 @@ angular.module('mediamanager')
               aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
     '</div>'
   }
+
+.directive 'fullHeight', ($window) ->
+  link: (scope, element, attr) ->
+    # TODO Watch window size
+#    scope.$watch $window.innerHeight, (height) ->
+#      console.log "Watch new height: #{height}"
+    element.css 'height', "#{$window.innerHeight - 50}px"
+
 
 .filter 'rate', ($filter) ->
   (input, votes) ->
@@ -238,3 +221,17 @@ angular.module('mediamanager')
       "#{hours input}#{minutes input, input > 3600}#{sec}"
     else
       ""
+
+
+.filter 'mediaType', ->
+  (input, types) ->
+    console.log "Input=#{input} and Types : " + JSON.stringify types
+    type = null
+    for t in types
+      if t.value == input
+        type = t
+
+    if type?
+      "<i class='glyphicon glyphicon-#{type.icon}'></i> #{type.name}"
+    else
+      input

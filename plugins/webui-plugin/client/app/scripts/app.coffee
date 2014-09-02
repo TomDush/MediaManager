@@ -19,6 +19,7 @@ angular
 #    'ui.bootstrap'
 #    'ui.bootstrap.carousel'
     'mediaServices'
+    'mediamanager.services.settings'
     'mediamanager.carousel'
   ])
 .config ($routeProvider, $locationProvider) ->
@@ -29,12 +30,18 @@ angular
   .when '/',
     templateUrl: 'views/home.html'
     controller: 'HomeCtrl'
+
+  .when '/settings/:tab?',
+    templateUrl: '/views/settings.html'
+    controller: 'SettingsCtrl'
+
   .when '/movies',
     templateUrl: 'views/medias.html'
     controller: 'HomeCtrl'
   .when '/movies/:movieId',
     templateUrl: '/views/movie.html'
     controller: 'MovieCtrl'
+
   .otherwise
       redirectTo: '/'
 
