@@ -90,11 +90,11 @@ angular.module('mediamanager')
   $scope.isLastSelected = (m) ->
     $scope.lastSelected == m?.id
   $scope.hasPoster = (m) ->
-    ! m.poster?
+    !m.poster?
 
   # Last movies - identification
   $scope.isNotIdentified = (m) ->
-    ! (m.poster? || m.release? || m.overview?)
+    !(m.poster? || m.release? || m.overview?)
 
   # In progress and restart action
   $scope.inProgress = Media.inProgress()
@@ -110,8 +110,8 @@ angular.module('mediamanager')
     {id: 'param', name: 'Parameters'}
   ]
   $scope.types = [
-    {value: 'MOVIES', icon: 'film', name: 'Movies'}
-    {value: 'SHOWS', icon: 'camera', name: 'Shows'}
+    {value: 'MOVIE', icon: 'film', name: 'Movies'}
+    {value: 'SHOW', icon: 'camera', name: 'Shows'}
   ]
 
   # Control URL for sub-page
@@ -152,10 +152,34 @@ angular.module('mediamanager')
   $scope.saveUpdate = ->
     # Call back of successful update on server
     if $scope.directory.orig
-      angular.copy  $scope.directory, $scope.directory.orig
+      angular.copy $scope.directory, $scope.directory.orig
     else
       $scope.directories.push $scope.directory
 
+  # Control modal
+  $scope.showPaths = ->
+    $scope.showPathsTree = true
+  $scope.removePath = (dir, path) ->
+    dir.paths = dir.paths.filter (e) ->
+      e != path
+
+  $scope.onTreeSelect = (branch) ->
+    console.log "Selected: #{branch}"
+  $scope.tree = [
+    {
+      label: 'Hello <b>Pwet</b>'
+      onSelect: (branch) ->
+        console.log "Click on #{branch}"
+      children: [
+        {
+          label: 'Konkon'
+        }
+        {
+          label: 'Foobar'
+        }
+      ]
+    }
+  ]
 
 
 ## UTILITIES

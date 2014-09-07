@@ -635,10 +635,57 @@ ul.last-movies {
 }
 
 .settings-content {
-  padding-left: @settings-width + 10px;
+  @media (min-width: @screen-sm-min) {
+    padding-left: @settings-width + 10px;
+  }
 
-  th.icons {
+  .icons {
     width: 70px;
+    @media (max-width: @screen-sm-max) {
+      // Bigger icons for mobile devices
+      font-size: 1.3em;
+      width: 100px;
+
+      .glyphicon {
+        padding-left: 5px;
+      }
+    }
+  }
+
+}
+
+#edit-directory {
+  .lang-group {
+    @media (min-width: @screen-sm-min) {
+      margin-left: 50px;
+    }
+    input {
+      width: 60px;
+    }
+  }
+
+  .file-tree {
+    background-color: @gray-lighter;
+    border-radius: 5px;
+    border: solid 1px @gray-dark;
+
+    .indication {
+      font-size: 0.8em;
+      font-style: italic;
+      color: @gray-light;
+      text-align: center;
+    }
+  }
+
+  // Special layout for XS devices (phone)
+  @media (max-width: @screen-xs-max) {
+    .name-group {
+      .make-xs-column(7);
+    }
+
+    .lang-group {
+      .make-xs-column(1);
+    }
   }
 }
 

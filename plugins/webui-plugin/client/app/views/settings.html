@@ -1,6 +1,6 @@
 <div foobar></div>
-<div class="settings-nav col-sm-3" full-height>
-    <ul>
+<div class="settings-nav col-sm-3 hidden-xs" full-height>
+<ul>
         <li ng-class="{active: tab == t.id}" ng-repeat="t in tabs">
             <a ng-click="setTab(t.id)">{{t.name}}</a>
         </li>
@@ -26,28 +26,28 @@
                 <tr>
                     <th class="icons"></th>
                     <th>Name</th>
-                    <th>Refreshed</th>
-                    <th>Type</th>
+                    <th class="hidden-xs">Refreshed</th>
+                    <th><span class="hidden-xs">Type</span></th>
                     <th>Lang</th>
                 </tr>
                 <tbody>
                 <tr ng-repeat="d in directories | orderBy:'name'">
-                    <td>
+                    <td class="icons">
                         <i class="glyphicon glyphicon-edit link" ng-click="setDirectory(d)" data-toggle="modal"
-                           data-target="#edit-directory"></i>
-                        <i class="glyphicon glyphicon-remove"></i>
-                        <i class="glyphicon glyphicon-refresh"></i>
+                           data-target="#edit-directory"></i> <i class="glyphicon glyphicon-remove"></i> <i
+                            class="glyphicon glyphicon-refresh"></i>
                     </td>
                     <td>
-                        <span class="pull-right badge">{{d.size}}</span>
-                        {{d.name}}
+                        <span class="pull-right badge" ng-show="d.size">{{d.size}}</span> {{d.name}}
                     </td>
-                    <td>{{d.lastRefresh | date:'dd/MM/yyyy HH:mm'}}</td>
+                    <td class="hidden-xs">{{d.lastRefresh | date:'dd/MM/yyyy HH:mm'}}</td>
                     <td><span ng-bind-html="d.mediaType | mediaType:types"></span></td>
                     <td>{{d.lang}}</td>
                 </tr>
                 </tbody>
             </table>
+
+            <!--<file-tree roots="['/mnt/local/data', '/mnt/remote/server']"></file-tree>-->
         </div>
     </div>
     <div class="row" ng-show="tab == 'param'">
@@ -64,47 +64,72 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span>
                 </button>
-                <h4>{{directory.name}}</h4>
+                <h3>{{directory.name}}</h3>
             </div>
-            <div class="modal-body">
-                <form class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <label for="name" class="col-sm-2 control-label">Name</label>
-
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="name" ng-model="directory.name"/>
+            <div class="modal-body container-fluid">
+                <form class="form-inline" role="form">
+                    <div class="form-group pull-right type-group">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span ng-bind-html="directory.mediaType | mediaType:types"></span> <span
+                                    class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-repeat="t in types" ng-click="directory.mediaType = t.value" ng-class="link">
+                                    <i ng-class="getIconClass(t.icon)"></i> {{t.name}} </li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="lang" class="col-sm-2 control-label">Lang</label>
-
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="lang" ng-model="directory.lang"/>
-                        </div>
+                    <div class="form-group name-group">
+                        <input type="text" class="form-control" id="name" placeholder="Name" ng-model="directory.name"
+                               placeholder="Name" />
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">Type</label>
-
-                        <div class="col-sm-10">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                    <span ng-bind-html="directory.mediaType | mediaType:types"></span>
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li ng-repeat="t in types" ng-click="directory.mediaType = t.value" ng-class="link">
-                                        <i ng-class="getIconClass(t.icon)"></i> {{t.name}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="form-group lang-group">
+                        <label for="lang" class="control-label hidden-xs">Lang: </label> <input type="text"
+                                                                                                class="form-control"
+                                                                                                id="lang"
+                                                                                                placeholder="Lang"
+                                                                                                ng-model="directory.lang" />
                     </div>
                 </form>
+
+                <div class="clearfix"></div>
+
+                <h6>
+                <button class="btn btn-success pull-right" ng-click="showPaths()"><i
+                            class="glyphicon glyphicon-plus"></i></button>
+                    Paths
+                </h6>
+                <table class="table">
+                    <tbody>
+                    <tr ng-repeat="p in directory.paths">
+                        <td class="icons"><i class="glyphicon glyphicon-remove link"
+                                             ng-click="removePath(directory, p)"></i></td>
+                        <td>{{p}}</td>
+                    </tr>
+                    <tr class="text-center" ng-show="!directory.paths || directory.paths.length == 0">
+                        <td colspan="2">No paths selected</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div ng-show="showPathsTree">
+                    <file-tree roots="directory.paths"></file-tree>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" ng-click="saveUpdate()">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" ng-click="saveUpdate()" data-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- TODO List Directories and files --><!--
+- Add remote & online on directories
+- Add options 'Delete - Mark as delete' and 'Copy on/delete from local' on movies
+- Add 'Favorite (files)' and 'Deletion page' in settings -> multi select for favorites, 'Delete all' in red for deletion
+- Add 'local' in VideoFile with the same video, on local -> don't appear twice everywhere
+- Add 'isRemote' field to media files => means it's on remote repository, save this field when scanning
+- Add 'Files' in primary nav bar - list only favorite folders, offer 'copy to repository' and 'play' actions
+
+-->
