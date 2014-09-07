@@ -21,6 +21,7 @@ angular
     'mediaServices'
     'mediamanager.services.settings'
     'mediamanager.carousel'
+    'angularBootstrapNavTree'
   ])
 .config ($routeProvider, $locationProvider) ->
   $locationProvider.html5Mode true

@@ -121,7 +121,7 @@ angular.module('mediamanager')
   link: ($scope) ->
     # If poster isn't defined
     width = if $scope.size == "MINI" then "92" else "185"
-    $scope.noPoster = "img/no-poster-w#{width}.jpg"
+    $scope.noPoster = "/img/no-poster-w#{width}.jpg"
 
     # Poster url
     $scope.poster = ->
@@ -158,13 +158,13 @@ angular.module('mediamanager')
     updateProgression = ->
       scope.progression = Math.round(100 * scope.position / scope.length);
 
-      # TODO Reenable this...
-#    scope.$watch attrs.position, (value) ->
-#      scope.position = value;
-#      updateProgression()
+    # TODO Reenable this...
+    #    scope.$watch attrs.position, (value) ->
+    #      scope.position = value;
+    #      updateProgression()
 
-#    scope.$watch attrs.player, (value) ->
-#      scope.player = value
+    #    scope.$watch attrs.player, (value) ->
+    #      scope.player = value
 
     # Set values from attributes
     scope.length = attrs.length;
@@ -181,7 +181,7 @@ angular.module('mediamanager')
   template: '<div class="progress" ng-show="status.length">' +
 #    '       <span style="position:absolute">{{status.position | time}} / {{status.length | time}}</span>' +
     '<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" style="width: {{status.position | progress:status.length}}%;"
-              aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
+                                  aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
     '</div>'
   }
 
@@ -191,6 +191,203 @@ angular.module('mediamanager')
 #    scope.$watch $window.innerHeight, (height) ->
 #      console.log "Watch new height: #{height}"
     element.css 'height', "#{$window.innerHeight - 50}px"
+
+# File and dir tree
+.directive 'fileTree', (Paths) ->
+  restrict: 'E'
+  scope:
+    roots: '='
+    callBack: '='
+    files: '@' # show files
+  templateUrl: '/views/directives/filetree.html'
+  controller: ($scope) ->
+    # Tree controls
+    $scope.selected = null
+    $scope.select = (elem) ->
+      if !elem.data?.metadata
+        console.log "Element #{elem.data.path} has been selected"
+        $scope.selected = elem
+    $scope.valid = ->
+      if $scope.selected? && $scope.callBack?
+        $scope.callBack $scope.selected
+
+    $scope.expendLevel = 0
+
+    ###
+    Tree feeding
+    ###
+
+    #
+    # Convert element to UI model
+    #
+    createNode = (elem, path) ->
+      node =
+        label: elem.name
+        children: []
+        data:
+          path: path
+          lazy: elem.lazy
+
+      node
+
+    #
+    # Add element to it's parent node, use the one already existing if any
+    #
+    addElement = (parent, child, parentPath) ->
+      path = "#{parentPath}/#{child.name}"
+
+      if !parent.children
+        parent.children = []
+
+      node = findInTree parent.children, child.name
+      if !node
+        # Node not found, create it
+        node = createNode child, path
+        parent.children.push node
+
+        # If Lazy -> special behavior to load data
+        if child.lazy
+          node.children.push
+            label: 'loading....'
+            treeIcon: (b) ->
+              "glyphicon glyphicon-info-sign"
+            data:
+              metadata: true
+
+          # TODO Manage empty directory in non-lazy condition
+          node.onSelect = (node) ->
+            mergeTree Paths.list([node.data.path], 3), $scope.tree
+            # remove metadata...
+            node.children = node.children.filter (n) ->
+              !n.data.metadata
+            # Add 'empty' indicator if empty
+            if node.children?.length == 0
+              node.children.push
+                label: " empty "
+                treeIcon: (b) ->
+                  "glyphicon glyphicon-info-sign"
+                data:
+                  metadata: true
+
+      else
+        # Clean node if from its lazy behavior
+        if node.data?.notInitialised
+          delete node.treeIcon
+          delete node.onSelect
+        if node.data?.lazy && !child.lazy
+          # Not lazy anymore -> remove metadata and specia behavior
+          delete node.onSelect
+          node.children = node.children.filter (n) ->
+            !n.data.metadata
+
+      # Add children
+      if child.children?.length
+        for c in child.children
+          addElement node, c, path
+
+
+    #
+    # Find node based on it's label
+    #
+    findInTree = (tree, nodeLabel) ->
+      node = null
+      for e in tree
+        if e.label == nodeLabel
+          node = e
+
+      node
+
+    #
+    # Merge result from REST service to existing tree
+    #
+    mergeTree = (serverTree, tree = []) ->
+      for elem in serverTree
+        if elem.name.substring(1).indexOf('/') > -1
+          # If root is a path and not single folder, split it to 'lazy above nodes'
+          lastNode = null
+          fullPath = ""
+
+          # For each part of path, create a 'lazy above node'
+          split = elem.name.split '/'
+          for i in [0..split.length - 2]
+            p = split[i]
+            label = p
+            if !!p
+              fullPath += "/#{p}"
+            else
+              label = '/'
+              fullPath = ""
+
+            # Try to find this node is existing tree
+            treeToMerge = if lastNode?.children then lastNode.children else tree
+            node = findInTree treeToMerge, label
+
+            if !node?
+              # If it doesn't exist, create it
+              node =
+                label: label
+                children: []
+                data:
+                  path: fullPath
+                  notInitialised: true
+                treeIcon: (branch) ->
+                  "glyphicon glyphicon-folder-close"
+                onSelect: (node) ->
+                  mergeTree [Paths.above elem.fullname], tree
+              #                  delete node.treeIcon
+
+              if lastNode?
+                lastNode.children.push node
+              else
+                tree.push node
+
+            lastNode = node
+
+          # Then, add the last element as classical element with its children - warn, name is changed!
+          elem.fullname = elem.name
+          elem.name = split[split.length - 1]
+          addElement lastNode, elem, fullPath
+
+        else
+          # We have full detail
+          fakeParent =
+            children: tree
+          addElement fakeParent, elem, ""
+
+      tree
+
+    ###
+    Initial load
+    ###
+    $scope.tree = []
+
+    #
+    # Update tree when roots are changed
+    #
+    $scope.$watch 'roots', (roots, oldRoots) ->
+      console.log "Roots changed from #{JSON.stringify oldRoots} to #{JSON.stringify roots}"
+      if roots?
+        oldRoots ?= []
+        newRoots = []
+        for r in roots
+          if r not in oldRoots
+            newRoots.push r
+
+        if newRoots.length > 0
+          # Load tree
+          mergeTree Paths.list(newRoots, 3), $scope.tree
+
+          # Expends tree to the shorter path
+          for root in $scope.roots
+            prevList = $scope.tree
+            for nodeName in root.split('/')
+              if prevList?
+                nodeName = if !!nodeName then nodeName else '/'
+                node = findInTree prevList, nodeName
+                prevList = node?.children
+                node?.expanded = true
+      else
+        $scope.tree = []
 
 
 .filter 'rate', ($filter) ->
@@ -225,13 +422,12 @@ angular.module('mediamanager')
 
 .filter 'mediaType', ->
   (input, types) ->
-    console.log "Input=#{input} and Types : " + JSON.stringify types
     type = null
     for t in types
       if t.value == input
         type = t
 
     if type?
-      "<i class='glyphicon glyphicon-#{type.icon}'></i> #{type.name}"
+      "<i class='glyphicon glyphicon-#{type.icon}' title='#{type.name}'></i> <span class='hidden-xs'>#{type.name}</span>"
     else
       input
