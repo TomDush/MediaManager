@@ -134,55 +134,96 @@ angular.module('mediamanager')
     $scope.tab = t
 
   # Loading data
-  $scope.directories = RootDirectory.list()
+  $scope.directories = RootDirectory.query()
+
+  ###
+  Directories Controller
+  ###
 
   ## Control on selected directory
   $scope.setDirectory = (dir) ->
     $scope.directory = angular.copy dir
     $scope.directory.orig = dir
+    $scope.treePaths = if $scope.directory.paths?.length > 0 then $scope.directory.paths else []
+    $scope.showTree = false
 
   $scope.setNewDirectory = ->
+    $scope.treePaths = []
+    $scope.showTree = false
     $scope.directory =
       name: 'New Directory'
       mediaType: $scope.types[0].value
 
+  $scope.setToDelete = (dir) ->
+    $scope.toDelete = dir
+
   $scope.getIconClass = (icon) ->
     return "glyphicon glyphicon-#{icon}"
 
+  # Save directory
   $scope.saveUpdate = ->
-    # Call back of successful update on server
-    if $scope.directory.orig
-      angular.copy $scope.directory, $scope.directory.orig
-    else
-      $scope.directories.push $scope.directory
+    return if not !!$scope.directory.name
 
-  # Control modal
+    updated = $scope.directory
+    while updated.name.indexOf(',') >= 0
+      updated.name = updated.name.replace /\,/, ''
+
+    # We must notify server when the name has changed
+    if updated.orig && updated.name != updated.orig.name
+      updated.oldName = updated.orig.name
+
+    # Call server
+    orig = updated.orig
+    delete updated.orig
+    updated.$save {}, ->
+      # SUCCESS call back: update existing or add new in list
+      if orig
+        angular.copy updated, orig
+      else
+        $scope.directories.push updated
+    ,
+    ->
+      console.log "An error occurred while saving Directory."
+
+  # Ask server to refresh directories
+  $scope.refreshDirectories = (name = null) ->
+    if name
+      RootDirectory.refresh {names: [name]}
+    else
+      RootDirectory.refresh()
+
+  # Delete repository
+  $scope.deleteRepository = (dir) ->
+    dir.$delete {}, ->
+      $scope.directories = $scope.directories.filter (d) ->
+        d.name != name
+
+  ## Modal controls
   $scope.showPaths = ->
-    $scope.showPathsTree = true
+    $scope.showTree = true
   $scope.removePath = (dir, path) ->
     dir.paths = dir.paths.filter (e) ->
       e != path
-
-  $scope.onTreeSelect = (branch) ->
-    console.log "Selected: #{branch}"
-  $scope.tree = [
-    {
-      label: 'Hello <b>Pwet</b>'
-      onSelect: (branch) ->
-        console.log "Click on #{branch}"
-      children: [
-        {
-          label: 'Konkon'
-        }
-        {
-          label: 'Foobar'
-        }
-      ]
-    }
-  ]
+  $scope.addPath = (path) ->
+    $scope.directory.paths ?= []
+    if path not in $scope.directory.paths
+      $scope.directory.paths.push path
 
 
 ## UTILITIES
 mergeObjs = (obj1, obj2) ->
   for key, val of obj2
     obj1[key] = val
+
+#
+# Remove all data which can't or mustn't be send as GET params and serialise Arrays.
+#
+serializeObj = (obj) ->
+  result = angular.copy obj
+  for key, val of obj
+    if key.indexOf('$') >= 0
+      delete result[key]
+    if Array.isArray val
+      result[key] = val.toString()
+
+  result

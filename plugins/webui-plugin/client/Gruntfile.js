@@ -82,8 +82,8 @@ module.exports = function (grunt) {
                     middleware: function (connect) {
                         return [
                             modRewrite([
-                                '!^/.*\\.(html|css|json|js|png|jpeg|jpg|gif|woff|ttf|svg)(\\?.*)*$ /index.html'
-                                //'^/.*$ /index.html'
+                                '!^/(api/.*|.*\\.(html|css|json|js|png|jpeg|jpg|gif|woff|ttf|svg))(\\?.*)*$ /index.html',
+                                '^/api/([^?]*)(\\?.*)*$ /api/$1.json'
                             ]),
 
                             connect.static('restmock'),

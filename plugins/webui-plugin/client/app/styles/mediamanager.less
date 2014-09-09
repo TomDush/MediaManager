@@ -640,15 +640,23 @@ ul.last-movies {
   }
 
   .icons {
-    width: 70px;
+    width: 80px;
     @media (max-width: @screen-sm-max) {
       // Bigger icons for mobile devices
       font-size: 1.3em;
-      width: 100px;
+      width: 130px;
 
       .glyphicon {
         padding-left: 5px;
       }
+    }
+
+    .success {
+      color: @brand-success;
+    }
+
+    .danger {
+      color: @brand-danger;
     }
   }
 
@@ -674,6 +682,20 @@ ul.last-movies {
       font-style: italic;
       color: @gray-light;
       text-align: center;
+    }
+
+    ul {
+      .make-sm-column(9)
+    }
+    .btn-ctrl {
+      .make-sm-column(3);
+      text-align: center;
+      padding-bottom: 10px;
+
+      .btn {
+        .make-sm-column(10);
+        margin-top: 10px;
+      }
     }
   }
 

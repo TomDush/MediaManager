@@ -121,7 +121,7 @@ angular.module('mediamanager')
   link: ($scope) ->
     # If poster isn't defined
     width = if $scope.size == "MINI" then "92" else "185"
-    $scope.noPoster = "/img/no-poster-w#{width}.jpg"
+    $scope.noPoster = "img/no-poster-w#{width}.jpg"
 
     # Poster url
     $scope.poster = ->
@@ -198,18 +198,23 @@ angular.module('mediamanager')
   scope:
     roots: '='
     callBack: '='
+    indication: '@'
     files: '@' # show files
   templateUrl: '/views/directives/filetree.html'
   controller: ($scope) ->
-    # Tree controls
-    $scope.selected = null
+    ###
+    Tree controls
+    ###
+
+    $scope.treeCtrl = {}
+
     $scope.select = (elem) ->
       if !elem.data?.metadata
         console.log "Element #{elem.data.path} has been selected"
-        $scope.selected = elem
     $scope.valid = ->
-      if $scope.selected? && $scope.callBack?
-        $scope.callBack $scope.selected
+      selected = $scope.treeCtrl.get_selected_branch()
+      if $scope.callBack? && selected? && ! selected.data?.metadata && selected.data?.path
+        $scope.callBack selected.data.path
 
     $scope.expendLevel = 0
 
@@ -227,6 +232,14 @@ angular.module('mediamanager')
         data:
           path: path
           lazy: elem.lazy
+
+      if elem.isDirectory && (!elem.children? || elem.children.length == 0)
+        node.children.push
+          label: " empty "
+          treeIcon: (b) ->
+            "glyphicon glyphicon-info-sign"
+          data:
+            metadata: true
 
       node
 
@@ -254,20 +267,21 @@ angular.module('mediamanager')
             data:
               metadata: true
 
-          # TODO Manage empty directory in non-lazy condition
           node.onSelect = (node) ->
-            mergeTree Paths.list([node.data.path], 3), $scope.tree
-            # remove metadata...
-            node.children = node.children.filter (n) ->
-              !n.data.metadata
-            # Add 'empty' indicator if empty
-            if node.children?.length == 0
-              node.children.push
-                label: " empty "
-                treeIcon: (b) ->
-                  "glyphicon glyphicon-info-sign"
-                data:
-                  metadata: true
+            Paths.list {paths: [node.data.path]}, (val) ->
+              mergeTree val, $scope.tree
+
+              # remove metadata...
+              node.children = node.children.filter (n) ->
+                !n.data.metadata
+              # Add 'empty' indicator if empty
+              if node.children?.length == 0
+                node.children.push
+                  label: " empty "
+                  treeIcon: (b) ->
+                    "glyphicon glyphicon-info-sign"
+                  data:
+                    metadata: true
 
       else
         # Clean node if from its lazy behavior
@@ -301,58 +315,59 @@ angular.module('mediamanager')
     # Merge result from REST service to existing tree
     #
     mergeTree = (serverTree, tree = []) ->
-      for elem in serverTree
-        if elem.name.substring(1).indexOf('/') > -1
-          # If root is a path and not single folder, split it to 'lazy above nodes'
-          lastNode = null
-          fullPath = ""
+      if !is_empty(serverTree)
+        for elem in serverTree
+          if elem.name.substring(1).indexOf('/') > -1
+            # If root is a path and not single folder, split it to 'lazy above nodes'
+            lastNode = null
+            fullPath = ""
 
-          # For each part of path, create a 'lazy above node'
-          split = elem.name.split '/'
-          for i in [0..split.length - 2]
-            p = split[i]
-            label = p
-            if !!p
-              fullPath += "/#{p}"
-            else
-              label = '/'
-              fullPath = ""
-
-            # Try to find this node is existing tree
-            treeToMerge = if lastNode?.children then lastNode.children else tree
-            node = findInTree treeToMerge, label
-
-            if !node?
-              # If it doesn't exist, create it
-              node =
-                label: label
-                children: []
-                data:
-                  path: fullPath
-                  notInitialised: true
-                treeIcon: (branch) ->
-                  "glyphicon glyphicon-folder-close"
-                onSelect: (node) ->
-                  mergeTree [Paths.above elem.fullname], tree
-              #                  delete node.treeIcon
-
-              if lastNode?
-                lastNode.children.push node
+            # For each part of path, create a 'lazy above node'
+            split = elem.name.split '/'
+            for i in [0..split.length - 2]
+              p = split[i]
+              label = p
+              if !!p
+                fullPath += "/#{p}"
               else
-                tree.push node
+                label = '/'
+                fullPath = ""
 
-            lastNode = node
+              # Try to find this node is existing tree
+              treeToMerge = if lastNode?.children then lastNode.children else tree
+              node = findInTree treeToMerge, label
 
-          # Then, add the last element as classical element with its children - warn, name is changed!
-          elem.fullname = elem.name
-          elem.name = split[split.length - 1]
-          addElement lastNode, elem, fullPath
+              if !node?
+                # If it doesn't exist, create it
+                node =
+                  label: label
+                  children: []
+                  data:
+                    path: fullPath
+                    notInitialised: true
+                  treeIcon: (branch) ->
+                    "glyphicon glyphicon-folder-close"
+                  onSelect: (node) ->
+                    Paths.above {path: elem.fullname}, (val) ->
+                      mergeTree [val], tree
 
-        else
-          # We have full detail
-          fakeParent =
-            children: tree
-          addElement fakeParent, elem, ""
+                if lastNode?
+                  lastNode.children.push node
+                else
+                  tree.push node
+
+              lastNode = node
+
+            # Then, add the last element as classical element with its children - warn, name is changed!
+            elem.fullname = elem.name
+            elem.name = split[split.length - 1]
+            addElement lastNode, elem, fullPath
+
+          else
+            # We have full detail
+            fakeParent =
+              children: tree
+            addElement fakeParent, elem, ""
 
       tree
 
@@ -365,27 +380,23 @@ angular.module('mediamanager')
     # Update tree when roots are changed
     #
     $scope.$watch 'roots', (roots, oldRoots) ->
-      console.log "Roots changed from #{JSON.stringify oldRoots} to #{JSON.stringify roots}"
       if roots?
-        oldRoots ?= []
-        newRoots = []
-        for r in roots
-          if r not in oldRoots
-            newRoots.push r
+        # Reset and Load tree
+        $scope.tree = []
+        Paths.list {paths: roots}, (val) ->
+          mergeTree val, $scope.tree
 
-        if newRoots.length > 0
-          # Load tree
-          mergeTree Paths.list(newRoots, 3), $scope.tree
+          # Expends tree to expect tree or to the first path in response
+          roots = [val[0].fullname] if roots?.length == 0 && val?.length > 0
 
-          # Expends tree to the shorter path
-          for root in $scope.roots
+          for root in roots
             prevList = $scope.tree
             for nodeName in root.split('/')
               if prevList?
                 nodeName = if !!nodeName then nodeName else '/'
                 node = findInTree prevList, nodeName
-                prevList = node?.children
                 node?.expanded = true
+                prevList = node?.children
       else
         $scope.tree = []
 
@@ -431,3 +442,23 @@ angular.module('mediamanager')
       "<i class='glyphicon glyphicon-#{type.icon}' title='#{type.name}'></i> <span class='hidden-xs'>#{type.name}</span>"
     else
       input
+
+###
+Direct useful tools
+###
+typeIsArray = Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
+
+is_empty = (obj) ->
+  return true if not obj? or obj.length is 0
+
+  if typeIsArray obj
+    for o in obj
+      return false if !is_empty o
+    return true
+
+  return false if obj.length? and obj.length > 0
+
+  for key of obj
+    return false if Object.prototype.hasOwnProperty.call(obj,key)
+
+  return true
