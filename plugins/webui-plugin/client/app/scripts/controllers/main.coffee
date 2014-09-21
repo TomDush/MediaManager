@@ -104,9 +104,13 @@ angular.module('mediamanager')
       type: recovery.mediaSummary.mediaType
       mediaId: recovery.mediaSummary.id
 
-.controller 'SettingsCtrl', ($scope, $route, $rootScope, $location, $routeParams, RootDirectory) ->
+#
+# SETTINGS PAGE CONTROLLER
+#
+.controller 'SettingsCtrl', ($scope, $route, $rootScope, $location, $routeParams, RootDirectory, Favorite) ->
   $scope.tabs = [
     {id: 'repo', name: 'Repositories'}
+    {id: 'favorite', name: 'Favorites'}
     {id: 'param', name: 'Parameters'}
   ]
   $scope.types = [
@@ -209,11 +213,55 @@ angular.module('mediamanager')
     if path not in $scope.directory.paths
       $scope.directory.paths.push path
 
+  ###
+  FAVORITE CTRL
+  ###
+  # TODO Manage errors to keep table up to date
+  $scope.favorites = Favorite.query()
+
+  $scope.deleteFavorite = (f) ->
+    $scope.favorites = $scope.favorites.filter (e) ->
+      e != f
+    f.$delete()
+
+  $scope.addFavorite = (path) ->
+    favorite =
+      name: basename path
+      path: path
+
+    Favorite.save favorite, (f) ->
+      $scope.favorites.push f
+
+  $scope.updateFavorite = (f) ->
+    if f.name != f.oldName
+      f.$save()
+    $scope.editedFavorite = null
+
+  $scope.setEditedFavorite = (f) ->
+    $scope.cancelFavorite($scope.editedFavorite) if $scope.editedFavorite?
+
+    f.oldName = f.name
+    $scope.editedFavorite = f
+
+  $scope.cancelFavorite = (f) ->
+    f.name = f.oldName
+    $scope.editedFavorite = null
+
 
 ## UTILITIES
 mergeObjs = (obj1, obj2) ->
   for key, val of obj2
     obj1[key] = val
+
+#
+# Select the end of
+basename = (path) ->
+  p = path
+  while p.indexOf('/') > -1
+    console.log "Path = #{path} ; p=#{p} ; index=#{p.indexOf '/'}"
+    p = p.substr p.indexOf('/') + 1
+
+  p
 
 #
 # Remove all data which can't or mustn't be send as GET params and serialise Arrays.

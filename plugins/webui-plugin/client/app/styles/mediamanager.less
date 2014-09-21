@@ -18,6 +18,58 @@ a, .link {
   margin-top: 60px;
 }
 
+/**************/
+/* DIRECTIVES */
+/**************/
+.file-tree {
+  background-color: @gray-lighter;
+  border-radius: 5px;
+  border: solid 1px @gray-dark;
+
+  .indication {
+    font-size: 0.8em;
+    font-style: italic;
+    color: @gray-light;
+    text-align: center;
+  }
+
+  &.file-tree-sm {
+    // btn-ctrl as btn group
+    .btn-ctrl:extend(.btn-group all) {
+    }
+    .btn-ctrl > button:extend(.btn-group > .btn all) {
+    }
+    .btn-ctrl button + button:extend(.btn-group .btn + .btn all) {
+    }
+
+    .file-tree-cmd {
+      text-align: center;
+    }
+    ul {
+      margin-bottom: 15px;
+    }
+  }
+
+  &.file-tree-default {
+    ul {
+      .make-sm-column(9);
+      .make-sm-column-pull(3);
+      margin-bottom: 15px;
+    }
+    .file-tree-cmd {
+      .make-sm-column(3);
+      .make-sm-column-push(9);
+      text-align: center;
+      padding-bottom: 10px;
+
+      .btn {
+        .make-sm-column(10);
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
 /**********/
 /* HEADER */
 /**********/
@@ -672,33 +724,6 @@ ul.last-movies {
     }
   }
 
-  .file-tree {
-    background-color: @gray-lighter;
-    border-radius: 5px;
-    border: solid 1px @gray-dark;
-
-    .indication {
-      font-size: 0.8em;
-      font-style: italic;
-      color: @gray-light;
-      text-align: center;
-    }
-
-    ul {
-      .make-sm-column(9)
-    }
-    .btn-ctrl {
-      .make-sm-column(3);
-      text-align: center;
-      padding-bottom: 10px;
-
-      .btn {
-        .make-sm-column(10);
-        margin-top: 10px;
-      }
-    }
-  }
-
   // Special layout for XS devices (phone)
   @media (max-width: @screen-xs-max) {
     .name-group {
@@ -714,6 +739,20 @@ ul.last-movies {
 .settings-ctrl {
   margin: 20px 0px;
   text-align: center;
+}
+
+#favorite {
+  .glyphicon-remove-sign {
+    color: @brand-danger;
+  }
+  .glyphicon-ok-sign {
+    color: @brand-success;
+  }
+}
+
+.favorite-path {
+  color: @gray;
+  font-style: italic;
 }
 
 /* MEDIA SEARCH */
