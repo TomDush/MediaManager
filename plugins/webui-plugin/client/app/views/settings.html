@@ -55,21 +55,35 @@
         </div>
     </div>
     <div class="row" ng-show="tab == 'favorite'">
-      <div class="col-xs-12"><h1>Favorites</h1></div>
+        <div class="col-xs-12"><h1>Favorites</h1></div>
     </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <ul>
-          <li ng-repeat="f in favotites">
-            <i class="glyficon glyphicon-remove link" ng-click="deleteFavorite(f)" ></i>
-            <span ng-show="edittedFavorite != f" ng-click="setEdittedFavorite(f)">{{f.name}} - <span class="favotite-path">{{f.path}}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="col-xs-6">
-      </div>
+    <div class="row" id="favorite" ng-show="tab == 'favorite'">
+        <div class="col-sm-6">
+            <table class="table">
+                <tr ng-repeat="f in favorites |orderBy:'name'">
+                    <td><i class="glyphicon glyphicon-remove link" ng-click="deleteFavorite(f)"></i></td>
+                    <td ng-show="editedFavorite != f" ng-click="setEditedFavorite(f)" class="link">{{f.name}}</td>
+                    <td ng-show="editedFavorite == f">
+                        <form class="input-group" ng-submit="updateFavorite(f)">
+                            <input type="text" class="form-control" ng-model="f.name" />
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i
+                                        class="glyphicon glyphicon-ok-sign"></i></button>
+                                <span class="btn btn-default" ng-click="cancelFavorite(f)"><i
+                                        class="glyphicon glyphicon-remove-sign"></i></span>
+                            </span>
+                        </form>
+                    </td>
+                    <td class="favorite-path">{{f.path}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <file-tree roots="[]" indication="Select path you want to add to favorites" call-back="addFavorite"
+                       small="true"></file-tree>
+        </div>
     </div>
-    
+
     <div class="row" ng-show="tab == 'param'">
         <div class="col-xs-12">
             <h1>Parameters</h1>
@@ -164,8 +178,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal"
-                        ng-click="deleteRepository(toDelete)"> Delete
+                <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="deleteRepository(toDelete)">
+                    Delete
                 </button>
             </div>
         </div>

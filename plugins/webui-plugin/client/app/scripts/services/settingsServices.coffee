@@ -10,6 +10,12 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
     # names can be specified to refresh only some directories, offline will be ignored in any case
     refresh: { method: 'GET', url: '/api/directory/refresh'}
 
+#
+# Rest call to manage Favorites: CRUD + refresh
+#
+.factory 'Favorite', ($resource) ->
+  $resource '/api/favorite/:name', {name: '@name'}, []
+
 # Navigate on server files - MOCK
 .factory 'Paths', ->
   #

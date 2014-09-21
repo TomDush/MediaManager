@@ -1,13 +1,16 @@
-<div class="file-tree container-fluid">
+<div class="file-tree container-fluid" ng-class="{'file-tree-sm': small, 'file-tree-default': !small}">
     <div class="row indication" ng-show="indication">{{indication}}</div>
     <div class="row">
-        <abn-tree tree-data="tree" on-select="select(branch)" expand-level="{{expendLevel}}"
-                  icon-expand="glyphicon glyphicon-folder-close"
-                  icon-collapse="glyphicon glyphicon-folder-open"
-                  tree-control="treeCtrl"></abn-tree>
-        <div class="btn-ctrl">
-            <button class="btn btn-success" ng-click="valid()"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            <button class="btn btn-default" ng-click="treeCtrl.collapse_all()"><i class="glyphicon glyphicon-collapse-up"></i> Collapse</button>
+        <div class="file-tree-cmd">
+            <div class="btn-ctrl">
+                <button class="btn btn-success" ng-click="valid()"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                <button class="btn btn-default" ng-click="treeCtrl.collapse_all()"><i
+                        class="glyphicon glyphicon-collapse-up"></i> Collapse
+                </button>
+            </div>
         </div>
+        <abn-tree tree-data="tree" on-select="select(branch)" expand-level="{{expendLevel}}"
+                  icon-expand="glyphicon glyphicon-folder-close" icon-collapse="glyphicon glyphicon-folder-open"
+                  tree-control="treeCtrl"></abn-tree>
     </div>
 </div>

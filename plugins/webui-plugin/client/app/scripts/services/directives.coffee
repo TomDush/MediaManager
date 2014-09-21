@@ -181,7 +181,7 @@ angular.module('mediamanager')
   template: '<div class="progress" ng-show="status.length">' +
 #    '       <span style="position:absolute">{{status.position | time}} / {{status.length | time}}</span>' +
     '<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" style="width: {{status.position | progress:status.length}}%;"
-                                  aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
+                                          aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
     '</div>'
   }
 
@@ -193,19 +193,24 @@ angular.module('mediamanager')
     element.css 'height', "#{$window.innerHeight - 50}px"
 
 # File and dir tree
-.directive 'fileTree', (Paths) ->
+.directive 'fileTree', ($window, Paths) ->
   restrict: 'E'
   scope:
-    roots: '='
-    callBack: '='
-    indication: '@'
-    files: '@' # show files
+    roots: '='      # Root path to load and extends
+    callBack: '='   # Function to call when submit button has been clicked
+    indication: '@' # Indication text
+    files: '@'      # show files
+    small: '@'      # boolean: group buttons instead of having them on right column
   templateUrl: '/views/directives/filetree.html'
+  link: (scope, elem, attr) ->
+    attr.small ?= false
+    if $window.innerWidth < 768
+      attr.small = true
+
   controller: ($scope) ->
     ###
     Tree controls
     ###
-
     $scope.treeCtrl = {}
 
     $scope.select = (elem) ->
@@ -213,7 +218,7 @@ angular.module('mediamanager')
         console.log "Element #{elem.data.path} has been selected"
     $scope.valid = ->
       selected = $scope.treeCtrl.get_selected_branch()
-      if $scope.callBack? && selected? && ! selected.data?.metadata && selected.data?.path
+      if $scope.callBack? && selected? && !selected.data?.metadata && selected.data?.path
         $scope.callBack selected.data.path
 
     $scope.expendLevel = 0
@@ -446,7 +451,7 @@ angular.module('mediamanager')
 ###
 Direct useful tools
 ###
-typeIsArray = Array.isArray || ( value ) -> return {}.toString.call( value ) is '[object Array]'
+typeIsArray = Array.isArray || (value) -> return {}.toString.call(value) is '[object Array]'
 
 is_empty = (obj) ->
   return true if not obj? or obj.length is 0
@@ -459,6 +464,6 @@ is_empty = (obj) ->
   return false if obj.length? and obj.length > 0
 
   for key of obj
-    return false if Object.prototype.hasOwnProperty.call(obj,key)
+    return false if Object.prototype.hasOwnProperty.call(obj, key)
 
   return true
