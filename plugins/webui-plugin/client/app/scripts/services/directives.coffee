@@ -186,11 +186,14 @@ angular.module('mediamanager')
   }
 
 .directive 'fullHeight', ($window) ->
-  link: (scope, element, attr) ->
-    # TODO Watch window size
-#    scope.$watch $window.innerHeight, (height) ->
-#      console.log "Watch new height: #{height}"
-    element.css 'height', "#{$window.innerHeight - 50}px"
+  link: (scope, element) ->
+    setHeight = ->
+      element.css 'height', "#{$window.innerHeight - 50}px"
+
+    $(window).resize ->
+      setHeight()
+
+    setHeight()
 
 # File and dir tree
 .directive 'fileTree', ($window, Paths) ->

@@ -5,7 +5,7 @@
     <title></title>
     <meta name="description" content="">
     <!--<meta name="viewport" content="width=device-width">-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0"/>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory --><!-- build:css(.) styles/vendor.css -->
     <!-- endbuild --><!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="/styles/abn_tree.css">
@@ -18,23 +18,29 @@
 
 <div>
     <!-- Top Menu (static for all application) -->
-    <nav class="navbar navbar-default navbar-inverse" role="navigation" ng-controller="TopMenuCtrl">
+    <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" ng-controller="TopMenuCtrl">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
-                        class="icon-bar"></span> <span class="icon-bar"></span>
+                        data-target="#topmenu">
+                    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="/"><span class="first">M</span>edima</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse" id="topmenu">
                 <ul class="nav navbar-nav">
-                    <li ng-repeat="e in entries" ng-class="{active: active(e.href)}"><a ng-href="{{e.href}}"> <i
-                            ng-class="icon(e.icon)"></i><span class="hidden-sm"> {{e.name}}</span></a>
+                    <li ng-repeat="e in entries" ng-class="{active: active(e.href)}">
+                        <a ng-href="{{e.href}}" data-toggle="collapse" data-target="#topmenu"><i ng-class="icon(e.icon)"></i>
+                            <span class="hidden-sm"> {{e.name}}</span>
+                        </a>
+                        <ul ng-show="isXs() && e.entries && e.entries.length > 0" class="sub-menu">
+                            <li ng-repeat="sub in e.entries" class="sub-link" ng-class="{active: active(sub.href)}">
+                                <a href="{{sub.href}}" data-toggle="collapse" data-target="#topmenu">{{sub.name}}</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
                 <form class="navbar-form navbar-right" role="search">

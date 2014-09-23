@@ -8,6 +8,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
   margin-bottom: 100px;
+  margin-top: 50px;
 }
 
 a, .link {
@@ -70,20 +71,6 @@ a, .link {
   }
 }
 
-/**********/
-/* HEADER */
-/**********/
-.navbar-brand {
-  font-variant: small-caps;
-
-  .first {
-    color: red;
-    font-variant: normal;
-    font-weight: bold;
-  }
-}
-
-/* Everywhere */
 tags {
   &:extend(div);
   display: block;
@@ -102,6 +89,35 @@ tags {
     border-radius: 3px;
   }
 
+}
+
+/**********/
+/* HEADER */
+/**********/
+.navbar-brand {
+  font-variant: small-caps;
+
+  .first {
+    color: red;
+    font-variant: normal;
+    font-weight: bold;
+  }
+}
+
+li.active ul, li.active ul a {
+  background-color: #080808;
+}
+
+ul.sub-menu {
+  list-style: none;
+  a {
+    color: @gray-light;
+  }
+
+  li.active a {
+    color: #FFF;
+    font-style: italic;
+  }
 }
 
 /*************/
@@ -576,7 +592,7 @@ ul.last-movies {
 @link-height: 60px;
 .settings-nav {
   // Position
-  position: absolute;
+  position: fixed;
   top: 50px;
   width: @settings-width;
 

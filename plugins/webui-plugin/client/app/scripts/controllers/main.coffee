@@ -6,11 +6,15 @@ menu = [
   {href: '/movies', name: 'Movies', icon: 'film'}
   {href: '/search', name: 'Advanced search', icon: 'search'}
   {href: '/controls', name: 'Control', icon: 'cog'}
-  {href: '/settings', name: 'Settings', icon: 'wrench'}
+  {href: '/settings', name: 'Settings', icon: 'wrench', entries: [
+    {href: '/settings/repo', name: 'Repositories'}
+    {href: '/settings/favorite', name: 'Favorites'}
+    {href: '/settings/param', name: 'Parameters'}
+  ]}
 ]
 
 angular.module('mediamanager')
-.controller 'TopMenuCtrl', ($scope, $location) ->
+.controller 'TopMenuCtrl', ($scope, $location, $window) ->
   $scope.pageTitle = "Medima - Manage yours medias !"
   $scope.active = (path) ->
     if path == '/'
@@ -22,6 +26,15 @@ angular.module('mediamanager')
 
   $scope.icon = (icon) ->
     "glyphicon glyphicon-#{icon}"
+
+  $scope.$watch ->
+    $window.innerWidth
+  ,
+  (val) ->
+    $scope.xs = val < 768
+
+  $scope.isXs = ->
+    $scope.xs
 
 #  $scope.onSearch = (title) ->
 #    $state.go "medias.list", {title: title}, {inherit: false}
@@ -118,15 +131,21 @@ angular.module('mediamanager')
     {value: 'SHOW', icon: 'camera', name: 'Shows'}
   ]
 
-  # Control URL for sub-page
+  ###
+  Control URL for sub-page
+  ###
+
   lastRoute = $route.current;
   $scope.$on '$locationChangeSuccess', ->
-    console.log "Change location from " + $route.current.$$route.controller
-    if $route.current.$$route.controller == 'SettingsCtrl'
+    if $route.current.$$route?.controller == 'SettingsCtrl'
+      ## Stay on this route but change tab if needed
       $route.current = lastRoute
+      path = $location.url().split '/'
+      if path.length >= 3 && $scope.tab != path[2]
+        $scope.tab = path[2]
+
 
   $scope.$watch 'tab', (newTab) ->
-    console.log "New tab=#{newTab}"
     $location.url "/settings/#{newTab}"
 
   # Default tab
