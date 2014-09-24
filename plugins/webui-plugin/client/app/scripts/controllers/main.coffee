@@ -270,13 +270,14 @@ angular.module('mediamanager')
 #
 # File Manager Controller
 #
-.controller 'FilesCtrl', ($scope, Paths, Favorite) ->
+.controller 'FilesCtrl', ($scope, $location, $route, Paths, Favorite) ->
 
   ###
   Tree control
   ###
 
   # Default: Load from favorite
+  $scope.loading = true
   $scope.favorites = Favorite.query {}, (favorites) ->
     if favorites?.length > 0
       $scope.noFavorite = false
@@ -292,17 +293,39 @@ angular.module('mediamanager')
         $scope.root =
           name: 'Favorites'
           type: 'FOLDER'
+          path: ''
         $scope.root.children = process paths, $scope.root
 
         $scope.current = $scope.root
+        currentPath = $location.search()?.current
+
+        if !!currentPath
+          navigateTo $scope.root.children, currentPath, (file) ->
+            $scope.current = file if file
+            $scope.loading = false
+        else
+          $scope.loading = false
 
     else
       $scope.noFavorite = true
 
-  $scope.open = (f) ->
-    console.log "Open #{f.name}"
+  $scope.open = (f, fct = null) ->
     if f.type == 'FOLDER'
+      if f.lazy
+        $scope.loading = true
+        Paths.list
+          paths: [f.path]
+        , (path) ->
+          if path && path[0]
+            f.children = process path[0].children, f if path[0].children?
+            f.lazy = false
+          $scope.loading = false if !fct
+
+          fct() if fct
+
       $scope.current = f
+      $location.search 'current', f.path || null
+      fct() if fct
 
   $scope.play = (f) ->
     if f.type == 'FOLDER'
@@ -310,9 +333,50 @@ angular.module('mediamanager')
     else
       console.log "Play #{f.name}"
 
-  # Create bi-directional tree
-  process = (files, parent = null) ->
+  navigateTo = (files, path, fct) ->
     for f in files
+      if f.name == path
+        # Found!
+        $scope.open f, ->
+          fct f if fct
+      else if path.indexOf(f.name) == 0
+        localPath = path
+        # Found ancestor, open it (to load if lazy) then continue search
+        $scope.open f, ->
+          navigateTo f.children, localPath.substr(f.name.length + 1), fct
+
+        break
+
+
+  # Prevent controller to be reloaded when location.search is changed.
+  lastRoute = $route.current;
+  $scope.$on '$locationChangeSuccess', ->
+    if $route.current.$$route?.controller == 'FilesCtrl'
+      $route.current = lastRoute
+      # Previous support - update display if url has been manually changed
+      if $location.search()?.current != $scope.current?.path
+        if $location.search()?.current
+          navigateTo $scope.root.children, $location.search()?.current
+        else
+          $scope.current = $scope.root
+
+
+  # Create bi-directional tree
+  process = (files, parent) ->
+    for f in files
+      # Full path
+      f.path = parent.path
+      f.path += '/' if !!f.path
+      f.path += f.name
+
+      # Pretty name
+      f.getName = ->
+        if !!this.favoriteName
+          "#{this.favoriteName} (#{this.name})"
+        else
+          this.name
+
+      # Children
       if f.type == 'FOLDER' || f.children?.length > 0 || f.isDirectory || f.lazy
         f.type = 'FOLDER'
         f.parent = parent
@@ -364,6 +428,24 @@ angular.module('mediamanager')
       type = "Undefined"
 
     type
+
+  $scope.getSize = (f) ->
+    if f.type == 'FOLDER'
+      if f.lazy then "-" else f.children?.length
+    else
+      f.size
+
+  $scope.breadcrumb = (file) ->
+    if file
+      breadcrumb = [file]
+      it = file
+      while it.parent
+        breadcrumb.push it.parent
+        it = it.parent
+
+      breadcrumb.reverse()
+    else
+      []
 
 ## UTILITIES
 mergeObjs = (obj1, obj2) ->

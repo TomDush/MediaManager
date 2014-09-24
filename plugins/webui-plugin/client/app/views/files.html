@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div id="file-manager" class="container-fluid">
     <div class="row">
         <h1>File Manager</h1>
     </div>
@@ -6,52 +6,60 @@
         <strong>No favorite!</strong> Configure your favorites on <a href="/settings/favorite">settings page</a>
     </div>
     <div class="row" ng-show="!noFavorite">
+        <ol class="breadcrumb">
+            <li ng-repeat="f in breadcrumb(current)" ng-class="{active: current.name == f.name}">
+                <a ng-click="open(f)" ng-hide="current.name == f.name">{{f.favoriteName || f.name}}</a>
+                <span ng-show="current.name == f.name">{{f.favoriteName || f.name}}</span>
+            </li>
+        </ol>
+
         <div class="col-sm-12">
-            <table class="table table-condensed table-hover table-striped">
+            <table class="table table-condensed table-hover table-striped" ng-show="!loading">
                 <tr>
                     <th></th> <!-- Icon -->
                     <th>Name</th>
                     <th>Type</th>
                     <th>Created</th>
-                    <th></th> <!-- More actions... -->
+                    <th>Size</th>
                 </tr>
                 <tbody>
-                <tr ng-show="current.parent">
-                    <td class="link" title="Parent directory: {{current.parent.name}}" ng-click="open(current.parent)" ng-dblclick="open(current.parent)">
-                        <i class="glyphicon glyphicon-folder-close"></i>
-                    </td>
-                    <td class="link" title="Parent directory: {{current.parent.name}}" ng-click="open(current.parent)" ng-dblclick="open(current.parent)">
-                        ..
-                    </td>
-                    <td></td>
+                <tr ng-show="current.parent" class="link" title="Parent directory: {{current.parent.name}}" ng-click="open(current.parent)" ng-dblclick="open(current.parent)">
+                    <td><i class="glyphicon glyphicon-folder-close"></i></td>
+                    <td>..</td>
                     <td></td>
                 </tr>
                 <tr ng-repeat="f in current.children |orderBy:'sortKey' ">
-                    <td class="single-icon"><i ng-class="getIcon(f)"></i></td>
-                    <td class="link file-name" sglclick="open(f)" ng-dblclick="play(f)">{{f.name}}</td>
+                    <td class="link single-icon" sglclick="open(f)" ng-dblclick="play(f)"><i ng-class="getIcon(f)"></i></td>
+                    <td class="link file-name" sglclick="open(f)" ng-dblclick="play(f)">{{f.getName()}}</td>
                     <td>{{getType(f)}}</td>
                     <td>{{f.created |date:'dd/MM/yyyy HH:MM'}}</td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                <i class="glyphicon glyphicon-cog"></i>
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Play</a></li>
-                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete</a></li>
+                    <td>{{getSize(f)}}</td>
+                    <!-- TODO Add actions to delete / move to RootDirectory / local copy -->
+                    <!--<td>-->
+                        <!--<div class="dropdown">-->
+                            <!--<button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">-->
+                                <!--<i class="glyphicon glyphicon-cog"></i>-->
+                                <!--<span class="caret"></span>-->
+                            <!--</button>-->
+                            <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">-->
+                                <!--<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Play</a></li>-->
+                                <!--<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Delete</a></li>-->
                                 <!--<li role="presentation" class="divider"></li>-->
-                            </ul>
-                        </div>
-                    </td>
+                            <!--</ul>-->
+                        <!--</div>-->
+                    <!--</td>-->
                 </tr>
                 <tr ng-show="!current.children || current.children.length == 0">
-                    <td colspan="5" class="text-center"><i class="glyphicon glyphicon-info-sign"></i> This folder is empty.</td>
+                    <td colspan="4" class="text-center"><i class="glyphicon glyphicon-info-sign"></i> This folder is empty.</td>
                 </tr>
                 </tbody>
             </table>
+
+            <div class="text-center" ng-show="loading">
+                <i class="glyphicon glyphicon-info-sign"></i> Loading...
+            </div>
         </div>
 
-        <!-- Possible to add a fixed column here with detail on this file -->
+        <!-- TODO Possible to add a 'CSS fixed' column here with detail on this file + bind file with media if directory has been scanned -->
     </div>
 </div>

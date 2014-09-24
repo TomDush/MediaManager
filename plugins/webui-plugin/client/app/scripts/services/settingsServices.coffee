@@ -39,6 +39,7 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
       console.log "Return '/mnt/data/toSort', '/mnt/usb-key'"
       result = [
         name: '/mnt/data/toSort'
+        favoriteName: 'Tempo'
         created: 1178147800000
         children: [
           {name: 'bt', lazy:true, isDirectory:true}
@@ -46,6 +47,7 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
         ]
       ,
         name: '/mnt/usb-key'
+        favoriteName: 'USB Key'
         created: 1178246800000
         children: [
           name: 'Movies'
@@ -64,7 +66,6 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
           ]
         ]
       ]
-
     else if paths.length > 1
       console.log "Return /mnt/local/data and /mnt/remote/hoster"
       result = [
@@ -99,6 +100,16 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
       console.log "/mnt/local/data/Movies_VF/HD"
       result = [
         name: '/mnt/local/data/Movies_VF/HD'
+        children: [
+          {name: 'Star Wars', lazy: true, isDirectory: true}
+          {name: 'Star Trek', lazy: true, isDirectory: true}
+          {name: 'Indiana Jones', lazy: true, isDirectory: true}
+        ]
+      ]
+    else if paths.length == 1 && paths[0] == '/mnt/usb-key/Movies/Saga'
+      console.log "Return /mnt/usb-key/Movies/Saga"
+      result = [
+        name: '/mnt/usb-key/Movies/Saga'
         children: [
           {name: 'Star Wars', lazy: true, isDirectory: true}
           {name: 'Star Trek', lazy: true, isDirectory: true}
