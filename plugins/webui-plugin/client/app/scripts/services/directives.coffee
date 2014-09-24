@@ -1,7 +1,11 @@
+###
+Useful tools - filter and directives
+###
 angular.module('mediamanager')
-## Useful tools - filter and directives
 
+#
 # Split text and and 'tail' at this end
+#
 .filter 'cut', ->
   (value, wordwise, max, tail) ->
     if value?
@@ -19,20 +23,52 @@ angular.module('mediamanager')
     else
       ''
 
+#
 # Replace image by another one if not found
+#
 .directive 'errSrc', ->
   #return
   link: (scope, element, attrs) ->
     element.bind 'error', ->
       element.attr 'src', attrs.errSrc
 
-# Replace image by another one if not found
+#
+# Get basename from given string (after last /)
+#
 .filter 'basename', ->
   (value) ->
     index = value.lastIndexOf('/')
     if index == -1 then value else value.substr(index + 1)
 
-## Directive and filters to extract all tags from media
+#
+# Handle a simple click when double click can be involved.
+#
+.directive 'sglclick', ['$parse', ($parse) ->
+  restrict: 'A',
+  link: (scope, element, attr) ->
+    fn = $parse attr.sglclick
+    delay = 300
+    clicks = 0
+    timer = null
+
+    element.on 'click', (event) ->
+      clicks++;  #count clicks
+      if clicks == 1
+        timer = setTimeout ->
+          scope.$apply ->
+            fn scope, { $event: event };
+          clicks = 0             #after action performed, reset counter
+        , delay
+
+      else
+        clearTimeout timer    # prevent single-click action
+        clicks = 0           #after action performed, reset counter
+]
+
+###
+Directive and filters to extract all tags from media
+###
+angular.module('mediamanager')
 
 # Extract genres, with link for search
 .directive 'genres', ->
@@ -73,9 +109,14 @@ angular.module('mediamanager')
     btnSize: '@'
   templateUrl: '/views/directives/play.html'
 
-## Direct display of some media properties
+###
+Direct display of some media properties
+###
+angular.module('mediamanager')
 
+#
 # Title with date if any
+#
 .filter 'mediatitle', ($filter) ->
   (input) ->
     if input?
@@ -83,7 +124,9 @@ angular.module('mediamanager')
       "#{input.title}#{dateStr}"
     else ""
 
-# List of person name
+#
+# List of person names
+#
 .filter 'person', ->
   (input, withLink) ->
     res = ""
@@ -99,6 +142,9 @@ angular.module('mediamanager')
 
     res
 
+#
+# Wrapper for filter
+#
 .directive 'personList', ->
   restrict: 'E'
   template: '<span class="persons" ng-bind-html="persons | limitTo:getLimit() | person:withLink"></span>'
@@ -110,8 +156,9 @@ angular.module('mediamanager')
     $scope.getLimit = ->
       if $scope.limit then $scope.limit else $scope.persons?.length
 
-
+#
 # Img element for poster, if any, else choose no poster img with width 92 or 185.
+#
 .directive 'poster', ['$interval', 'dateFilter', ($interval, dateFilter) ->
   restrict: 'E'
   template: '<img ng-src="/{{poster()}}?size={{size}}" err-src="{{noPoster}}" />'
@@ -185,6 +232,9 @@ angular.module('mediamanager')
     '</div>'
   }
 
+#
+# Make element height same than window height - 50px (top navbar size)
+#
 .directive 'fullHeight', ($window) ->
   link: (scope, element) ->
     setHeight = ->
@@ -195,7 +245,9 @@ angular.module('mediamanager')
 
     setHeight()
 
+#
 # File and dir tree
+#
 .directive 'fileTree', ($window, Paths) ->
   restrict: 'E'
   scope:

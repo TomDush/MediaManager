@@ -36,6 +36,10 @@ angular
     templateUrl: '/views/settings.html'
     controller: 'SettingsCtrl'
 
+  .when '/files',
+    templateUrl: '/views/files.html'
+    controller: 'FilesCtrl'
+
   .when '/movies',
     templateUrl: 'views/medias.html'
     controller: 'HomeCtrl'

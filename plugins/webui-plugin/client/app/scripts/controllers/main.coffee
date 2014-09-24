@@ -5,6 +5,7 @@ menu = [
   {href: '/', name: 'Home', icon: 'home'}
   {href: '/movies', name: 'Movies', icon: 'film'}
   {href: '/search', name: 'Advanced search', icon: 'search'}
+  {href: '/files', name: 'File Manager', icon: 'folder-open'}
   {href: '/controls', name: 'Control', icon: 'cog'}
   {href: '/settings', name: 'Settings', icon: 'wrench', entries: [
     {href: '/settings/repo', name: 'Repositories'}
@@ -266,6 +267,103 @@ angular.module('mediamanager')
     f.name = f.oldName
     $scope.editedFavorite = null
 
+#
+# File Manager Controller
+#
+.controller 'FilesCtrl', ($scope, Paths, Favorite) ->
+
+  ###
+  Tree control
+  ###
+
+  # Default: Load from favorite
+  $scope.favorites = Favorite.query {}, (favorites) ->
+    if favorites?.length > 0
+      $scope.noFavorite = false
+
+      roots = favorites.map (e) ->
+        e.path
+
+      console.log "Get favorite content: #{roots}"
+      Paths.list
+        paths: roots
+      ,
+      (paths) ->
+        $scope.root =
+          name: 'Favorites'
+          type: 'FOLDER'
+        $scope.root.children = process paths, $scope.root
+
+        $scope.current = $scope.root
+
+    else
+      $scope.noFavorite = true
+
+  $scope.open = (f) ->
+    console.log "Open #{f.name}"
+    if f.type == 'FOLDER'
+      $scope.current = f
+
+  $scope.play = (f) ->
+    if f.type == 'FOLDER'
+      $scope.open f
+    else
+      console.log "Play #{f.name}"
+
+  # Create bi-directional tree
+  process = (files, parent = null) ->
+    for f in files
+      if f.type == 'FOLDER' || f.children?.length > 0 || f.isDirectory || f.lazy
+        f.type = 'FOLDER'
+        f.parent = parent
+
+        if f.children?.length > 0
+          process f.children, f
+
+      # Used to sort folder first
+      f.sortKey = (if f.type == 'FOLDER' then "0 " else "1 ") + f.name
+
+    files
+
+  ###
+  Display helpers
+  ###
+
+  $scope.getIcon = (f) ->
+    icon = ""
+    if f.type == 'VIDEO'
+      icon = "glyphicon glyphicon-facetime-video"
+    else if f.type in ['JPG', 'JPEG', 'PNG', 'BMP', 'GIF']
+      icon = "glyphicon glyphicon-picture"
+    else if f.type == 'FOLDER'
+      icon = "glyphicon glyphicon-folder-open"
+    else
+      icon = "glyphicon glyphicon-file"
+
+    ## Make it in green if this file is part of medias
+    if f.movieId?
+      icon += "glyphicon glyphicon-film success"
+
+    icon
+
+  $scope.getType = (f) ->
+    type = ""
+    if f.type == 'VIDEO'
+      type = "Video file"
+    else if f.type in ['JPG', 'JPEG', 'PNG', 'BMP', 'GIF']
+      type = "Picture"
+    else if f.type == 'FOLDER'
+      type = "Folder"
+    else if !!f.name
+      ext = f.name
+      while ext.indexOf('.') >= 0
+        ext = ext.substring ext.indexOf('.') + 1
+
+      type = "#{ext} File"
+    else
+      type = "Undefined"
+
+    type
 
 ## UTILITIES
 mergeObjs = (obj1, obj2) ->

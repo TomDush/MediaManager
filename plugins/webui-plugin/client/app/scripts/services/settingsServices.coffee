@@ -35,7 +35,37 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
 
     result = []
     console.log "PATHS:LIST paths=#{JSON.stringify paths} ; deep=#{deep} ; withFile=#{withFiles}"
-    if paths.length > 1
+    if arrayEqual paths, ['/mnt/data/toSort', '/mnt/usb-key']
+      console.log "Return '/mnt/data/toSort', '/mnt/usb-key'"
+      result = [
+        name: '/mnt/data/toSort'
+        created: 1178147800000
+        children: [
+          {name: 'bt', lazy:true, isDirectory:true}
+          {name: 'video', lazy:true, isDirectory:true}
+        ]
+      ,
+        name: '/mnt/usb-key'
+        created: 1178246800000
+        children: [
+          name: 'Movies'
+          children: [
+            {name: 'Saga', lazy:true, isDirectory:true}
+            {name: 'Indiana Jones 3 (1989) French DVDrip xvid (condom be).avi', type:'VIDEO', movieId: '53850613043c93a62c3aa723'}
+            {name: 'Indiana jones poster.jpg', type:'JPG'}
+          ]
+        ,
+          name: 'Shows'
+          children: [
+            {name: 'Fringe', lazy:true, isDirectory:true}
+            {name: 'The Castle - Saison 06', children:[
+              {name: 'the_castle_S06E01', type: 'VIDEO', created: 1178146800000}
+            ]}
+          ]
+        ]
+      ]
+
+    else if paths.length > 1
       console.log "Return /mnt/local/data and /mnt/remote/hoster"
       result = [
         name: '/mnt/local/data'
@@ -123,3 +153,10 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
       callback result
 
     result
+
+
+#
+# Compare 2 arrays
+#
+arrayEqual = (a, b) ->
+  a.length is b.length and a.every (elem, i) -> elem is b[i]
