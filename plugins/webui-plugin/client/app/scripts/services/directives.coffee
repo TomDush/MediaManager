@@ -245,6 +245,29 @@ angular.module('mediamanager')
 
     setHeight()
 
+.factory 'Window', ($window) ->
+  toRange = (val) ->
+    if (val >= 1800)
+      return 'huge'
+    else if val >= 1300
+      return 'xlarge'
+    else if val >= 992
+      return 'large'
+    else if val >= 768
+      return 'medium'
+    else
+      return 'small'
+
+  register: (scope, fct) ->
+    scope.$watch ->
+      $window.innerWidth
+    ,
+    (val) ->
+      fct toRange(val)
+  getRange: () ->
+    toRange $window.innerWidth
+
+
 #
 # File and dir tree
 #

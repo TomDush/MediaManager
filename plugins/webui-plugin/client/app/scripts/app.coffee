@@ -42,7 +42,8 @@ angular
 
   .when '/movies',
     templateUrl: 'views/medias.html'
-    controller: 'HomeCtrl'
+    controller: 'MoviesCtrl'
+
   .when '/movies/:movieId',
     templateUrl: '/views/movie.html'
     controller: 'MovieCtrl'

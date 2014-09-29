@@ -22,12 +22,18 @@
 # }
 
 angular.module 'mediaServices', [ 'ngResource' ]
+.factory 'Genre', ($http) ->
+  query: (callback) ->
+    $http.get('/api/medias/genres').success callback
+
 .factory 'Movie', ($resource) ->
-  $resource '/api/:destination/:ctrl:id', {destination: "movies"}, {
-    last: { method: 'GET', params: { ctrl: 'last', size: '@size' } },
-    random: { method: 'GET', params: { ctrl: 'random', size: '@size' } },
-    list: { method: 'GET', params: { ctrl: 'list', size: '@size' } },
+  $resource '/api/:destination/:order:id', {destination: "movies"}, {
     find: {method: 'GET', params: {destination: "movie"}}
+    query: {method: 'GET', isArray: false}
+
+    last: { method: 'GET', params: { order: 'LAST', size: '@size' } },
+    random: { method: 'GET', params: { order: 'RANDOM', size: '@size' } },
+    list: { method: 'GET', params: { order: 'LIST', size: '@size' } },
   }
 
 .factory 'Player', ($resource) ->

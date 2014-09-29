@@ -16,48 +16,40 @@
 <!--[if lt IE 7]><p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a
         href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p><![endif]-->
 
-<div>
-    <!-- Top Menu (static for all application) -->
-    <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation" ng-controller="TopMenuCtrl">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse"
-                        data-target="#topmenu">
-                    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/"><span class="first">M</span>edima</a>
-            </div>
+<!-- Top Menu (static for all application) -->
+<nav class="navbar navbar-default navbar-inverse" role="navigation" ng-controller="TopMenuCtrl">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+                    class="icon-bar"></span> <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><span class="first">M</span>edima</a>
+        </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="topmenu">
-                <ul class="nav navbar-nav">
-                    <li ng-repeat="e in entries" ng-class="{active: active(e.href)}">
-                        <a ng-href="{{e.href}}" data-toggle="collapse" data-target="#topmenu"><i ng-class="icon(e.icon)"></i>
-                            <span class="hidden-sm"> {{e.name}}</span>
-                        </a>
-                        <ul ng-show="isXs() && e.entries && e.entries.length > 0" class="sub-menu">
-                            <li ng-repeat="sub in e.entries" class="sub-link" ng-class="{active: active(sub.href)}">
-                                <a href="{{sub.href}}" data-toggle="collapse" data-target="#topmenu">{{sub.name}}</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="navbar-form navbar-right" role="search">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Title, actor, ..." ng-model="title">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li ng-repeat="e in entries" ng-class="{active: active(e.href)}"><a ng-href="{{e.href}}"> <i
+                        ng-class="icon(e.icon)"></i><span class="hidden-sm"> {{e.name}}</span></a>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-right" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Title, actor, ..." ng-model="title">
                         <span class="input-group-btn">
                             <button ng-click="onSearch(title)" class="btn btn-primary">Search</button>
                         </span>
-                    </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Page content class="container-fluid" -->
-    <div ng-view=""></div>
-</div>
+<!-- Page content class="container-fluid" -->
+<div ng-view="" id="page-content"></div>
 
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
@@ -94,6 +86,7 @@
 <script src="/bower_components/angular-touch/angular-touch.js"></script>
 <script src="/bower_components/angular-route/angular-route.js"></script>
 <script src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="/bower_components/underscore/underscore.js"></script>
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
 <script src="/scripts/app.js"></script>

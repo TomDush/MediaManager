@@ -8,15 +8,10 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
   margin-bottom: 100px;
-  margin-top: 50px;
 }
 
 a, .link {
   cursor: pointer;
-}
-
-.content {
-  margin-top: 60px;
 }
 
 /**************/
@@ -781,21 +776,193 @@ ul.last-movies {
   }
 }
 
-/* MEDIA SEARCH */
-form.media-search .genre {
-  width: 40%;
-  margin-left: 10px;
+/***************/
+/* MOVIES LIST */
+/***************/
+
+#movies {
+  .search-form {
+    background-color: @gray-lighter;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-radius: 20px;
+  }
+  .form {
+    margin-top: 20px;
+
+    .buttons {
+      .clearfix();
+      margin-top: 20px;
+    }
+  }
+
+  .genre-checkbox {
+    margin-top: 6px;
+
+    .checkbox {
+      margin: 0px;
+    }
+  }
+
+  .seen-radio {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .check-control {
+    text-align: right;
+    cursor: pointer;
+    font-size: 1.1em;
+  }
+  .display-type {
+    .pull-right();
+    margin-top: 20px;
+    margin-left: 10px;
+    .btn {
+      font-size: 15px;
+    }
+  }
+
+  /* ICON DISPLAY */
+  .movie-icon {
+    @media (max-width: @screen-xs-max) {
+      .movie-icon-mixin(2);
+    }
+    @media (min-width: @screen-sm-min) and (max-width: @screen-sm-max) {
+      .movie-icon-mixin(3);
+    }
+    @media (min-width: @screen-md-min) and (max-width: 1299px) {
+      .movie-icon-mixin(4);
+    }
+    @media (min-width: 1300px) and (max-width: 1799px) {
+      .movie-icon-mixin(5);
+    }
+    @media (min-width: 1800px) {
+      .movie-icon-mixin(7);
+    }
+  }
+
+  .movie-icon-mixin (@iconSize) {
+    overflow: visible;
+    position: relative;
+    float: left;
+
+    @col-width: ((100% - 2 * @iconSize ) / @iconSize );
+    width: @col-width;
+
+    margin: 5px 1% 10px 1%;
+
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+
+    // Trick to get proportional height
+    padding-bottom: @col-width * 1.5;
+    height: 0;
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      position: absolute;
+      left: 0;
+    }
+
+    h4 {
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    .details {
+      visibility: hidden;
+      z-index: 999;
+      position: absolute;
+      left: 100%;
+      top: -0.5%;
+      height: 101%;
+      overflow: hidden;
+
+      // Animation
+      width: 0px;
+      transition: width 0.5s, visibility 0.5s;
+
+      border: 1px solid @gray-darker;
+
+      .border-right-radius(4px);
+
+      color: @gray-lighter;
+      background-color: @gray-dark;
+
+      .tagline {
+        font-size: 0.9em;
+        text-align: center;
+        padding: 5px;
+        font-style: italic;
+      }
+    }
+
+    &.active {
+      border-top: 1px solid @gray-darker;
+      border-bottom: 1px solid @gray-darker;
+      border-left: 1px solid @gray-darker;
+      border-right: none;
+
+      background-color: @gray-dark;
+
+      .details {
+        // Real size with margin (left + right)
+        width: 1 + (100% * @iconSize / (1 - 0.02 * @iconSize)) / @iconSize;
+        visibility: visible;
+      }
+
+      .border-right-radius(0);
+    }
+
+    // Inverse for last icon in row...
+    &.last-in-row {
+      .border-right-radius(4px);
+      .border-left-radius(0px);
+
+      .details {
+        left: auto;
+        right: 100%;
+        .border-right-radius(0px);
+        .border-left-radius(4px);
+      }
+    }
+
+    .buttons {
+      width: 100%;
+      position: absolute;
+      left: 0;
+      bottom: 10%;
+    }
+    .btn-default, .btn-group {
+      width: 80%;
+      margin: 10px 0px 0px 10%;
+    }
+    .btn-group .btn {
+      width: 100%;
+    }
+
+  }
+
+  /* LIST DISPLAY */
+  tags {
+    text-align: left;
+  }
+  .media-body .tagline {
+    font-style: italic;
+  }
+  .media-heading a {
+    font-weight: bold;
+    color: @gray-dark;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
 }
 
-.check-control {
-  text-align: right;
-}
-
-.check-control i {
-  cursor: pointer;
-}
-
-/* MEDIA LIST */
+// -------- NO IDEA
 //.media-icon {
 //  width: 10%;
 //  cursor: pointer;
