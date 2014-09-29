@@ -1,40 +1,167 @@
-<p>Movie pages...</p>
-<h2 ng-show="movies && movies.elements.length > 0">Movies</h2>
-
-<!-- TODO Sort... -->
-
-<div ng-repeat="movie in movies.elements" class="media">
-    <a ui-sref="medias.list({movieId : movie.id})" class="media-icon pull-left">
-        <poster url="{{movie.poster}}" size="MINI" />
-    </a>
-
-    <div class="media-body">
-        <span class="pull-right" ng-show="movie.voteAverage && movie.voteAverage > 0">{{movie.voteAverage |rate}}</span>
-        <h4 class="media-heading" ui-sref="medias.list({movieId : movie.id})">
-            <span class="btn btn-success btn-mini" ng-show="! movie.seen">NEW</span>
-            <mediatitle media="movie" />
-        </h4>
-
-        <ul class="unstyled">
-            <li>
-                <genres genres="movie.genres" />
-            </li>
-        </ul>
+<div id="movies" class="container-fluid">
+    <div class="row">
+        <div class="col-sm-8 col-sm-push-4">
+            <!-- Display type -->
+            <div class="btn-group display-type">
+                <button type="button" class="btn btn-default" ng-click="display = 'icon'"
+                        ng-class="{active: display == 'icon'}">
+                    <i class="glyphicon glyphicon-th"></i>
+                </button>
+                <button type="button" class="btn btn-default" ng-click="display = 'list'"
+                        ng-class="{active: display == 'list'}">
+                    <i class="glyphicon glyphicon-th-list"></i>
+                </button>
+            </div>
+            <!-- Order managing -->
+            <div class="btn-group display-type">
+                <button type="button" class="btn btn-default" ng-click="toogleOrder('ALPHA', 'ALPHA_DESC')"
+                        ng-class="{active: ['ALPHA', 'ALPHA_DESC'].indexOf(filter.order) >= 0}">
+                    <span ng-show="filter.order != 'ALPHA_DESC'">A-Z</span>
+                    <span ng-show="filter.order == 'ALPHA_DESC'">Z-A</span>
+                </button>
+                <button type="button" class="btn btn-default" ng-click="toogleOrder('DATE', 'DATE_DESC', 'ALPHA')"
+                        ng-class="{active: ['DATE', 'DATE_DESC'].indexOf(filter.order) >= 0}">
+                    Date <i class="glyphicon"
+                            ng-class="{'glyphicon-chevron-down': filter.order == 'DATE', 'glyphicon-chevron-up': filter.order == 'DATE_DESC'}"></i>
+                </button>
+                <button type="button" class="btn btn-default" ng-click="toogleOrder('FIRST', 'LAST', 'ALPHA')"
+                        ng-class="{active: ['FIRST', 'LAST'].indexOf(filter.order) >= 0}">
+                    Added <i class="glyphicon"
+                             ng-class="{'glyphicon-chevron-down': filter.order == 'FIRST', 'glyphicon-chevron-up': filter.order == 'LAST'}"></i>
+                </button>
+                <button type="button" class="btn btn-default" ng-click="toogleOrder('RANDOM', 'ALPHA')"
+                        ng-class="{active: filter.order == 'RANDOM'}">
+                    Random
+                </button>
+            </div>
+            <h1>Movies</h1>
+        </div>
     </div>
-</div>
+    <div class="row">
+        <div class="col-sm-4 search-form">
+            <div class="text-center">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default" ng-class="{active: filterIs(all)}"
+                            ng-click="selectFilter(all)">All
+                    </button>
+                    <button type="button" class="btn btn-default" ng-class="{active: filterIs(latest)}"
+                            ng-click="selectFilter(latest)">Latest
+                    </button>
+                    <button type="button" class="btn btn-default" ng-class="{active: filterIs(unidentified)}"
+                            ng-click="selectFilter(unidentified)">
+                        Unidentified
+                    </button>
+                </div>
+            </div>
 
-<!-- Pagination ... -->
-<div ng-show="movies.page > 0">
-    <pagination total-items="movies.size" page="movies.page" items-per-page="movies.pageSize"
-                on-select-page="selectPage(page)" />
-</div>
-<div ng-show="movies.page == 0 && movies.size > 0" style="margin: 20px 0px;">
-    There are <a ui-sref="medias.list({media: ['movies'], genres: null, title:null})">{{movies.size}} other movies</a>...
-</div>
+            <form class="form" ng-submit="applyFilter()">
+                <input type="text" class="form-control" ng-model="filter.search" placeholder="Title, actor, ...">
 
-<h3 ng-show="medias.shows && medias.shows.length > 0">Shows</h3>
+                <div class="form-group seen-radio">
+                    <label class="radio-inline"> <input type="radio" ng-model="filter.seen" value="UNSEEN"> New </label>
+                    <label class="radio-inline"> <input type="radio" ng-model="filter.seen" value="SEEN"> Viewed
+                    </label> <label class="radio-inline"> <input type="radio" ng-model="filter.seen" value="ALL"> Both
+                </label>
+                </div>
+
+                <div class="container-fluid">
+                    <div class="genre-checkbox col-sm-6" ng-repeat="g in genres | orderBy:'toString()'">
+                        <div class="checkbox">
+                            <label> <input type="checkbox" ng-model="selectedGenres[g]" ng-click="refreshFilter()"/>
+                                {{g}} </label>
+                        </div>
+                    </div>
+
+                    <div class="check-control">
+                        <i ng-click="selectAllGenres()" class="glyphicon glyphicon-check" title="Select all"></i> <i
+                            ng-click="clearGenres()" class="glyphicon glyphicon-remove-circle" title="Deselect all"></i>
+                        <i ng-click="inverseGenres()" class="glyphicon glyphicon-adjust" title="Inverse selection"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Select only</label>
+                    <select class="form-control" ng-model="filter.enriched">
+                        <option value="ALL">Both - Enriched and Not enriched</option>
+                        <option value="ENRICHED">Enriched</option>
+                        <option value="NOT_ENRICHED">Not enriched</option>
+                    </select>
+                </div>
+
+                <div class="text-center buttons">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-8">
+            <div>
+                <div ng-show="!movies.content || movies.content.length == 0">
+                    <i class="glyphicon glyphicon-info-sign"></i> No movie to show, check filter or <a
+                        href="/settings/repo">configure repositories</a>.
+                </div>
+
+                <div ng-show="display == 'icon' && movies.content.length > 0" class="container-fluid">
+                    <div class="row">
+                        <div class="media movie-icon link" ng-repeat="movie in movies.content"
+                             ng-class="{'active': selected == movie, 'last-in-row': isLast($index)}">
+                            <div class="details">
+                                <i class="close-cross" ng-click="setSelected(null)"></i>
+                                <h4>{{movie | mediatitle}}</h4>
+                                <tags media="movie"></tags>
+                                <p class="tagline">{{movie.tagline}}</p>
+
+                                <div class="buttons">
+                                    <a class="btn btn-sm btn-default" href="/movies/{{movie.id}}"><i
+                                            class="glyphicon glyphicon-info-sign"></i>
+                                        Detail</a>
+                                    <play-button media="movie" btn-size="sm"></play-button>
+                                </div>
+                            </div>
+                            <poster url="movie.poster" ng-show="movie.poster" ng-click="setSelected(movie)"></poster>
+                            <div class="caption" ng-hide="movie.poster">
+                                <h4>{{movie.title}}</h4>
+
+                                <div class="buttons">
+                                    <button class="btn btn-sm btn-default"><i class="glyphicon glyphicon-barcode"></i>
+                                        Identify
+                                    </button>
+                                    <a class="btn btn-sm btn-default" href="/movies/{{movie.id}}"><i
+                                            class="glyphicon glyphicon-info-sign"></i>
+                                        Detail</a>
+                                    <play-button media="movie" btn-size="sm"></play-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="display == 'list' && movies.content.length > 0">
+                    <div ng-repeat="movie in movies.content" class="media">
+                        <a class="pull-left">
+                            <poster url="movie.poster" size="MINI" class="media-object"/>
+                        </a>
+
+                        <div class="media-body">
+                            <span class="pull-right" ng-show="movie.voteAverage && movie.voteAverage > 0">{{movie.voteAverage |rate}}</span>
+                            <h4 class="media-heading">
+                                <a href="/movies/{{movie.id}}">
+                                    <span class="btn btn-success btn-xs" ng-show="! movie.seen">NEW</span> {{movie |
+                                    mediatitle}}</a></h4>
 
 
-<div ng-show="noMediaFound()">
-    <p>No media found...</p>
+                            <play-button media="movie" btn-size="sm" class="pull-right"></play-button>
+
+                            <tags media="movie"></tags>
+                            <p class="tagline">{{movie.tagline}}</p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div ng-show="display != 'list' && display != 'icon'">
+                    Display is: {{display}}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
