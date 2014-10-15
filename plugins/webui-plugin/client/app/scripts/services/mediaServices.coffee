@@ -53,3 +53,19 @@ angular.module 'mediaServices', [ 'ngResource' ]
   $resource '/api/admin/:type/:id/:action', {}, {
     ctrl: { method: 'GET'}
   }
+
+#
+# Very easy cache without any expiration
+#
+.factory 'Cache', ->
+  cache = {}
+
+  # Put value in cache, return old value
+  put: (key, value) ->
+    old = cache[key]
+    cache[key] = value
+
+    old
+  # Get value, or if 'false' (0,false,null,"",undefined, ...) the optional defaultValue
+  get: (key, defaultValue = null) ->
+    cache[key] || defaultValue

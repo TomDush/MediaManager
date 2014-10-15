@@ -86,7 +86,10 @@ angular.module('mediamanager')
   restrict: 'E'
   scope:
     media: '='
+    vote: '@'
   templateUrl: '/views/directives/tags.html'
+  link: (scope, attr) ->
+    attr.vote = attr.vote || false;
 
 # Video tag: quality
 .filter 'videoTags', ->
@@ -258,12 +261,13 @@ angular.module('mediamanager')
     else
       return 'small'
 
-  register: (scope, fct) ->
-    scope.$watch ->
-      $window.innerWidth
-    ,
-    (val) ->
-      fct toRange(val)
+  register: (scope, fct, init = true) ->
+    $(window).resize ->
+      fct toRange($window.innerWidth)
+
+    # Initialisation call
+    fct toRange($window.innerWidth) if init
+
   getRange: () ->
     toRange $window.innerWidth
 

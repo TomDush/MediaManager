@@ -84,6 +84,10 @@ tags {
     border-radius: 3px;
   }
 
+  .vote {
+    font-style: italic;
+  }
+
 }
 
 /**********/
@@ -946,11 +950,14 @@ ul.last-movies {
   }
 
   /* LIST DISPLAY */
-  tags {
-    text-align: left;
-  }
-  .media-body .tagline {
-    font-style: italic;
+  .media-body {
+    .tagline {
+      font-style: italic;
+    }
+    tags {
+      text-align: left;
+    }
+
   }
   .media-heading a {
     font-weight: bold;
