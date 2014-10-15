@@ -37,8 +37,8 @@ angular.module('mediamanager')
   $scope.isXs = ->
     $scope.xs
 
-#  $scope.onSearch = (title) ->
-#    $state.go "medias.list", {title: title}, {inherit: false}
+  $scope.onSearch = (title) ->
+    $location.url "/movies?search=#{title}"
 
 .controller 'HomeCtrl', ($scope, Movie, Media, Player, $window) ->
   $scope.menu = menu
@@ -82,7 +82,7 @@ angular.module('mediamanager')
       index = -1
 
       i = 0
-      for m in $scope.random.elements
+      for m in $scope.random.content
         if m.id == movieId
           index = i
         i++

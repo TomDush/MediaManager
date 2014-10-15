@@ -45,7 +45,7 @@ angular.module('mediamanager')
 #
 #  MOVIES LIST CONTROLLER
 #
-.controller 'MoviesCtrl', ($scope, $route, $location, Window, Genre, Movie) ->
+.controller 'MoviesCtrl', ($scope, $route, $location, Window, Genre, Movie, Cache) ->
   $scope.display = $location.search()?.display || 'icon'
   $scope.selectedGenres = {}
 
@@ -53,7 +53,8 @@ angular.module('mediamanager')
   $scope.latest = {filter: 'latest', seen: 'UNSEEN', order: 'LAST', enriched: 'ALL'}
   $scope.unidentified = {filter: 'unidentified', seen: 'ALL', order: 'ALPHA', enriched: 'NOT_ENRICHED'}
 
-  $scope.filter = angular.copy $scope.all
+  $scope.filter = angular.copy Cache.get('MoviesCtrl.filter', $scope.all)
+  $scope.filter.search = $location.search()?.search
 
   #
   # Genre loading and control
@@ -99,6 +100,7 @@ angular.module('mediamanager')
   $scope.selectFilter = (filter) ->
     $scope.filter = angular.copy filter
     updateGenre()
+    $scope.applyFilter()
 
   $scope.toogleOrder = (options...) ->
     index = options.indexOf($scope.filter.order)
@@ -112,14 +114,15 @@ angular.module('mediamanager')
   ,
   (val) ->
     # Summarise genres
-    delete $scope.filter.genres
-    genres = getSelectedGenres()
-    $scope.filter.genres = genres if genres.length > 0 && genres.length != $scope.genres.length
+    if $scope.genres # if initialised
+      delete $scope.filter.genres
+      genres = getSelectedGenres()
+      $scope.filter.genres = genres if genres.length > 0 && genres.length != $scope.genres.length
 
+  # Refresh page to get filter result
   $scope.applyFilter = ->
-    # Apply filter
-    $scope.filter.size = $scope.col * 5 || 10 # 5 lines if col is defined
     console.log "Filter: #{JSON.stringify $scope.filter}"
+    Cache.put 'MoviesCtrl.filter', angular.copy $scope.filter
     Movie.query $scope.filter, (movies) ->
       $scope.movies = movies
 
@@ -134,7 +137,6 @@ angular.module('mediamanager')
 
   $scope.$watch 'display', (display) ->
     if display == 'icon'
-      console.log "display = icon ; scope: #{$scope.display}"
       $location.search 'display', null
     else
       $location.search 'display', display
@@ -156,8 +158,14 @@ angular.module('mediamanager')
     medium: 3
     small: 2
   Window.register $scope, (range) ->
-    $scope.col = colRange[range];
-  $scope.col = colRange[Window.getRange()]
+    $scope.col = colRange[range]
+
+    defaultSize = $scope.col * 5 || 10 # 5 lines if col is defined
+
+    $scope.all.size = defaultSize
+    $scope.latest.size = defaultSize
+    $scope.unidentified.size = defaultSize
+    $scope.filter.size = defaultSize
 
   $scope.isLast = (index) ->
     (index + 1) % $scope.col == 0
