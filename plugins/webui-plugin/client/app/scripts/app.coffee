@@ -17,6 +17,7 @@ angular
     'ngSanitize'
     'ngTouch'
     'ui.bootstrap'
+    'ui.bootstrap.collapse'
 #    'ui.bootstrap.carousel'
     'mediaServices'
     'mediamanager.services.settings'
