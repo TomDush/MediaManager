@@ -16,7 +16,7 @@ angular
     'ngRoute'
     'ngSanitize'
     'ngTouch'
-#    'ui.bootstrap'
+    'ui.bootstrap'
 #    'ui.bootstrap.carousel'
     'mediaServices'
     'mediamanager.services.settings'

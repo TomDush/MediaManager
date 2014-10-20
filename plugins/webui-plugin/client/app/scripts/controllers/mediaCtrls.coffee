@@ -49,12 +49,13 @@ angular.module('mediamanager')
   $scope.display = $location.search()?.display || 'icon'
   $scope.selectedGenres = {}
 
-  $scope.all = {filter: 'all', seen: 'ALL', order: 'ALPHA', enriched: 'ALL'}
-  $scope.latest = {filter: 'latest', seen: 'UNSEEN', order: 'LAST', enriched: 'ALL'}
-  $scope.unidentified = {filter: 'unidentified', seen: 'ALL', order: 'ALPHA', enriched: 'NOT_ENRICHED'}
+  $scope.all = {filter: 'all', seen: 'ALL', order: 'ALPHA', enriched: 'ALL', page: 1}
+  $scope.latest = {filter: 'latest', seen: 'UNSEEN', order: 'LAST', enriched: 'ALL', page: 1}
+  $scope.unidentified = {filter: 'unidentified', seen: 'ALL', order: 'ALPHA', enriched: 'NOT_ENRICHED', page: 1}
 
   $scope.filter = angular.copy Cache.get('MoviesCtrl.filter', $scope.all)
-  $scope.filter.search = $location.search()?.search
+  $scope.filter = angular.copy $scope.latest if $location.search()?.filter == 'latest'
+  $scope.filter.search = $location.search()?.search if $location.search()?.search
 
   #
   # Genre loading and control
@@ -98,6 +99,8 @@ angular.module('mediamanager')
     _.isEqual filter, $scope.filter
 
   $scope.selectFilter = (filter) ->
+    console.log "Old: \t#{JSON.stringify $scope.filter} \nNew:\t#{JSON.stringify filter}\nequals? " + _.isEqual filter, $scope.filter
+    console.log "String equals? " + (JSON.stringify($scope.filter) == JSON.stringify(filter))
     $scope.filter = angular.copy filter
     updateGenre()
     $scope.applyFilter()
@@ -125,6 +128,13 @@ angular.module('mediamanager')
     Cache.put 'MoviesCtrl.filter', angular.copy $scope.filter
     Movie.query $scope.filter, (movies) ->
       $scope.movies = movies
+      $scope.filter.page = movies.number + 1
+
+  #
+  # Pagination
+  #
+  $scope.changePage = ->
+    $scope.applyFilter()
 
   #
   # Display managing - Keep display in URL without reloading

@@ -4,7 +4,7 @@
 angular.module('mediamanager.carousel', [])
 .directive 'carouselBs', ->
   restrict: 'E'
-  templateUrl: '/views/directives/carousel.html'
+  templateUrl: '/views/directives/carousel-bs.html'
   transclude: true
   replace: true
   scope:
@@ -35,3 +35,10 @@ angular.module('mediamanager.carousel', [])
     if first
       elem.addClass('active')
 
+# Disable ui.bootstrap carousel because there are in conflict
+angular.module('ui.bootstrap.carousel', ['ui.bootstrap.transition'])
+.controller 'CarouselController', ['$scope', '$timeout', '$transition', '$q', ($scope, $timeout, $transition, $q) ->
+
+]
+.directive 'carousel', ->
+  {}
