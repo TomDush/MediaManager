@@ -4,7 +4,7 @@
 menu = [
   {href: '/', name: 'Home', icon: 'home'}
   {href: '/movies', name: 'Movies', icon: 'film'}
-  {href: '/search', name: 'Advanced search', icon: 'search'}
+#  {href: '/search', name: 'Advanced search', icon: 'search'}
   {href: '/files', name: 'File Manager', icon: 'folder-open'}
   {href: '/controls', name: 'Control', icon: 'cog'}
   {href: '/settings', name: 'Settings', icon: 'wrench', entries: [
