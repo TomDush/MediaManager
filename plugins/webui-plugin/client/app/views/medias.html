@@ -12,33 +12,18 @@
                     <i class="glyphicon glyphicon-th-list"></i>
                 </button>
             </div>
-            <!-- Order managing -->
-            <div class="btn-group display-type">
-                <button type="button" class="btn btn-default" ng-click="toogleOrder('ALPHA', 'ALPHA_DESC')"
-                        ng-class="{active: ['ALPHA', 'ALPHA_DESC'].indexOf(filter.order) >= 0}">
-                    <span ng-show="filter.order != 'ALPHA_DESC'">A-Z</span>
-                    <span ng-show="filter.order == 'ALPHA_DESC'">Z-A</span>
-                </button>
-                <button type="button" class="btn btn-default" ng-click="toogleOrder('DATE', 'DATE_DESC', 'ALPHA')"
-                        ng-class="{active: ['DATE', 'DATE_DESC'].indexOf(filter.order) >= 0}">
-                    Date <i class="glyphicon"
-                            ng-class="{'glyphicon-chevron-down': filter.order == 'DATE', 'glyphicon-chevron-up': filter.order == 'DATE_DESC'}"></i>
-                </button>
-                <button type="button" class="btn btn-default" ng-click="toogleOrder('FIRST', 'LAST', 'ALPHA')"
-                        ng-class="{active: ['FIRST', 'LAST'].indexOf(filter.order) >= 0}">
-                    Added <i class="glyphicon"
-                             ng-class="{'glyphicon-chevron-down': filter.order == 'FIRST', 'glyphicon-chevron-up': filter.order == 'LAST'}"></i>
-                </button>
-                <button type="button" class="btn btn-default" ng-click="toogleOrder('RANDOM', 'ALPHA')"
-                        ng-class="{active: filter.order == 'RANDOM'}">
-                    Random
+            <div class="display-type visible-xs">
+                <button class="btn btn-default" ng-click="filterCollapsed = !filterCollapsed">
+                    Filter <span class="caret"></span>
                 </button>
             </div>
+            <!-- Order managing -->
+            <sort filter="filter" on-change="applyFilter" class="display-type hidden-xs"></sort>
             <h1>Movies</h1>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4 search-form">
+        <div class="col-sm-4 search-form" collapse="filterCollapsed">
             <div class="text-center">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default" ng-class="{active: filterIs(all)}"
@@ -55,7 +40,14 @@
             </div>
 
             <form class="form" ng-submit="applyFilter()">
+                <div class="form-group visible-xs">
+                    <label>Order by:</label>
+                    <sort filter="filter"></sort>
+                </div>
+
+                <div class="form-group">
                 <input type="text" class="form-control" ng-model="filter.search" placeholder="Title, actor, ...">
+                </div>
 
                 <div class="form-group seen-radio">
                     <label class="radio-inline"> <input type="radio" ng-model="filter.seen" value="UNSEEN"> New </label>
@@ -103,7 +95,7 @@
 
                 <div ng-show="movies.totalPages > 1">
                     <pager ng-model="filter.page" total-items="movies.totalElements" items-per-page="movies.size"
-                                ng-change="changePage()" align="false"></pager>
+                           ng-change="applyFilter()" align="false"></pager>
                 </div>
                 <div ng-show="display == 'icon' && movies.content.length > 0" class="container-fluid">
                     <div class="row">
@@ -164,7 +156,7 @@
 
                 <div class="text-center" ng-show="movies.totalPages > 1">
                     <pagination ng-model="filter.page" total-items="movies.totalElements" items-per-page="movies.size"
-                                ng-change="changePage()" max-size="'9'" boundary-links="true"
+                                ng-change="applyFilter()" max-size="paginationSize" boundary-links="true"
                                 direction-links="false"></pagination>
                 </div>
 

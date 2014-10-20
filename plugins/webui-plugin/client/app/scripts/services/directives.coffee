@@ -530,6 +530,23 @@ angular.module('mediamanager')
     else
       input
 
+#
+# Button set to act on order (in movie filter for example)
+#
+.directive 'sort', ($window, Paths) ->
+  restrict: 'E'
+  scope:
+    filter: '='      # Read-Write value
+    onChange: '='   # Fonction called when a value is changed
+  templateUrl: '/views/directives/sort.html'
+  controller: ($scope) ->
+    $scope.toogleOrder = (options...) ->
+      index = options.indexOf($scope.filter.order)
+      $scope.filter.order = options[(index + 1) % options.length]
+
+      # Fire value changed
+      $scope.onChange($scope.filter) if $scope.onChange
+
 ###
 Direct useful tools
 ###

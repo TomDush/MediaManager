@@ -99,17 +99,8 @@ angular.module('mediamanager')
     _.isEqual filter, $scope.filter
 
   $scope.selectFilter = (filter) ->
-    console.log "Old: \t#{JSON.stringify $scope.filter} \nNew:\t#{JSON.stringify filter}\nequals? " + _.isEqual filter, $scope.filter
-    console.log "String equals? " + (JSON.stringify($scope.filter) == JSON.stringify(filter))
     $scope.filter = angular.copy filter
     updateGenre()
-    $scope.applyFilter()
-
-  $scope.toogleOrder = (options...) ->
-    index = options.indexOf($scope.filter.order)
-    $scope.filter.order = options[(index + 1) % options.length]
-
-    # Refresh with new order
     $scope.applyFilter()
 
   $scope.$watch ->
@@ -124,17 +115,15 @@ angular.module('mediamanager')
 
   # Refresh page to get filter result
   $scope.applyFilter = ->
-    console.log "Filter: #{JSON.stringify $scope.filter}"
+    # Close filter if it was the default
+    $scope.filterCollapsed = $scope.defaultFilterCollapsed
+
+    console.log "Apply filter: #{JSON.stringify $scope.filter}"
+
     Cache.put 'MoviesCtrl.filter', angular.copy $scope.filter
     Movie.query $scope.filter, (movies) ->
       $scope.movies = movies
       $scope.filter.page = movies.number + 1
-
-  #
-  # Pagination
-  #
-  $scope.changePage = ->
-    $scope.applyFilter()
 
   #
   # Display managing - Keep display in URL without reloading
@@ -168,6 +157,11 @@ angular.module('mediamanager')
     medium: 3
     small: 2
   Window.register $scope, (range) ->
+    $scope.defaultFilterCollapsed = range == 'small'
+    $scope.filterCollapsed = $scope.defaultFilterCollapsed
+
+    $scope.paginationSize = if range == 'small' then 5 else 9
+
     $scope.col = colRange[range]
 
     defaultSize = $scope.col * 5 || 10 # 5 lines if col is defined

@@ -1,0 +1,21 @@
+<div class="btn-group">
+    <button type="button" class="btn btn-default" ng-click="toogleOrder('ALPHA', 'ALPHA_DESC')"
+            ng-class="{active: ['ALPHA', 'ALPHA_DESC'].indexOf(filter.order) >= 0}">
+        <span ng-show="filter.order != 'ALPHA_DESC'">A-Z</span>
+        <span ng-show="filter.order == 'ALPHA_DESC'">Z-A</span>
+    </button>
+    <button type="button" class="btn btn-default" ng-click="toogleOrder('DATE', 'DATE_DESC', 'ALPHA')"
+            ng-class="{active: ['DATE', 'DATE_DESC'].indexOf(filter.order) >= 0}">
+        Date <i class="glyphicon"
+                ng-class="{'glyphicon-chevron-down': filter.order == 'DATE', 'glyphicon-chevron-up': filter.order == 'DATE_DESC'}"></i>
+    </button>
+    <button type="button" class="btn btn-default" ng-click="toogleOrder('FIRST', 'LAST', 'ALPHA')"
+            ng-class="{active: ['FIRST', 'LAST'].indexOf(filter.order) >= 0}">
+        Added <i class="glyphicon"
+                 ng-class="{'glyphicon-chevron-down': filter.order == 'FIRST', 'glyphicon-chevron-up': filter.order == 'LAST'}"></i>
+    </button>
+    <button type="button" class="btn btn-default" ng-click="toogleOrder('RANDOM', 'ALPHA')"
+            ng-class="{active: filter.order == 'RANDOM'}">
+        Random
+    </button>
+</div>
