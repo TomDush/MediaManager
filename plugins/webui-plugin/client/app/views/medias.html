@@ -100,6 +100,11 @@
                         href="/settings/repo">configure repositories</a>.
                 </div>
 
+
+                <div ng-show="movies.totalPages > 1">
+                    <pager ng-model="filter.page" total-items="movies.totalElements" items-per-page="movies.size"
+                                ng-change="changePage()" align="false"></pager>
+                </div>
                 <div ng-show="display == 'icon' && movies.content.length > 0" class="container-fluid">
                     <div class="row">
                         <div class="media movie-icon link" ng-repeat="movie in movies.content"
@@ -157,6 +162,11 @@
                     </div>
                 </div>
 
+                <div class="text-center" ng-show="movies.totalPages > 1">
+                    <pagination ng-model="filter.page" total-items="movies.totalElements" items-per-page="movies.size"
+                                ng-change="changePage()" max-size="'9'" boundary-links="true"
+                                direction-links="false"></pagination>
+                </div>
 
                 <div ng-show="display != 'list' && display != 'icon'">
                     Display is: {{display}}

@@ -30,7 +30,7 @@
     <div class="randomFocus" ng-class="{focusclosed : !movieFocused || !isFocused}">
         <div class="content">
             <div class="backdrops col-xs-5" ng-show="movieFocused.backdrops[0]">
-                <img src="{{movieFocused.backdrops[0]}}?size=DISPLAY" class="pull-left"/>
+                <img ng-src="{{movieFocused.backdrops[0]}}?size=DISPLAY" class="pull-left"/>
             </div>
             <div class="backdrops col-xs-5" ng-hide="movieFocused.backdrops[0]">
                 <img src="movieFocused.poster?size=DISPLAY" class="pull-left"/>
@@ -116,7 +116,7 @@
                     </div>
                 </li>
             </ul>
-            <p><a href="/movies">{{lastMovies.size}} movie(s) recently added.</a></p>
+            <p><a href="/movies?filter=latest">{{lastMovies.totalElements}} movie(s) recently added.</a></p>
         </div>
     </div>
 </div>
