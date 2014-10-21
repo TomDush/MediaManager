@@ -15,8 +15,14 @@ menu = [
 ]
 
 angular.module('mediamanager')
-.controller 'TopMenuCtrl', ($scope, $location, $window) ->
+
+#
+# TOP MENU controller
+#
+.controller 'TopMenuCtrl', ($scope, $location, Window) ->
   $scope.pageTitle = "Medima - Manage yours medias !"
+
+  # Menu list
   $scope.active = (path) ->
     if path == '/'
       $location.path() == '/'
@@ -28,15 +34,19 @@ angular.module('mediamanager')
   $scope.icon = (icon) ->
     "glyphicon glyphicon-#{icon}"
 
-  $scope.$watch ->
-    $window.innerWidth
-  ,
-  (val) ->
-    $scope.xs = val < 768
-
+  # Screen size watcher
   $scope.isXs = ->
     $scope.xs
+  Window.register $scope, (screen) ->
+    $scope.xs = screen == 'small'
+    $scope.$apply()
+    console.log "Screen is #{screen} - isXs? #{$scope.isXs()}"
 
+  # Collapsing topmenu if XS
+  $scope.setTopmenuCollapsed = (val) ->
+    $scope.topmenuCollapsed = val
+
+  # Redirect to movie search
   $scope.onSearch = (title) ->
     $location.url "/movies?search=#{title}"
 
