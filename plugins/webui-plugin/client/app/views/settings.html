@@ -85,16 +85,31 @@
     </div>
 
     <div class="row" ng-show="tab == 'param'">
-        <div class="col-sm-10">
+        <div class="visible-xs">
+            <h1>Parameters</h1>
+        </div>
+        <div class="parameter-list" full-height>
             <ul class="nav nav-pills nav-stacked">
-                <li ng-repeat="set in fieldSets" ng-click="selectFieldSet(set)">
-                    {{set.name}}<span class="fieldset-id">{{fieldset.configId}}</span>
+                <li ng-repeat="set in fieldSets |orderBy:'configId'" ng-click="selectFieldSet(set)"
+                    ng-class="{active: activeFieldSet == set}">
+                    <a>{{set.name}} <span class="fieldset-id">{{set.configId}}</span></a>
                 </li>
             </ul>
 
         </div>
-        <div class="col-sm-10">
-            <h1>Parameters</h1>
+        <div class="parameter-content">
+            <h1 class="hidden-xs">Parameters</h1>
+
+            <form class="form" ng-submit="updateFiledSet(activeFieldSet)">
+
+                <div class="form-group" ng-repeat="f in activeFieldSet.fields | orderBy:'name'">
+                    <label>{{f.name}}</label> <span class="field-key"> - {{f.key}}</span>
+                    <input type="text" class="form-control" ng-model="f.value" ng-disabled="{{f.staticField}}">
+                    <p class="help-block" ng-show="f.description">{{f.description}}</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update</button>
+            </form>
         </div>
     </div>
 </div>

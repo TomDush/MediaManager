@@ -660,53 +660,11 @@ ul.last-movies {
     border: 1px solid rgb(0, 0, 0);
     box-shadow: rgba(195, 225, 255, 0.4) 0px -5px 70px 10px inset, rgba(0, 0, 0, 0.670588) 0px 1px 5px 0px;
   }
-
-  //  a {
-  //    color: @gray-lighter;
-  //
-  //    background: #000;
-  //    box-shadow: inset 0 -5px 70px 10px rgba(195,225,255,.4),0 1px 5px rgba(0,0,0,.67);
-  //    border: 1px solid #000;
-  //
-  //    display: block;
-  //    width: 5em;
-  //    text-shadow: 0 -1px 2px #000;
-  //    float: none;
-  //    min-height: 5em;
-  //    margin: -1px 7px 1px 5px;
-  //    border-radius: 5px;
-  //    box-shadow: 0 2px 15px 1px rgba(0,0,0,.67);
-  //    text-decoration: none;
-  //    border: 1px solid #222;
-  //    border-top: 1px solid #333;
-  //    border-bottom: 1px solid #000;
-  //  }
-  //
-  //  li, a {
-  //    width: 100%;
-  //    margin: 0px;
-  //  }
-  //  .nav {
-  //    a {
-  //      padding-left: 30px;
-  //    }
-  //
-  //    a:hover, a:active, .active > a:hover {
-  //      background-color: @gray;
-  ////      color: black;
-  //    }
-  //
-  //    .active {
-  //      a {
-  //        background: @gray-dark;
-  //      }
-  //    }
-  //  }
 }
 
 .settings-content {
   @media (min-width: @screen-sm-min) {
-    padding-left: @settings-width + 10px;
+    padding-left: @settings-width + 15px;
   }
 
   .icons {
@@ -771,6 +729,38 @@ ul.last-movies {
 .favorite-path {
   color: @gray;
   font-style: italic;
+}
+
+.parameter-list {
+  background-color: @gray-lighter;
+
+  .fieldset-id {
+    display: block;
+    font-size: 0.8em;
+    font-style: italic;
+  }
+}
+
+.field-key {
+  font-size: 0.8em;
+  font-style: italic;
+}
+
+.parameter-content {
+  margin-top: 20px;
+}
+
+// Specific display for screen > phone
+@media (min-width: @screen-sm-min) {
+  .parameter-list {
+    width: 220px;
+    padding: 50px 5px 0px 5px;
+    position: fixed;
+  }
+
+  .parameter-content {
+    margin-left: 235px;
+  }
 }
 
 /****************/

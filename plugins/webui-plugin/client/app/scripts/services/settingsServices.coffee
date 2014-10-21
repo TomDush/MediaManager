@@ -16,6 +16,12 @@ angular.module 'mediamanager.services.settings', [ 'ngResource' ]
 .factory 'Favorite', ($resource) ->
   $resource '/api/favorite/:name', {name: '@name'}, []
 
+#
+# Rest call to manage parameters
+#
+.factory 'Parameter', ($resource) ->
+  $resource '/api/parameter/:configId', {configId: '@configId'}, []
+
 # Navigate on server files - MOCK
 .factory 'Paths', ->
   #
