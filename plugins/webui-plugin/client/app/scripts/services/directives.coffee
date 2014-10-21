@@ -52,7 +52,7 @@ angular.module('mediamanager')
     timer = null
 
     element.on 'click', (event) ->
-      clicks++;  #count clicks
+      clicks++; #count clicks
       if clicks == 1
         timer = setTimeout ->
           scope.$apply ->
@@ -61,7 +61,7 @@ angular.module('mediamanager')
         , delay
 
       else
-        clearTimeout timer    # prevent single-click action
+        clearTimeout timer # prevent single-click action
         clicks = 0           #after action performed, reset counter
 ]
 
@@ -231,22 +231,30 @@ angular.module('mediamanager')
   template: '<div class="progress" ng-show="status.length">' +
 #    '       <span style="position:absolute">{{status.position | time}} / {{status.length | time}}</span>' +
     '<div class="progress-bar progress-bar-striped progress-bar-info active" role="progressbar" style="width: {{status.position | progress:status.length}}%;"
-                                          aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
+                                              aria-valuenow="{{status.position | progress:status.length}}" aria-valuemin="0" aria-valuemax="100">{{status.position | time}} / {{status.length | time}}</div>' +
     '</div>'
   }
 
 #
 # Make element height same than window height - 50px (top navbar size)
 #
-.directive 'fullHeight', ($window) ->
-  link: (scope, element) ->
+.directive 'fullHeight', ($window, Window) ->
+  restrict: 'A'
+  link: (scope, element, attr) ->
+    attr.fullHeight = parseInt(attr.fullHeight || 0) + 50
+
     setHeight = ->
-      element.css 'height', "#{$window.innerHeight - 50}px"
+      if Window.getRange() == 'small'
+        element.css 'height', 'auto'
+      else
+        element.css 'height', "#{$window.innerHeight - attr.fullHeight}px"
 
     $(window).resize ->
       setHeight()
 
     setHeight()
+
+    Window.register scope, setHeight, false
 
 .factory 'Window', ($window) ->
   toRange = (val) ->
@@ -261,16 +269,23 @@ angular.module('mediamanager')
     else
       return 'small'
 
+  safeApply = (scope, fn = null) ->
+    phase = scope.$root?.$$phase
+    if phase == '$apply' || phase == '$digest'
+      fn() if fn && typeof(fn) == 'function'
+    else
+      scope.$apply fn
+
   register: (scope, fct, init = true) ->
     $(window).resize ->
       fct toRange($window.innerWidth)
+      safeApply scope
 
     # Initialisation call
     fct toRange($window.innerWidth) if init
 
   getRange: () ->
     toRange $window.innerWidth
-
 
 #
 # File and dir tree

@@ -39,8 +39,7 @@ angular.module('mediamanager')
     $scope.xs
   Window.register $scope, (screen) ->
     $scope.xs = screen == 'small'
-    $scope.$apply()
-    console.log "Screen is #{screen} - isXs? #{$scope.isXs()}"
+#    $scope.$apply()
 
   # Collapsing topmenu if XS
   $scope.setTopmenuCollapsed = (val) ->
@@ -50,25 +49,22 @@ angular.module('mediamanager')
   $scope.onSearch = (title) ->
     $location.url "/movies?search=#{title}"
 
-.controller 'HomeCtrl', ($scope, Movie, Media, Player, $window) ->
+.controller 'HomeCtrl', ($scope, Movie, Media, Player, Window, $window) ->
   $scope.menu = menu
   $scope.icon = (icon) ->
     "glyphicon glyphicon-#{icon}"
   $scope.isFocused = false
 
   # Random movies - displayable posters
-  displayable = ->
-    if ($window.innerWidth > 1600)
-      $scope.displayablePoster = 15
-    else if $window.innerWidth > 1300
-      $scope.displayablePoster = 12
-    else
-      $scope.displayablePoster = 9
+  displayable =
+    huge: 15
+    xlarge: 12
+    large: 9
+    medium: 9
+    small: 0 # actually it's disabled in this case.
 
-  $(window).resize ->
-    $scope.$apply displayable
-
-  displayable()
+  Window.register $scope, (screen) ->
+    $scope.displayablePoster = displayable[screen]
 
   # Random movies - refresh
   $scope.refreshRandom = ->
@@ -131,7 +127,7 @@ angular.module('mediamanager')
 #
 # SETTINGS PAGE CONTROLLER
 #
-.controller 'SettingsCtrl', ($scope, $route, $rootScope, $location, $routeParams, RootDirectory, Favorite) ->
+.controller 'SettingsCtrl', ($scope, $route, $rootScope, $location, $routeParams, RootDirectory, Favorite, Parameter) ->
   $scope.tabs = [
     {id: 'repo', name: 'Repositories'}
     {id: 'favorite', name: 'Favorites'}
@@ -276,6 +272,18 @@ angular.module('mediamanager')
   $scope.cancelFavorite = (f) ->
     f.name = f.oldName
     $scope.editedFavorite = null
+
+  ###
+  Parameters Controller
+  ###
+  $scope.fieldSets = Parameter.query (params) ->
+    $scope.activeFieldSet = params[0] if params?.length > 0
+
+  $scope.selectFieldSet = (set) ->
+    $scope.activeFieldSet = set
+
+  $scope.updateFiledSet = (fieldSet) ->
+    fieldSet.$save()
 
 #
 # File Manager Controller
